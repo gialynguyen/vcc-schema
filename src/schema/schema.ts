@@ -1,4 +1,3 @@
-import { Number, String, Mixed } from '.';
 import { SchemaType } from './types';
 
 export class Schema<O = {}> {

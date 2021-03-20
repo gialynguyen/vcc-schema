@@ -1,4 +1,3 @@
-
 export type SchemaType<O = {}> = {
   [field in keyof O]: SchemaTypeParser<O[field]>;
 };
