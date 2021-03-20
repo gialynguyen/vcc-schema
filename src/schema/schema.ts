@@ -7,17 +7,17 @@ export class Schema<O = {}> {
   }
 }
 
-export const schemaParser = <O>(schema: Schema<O>, data: any, options?: { safeMode?: boolean }) => {
+export const schemaParser = <O>(schemaInstance: Schema<O>, data: any, options?: { safeMode?: boolean }) => {
   const parserData = {};
-  const schemas = schema.schema;
-  for (const field of Object.keys(schemas)) {
-    const schemaType = schemas[field];
+  const schema = schemaInstance.schema;
+  for (const field of Object.keys(schema)) {
+    const schemaTypeParser = schema[field];
     const dataFieldValue = data?.[field];
-    parserData[field] = schemaType(dataFieldValue, options);
+    parserData[field] = schemaTypeParser(dataFieldValue, options);
   }
 
   return parserData as {
-    [key in keyof SchemaType<O>]: ReturnType<typeof schemas[key]>
+    [key in keyof SchemaType<O>]: ReturnType<typeof schema[key]>
   };
 }
 
