@@ -6,7 +6,7 @@ export interface ArrayTypeOptions<R> {
 }
 
 export function ArrayType<R>(parser: SchemaTypeParser<R>, options?: ArrayTypeOptions<R>) {
-  return (value: any, extraConfig?: any) => {
+  return (value: any, extraConfig?: any): Array<R> => {
     const mergeConfig = {
       ...extraConfig,
       ...options,
