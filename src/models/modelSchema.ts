@@ -20,4 +20,11 @@ export class Model<O> {
   create(dataSource: any) {
     return schemaParser(this._schema, dataSource, this._config);
   }
+
+  createMap(dataSource: any[]) {
+    let _dataSource = dataSource;
+    if (!_dataSource || !Array.isArray(_dataSource)) _dataSource = [] ;
+
+    return _dataSource.map(this.create);
+  }
 }
