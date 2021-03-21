@@ -17,7 +17,7 @@ const UserEntity = new Model({
   gender: Enum({typeValues: ["male", "female", 1, "male"]})
 })
 
-const userDataSource = { gender: "male" };
+const userDataSource = { gender: 1 };
 const user = UserEntity.create(userDataSource);
 
 console.log('user: ', user)

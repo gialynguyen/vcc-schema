@@ -2,7 +2,6 @@ import { SchemaCreator } from '../types';
 
 export interface EnumTypeOptions<E> {
   typeValues: Array<E>;
-  defaultValue?: E;
 }
 
 // TODO: Re-check Type response
