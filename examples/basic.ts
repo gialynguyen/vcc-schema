@@ -1,4 +1,4 @@
-import { String, Number, Mixed, Model, Array } from '../dist';
+import { String, Number, Mixed, Model, Array, Boolean } from '../dist';
 
 const UserEntity = new Model({
   name: String(),
@@ -12,10 +12,11 @@ const UserEntity = new Model({
         age: Number()
       })
     )
-  })
+  }),
+  married: Boolean(),
 })
 
 const userDataSource = {  };
 const user = UserEntity.create(userDataSource);
 
-console.log('user: ', user.detail)
+console.log('user: ', user)
