@@ -7,3 +7,5 @@
    - [ ] Enum
    - [x] Number
    - [ ] Date
+   - [ ] Schema
+   
