@@ -4,3 +4,4 @@ export { NumberType as Number, toNumber, toNumberSafe } from './schemaTypes/numb
 export { Mixed } from './schemaTypes/mixed';
 export { ArrayType as Array } from './schemaTypes/array';
 export { Boolean, toBoolean, toSafeBoolean } from './schemaTypes/boolean';
+export { Enum, toEnum } from './schemaTypes/enum';
