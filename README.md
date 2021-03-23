@@ -3,7 +3,7 @@
    - [x] Mixed (Object)
    - [x] Array
    - [x] String
-   - [ ] Boolean
-   - [ ] Enum
+   - [x] Boolean
+   - [x] Enum
    - [x] Number
    - [ ] Date

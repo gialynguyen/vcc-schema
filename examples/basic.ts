@@ -1,4 +1,4 @@
-import { String, Number, Mixed, Model, Array, Boolean } from '../dist';
+import { String, Number, Mixed, Model, Array, Boolean, Enum } from '../dist';
 
 const UserEntity = new Model({
   name: String(),
@@ -14,9 +14,10 @@ const UserEntity = new Model({
     )
   }),
   married: Boolean(),
+  gender: Enum({values: ["male", "female", 1, "male", null, false, {a: 1}]})
 })
 
-const userDataSource = {  };
+const userDataSource = { gender: null };
 const user = UserEntity.create(userDataSource);
 
 console.log('user: ', user)
