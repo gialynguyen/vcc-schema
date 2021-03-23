@@ -14,10 +14,10 @@ const UserEntity = new Model({
     )
   }),
   married: Boolean(),
-  gender: Enum({typeValues: ["male", "female", 1, "male"]})
+  gender: Enum({values: ["male", "female", 1, "male", null, false, {a: 1}]})
 })
 
-const userDataSource = { gender: 1 };
+const userDataSource = { gender: null };
 const user = UserEntity.create(userDataSource);
 
 console.log('user: ', user)
