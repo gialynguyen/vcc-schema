@@ -9,7 +9,7 @@ export const Boolean: SchemaCreator<boolean, BooleanTypeOptions> = (options?: Bo
   return (value: any, extraConfig?: any) => toBoolean(value, { ...extraConfig, ...options});
 }
 
-export const toSafeBoolean = (value: any, options?: { defaultValue: boolean }) => {
+export const toSafeBoolean = (value: any, options?: { defaultValue?: boolean }) => {
   if (typeof value !== 'boolean') return options?.defaultValue || false;
 
   return value;

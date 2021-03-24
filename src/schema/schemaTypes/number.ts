@@ -9,7 +9,7 @@ export const NumberType: SchemaCreator<number, NumberTypeOptions> = (options?: N
   return (value: any, extraConfig?: any) => toNumber(value, { ...extraConfig, ...options});
 }
 
-export const toNumberSafe = (value: any, options?: { defaultValue: number }) => {
+export const toNumberSafe = (value: any, options?: { defaultValue?: number }) => {
   const valueAsNumber = Number(value);
   if (isNaN(valueAsNumber)) return options?.defaultValue || 0;
 

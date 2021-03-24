@@ -1,4 +1,4 @@
-export type SchemaType<O = {}> = {
+export type SchemaType<O extends { [key: string]: unknown }> = {
   [field in keyof O]: SchemaTypeParser<O[field]>;
 };
 
