@@ -7,6 +7,9 @@
   "author": "VCTeam",
   "license": "MIT",
   "private": false,
+  "repository": {
+    "url": "https://github.com/VC-Team/hardcore-react-schema"
+  },
   "scripts": {
     "build": "rollup -c"
   },
