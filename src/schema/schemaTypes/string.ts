@@ -9,7 +9,7 @@ export const String: SchemaCreator<string, StringTypeOptions> = (options?: Strin
   return (value: any, extraConfig?: any) => toString(value, { ...extraConfig, ...options });
 }
 
-export const toSafeString = (value: any, options?: { defaultValue: string }): string => {
+export const toSafeString = (value: any, options?: { defaultValue?: string }): string => {
   const valueType = typeof value;
   if (valueType === 'string') return value;
 

@@ -13,7 +13,7 @@ export const toEnum = <E, >(value: any, options?: EnumTypeOptions<E>) => {
   
   if(typeofValue === "undefined" || (value !== null && typeofValue === "object") || typeofValue === "function") return undefined; 
   
-  const unitTypeValues = new Set(options.values);
+  const unitTypeValues = new Set(options?.values);
 
   if(unitTypeValues.has(value)) return value;
 

@@ -18,7 +18,7 @@ const UserEntity = new Model({
   birthday: DateType()
 })
 
-const userDataSource = {birthday: new Date("{}")};
+const userDataSource = {};
 const user = UserEntity.create(userDataSource);
 
 console.log('user: ', user)

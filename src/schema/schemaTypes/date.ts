@@ -1,28 +1,27 @@
 import { SchemaCreator } from '../types';
 
-export interface DateTypeOptions<D = Date> {
+export interface DateTypeOptions {
   safeMode?: boolean;
-  defaultValue?: D;
+  defaultValue?: Date;
 }
 
 function isValid(date: Date) {
   return date.getTime() === date.getTime();
 }
 
-export const DateType = <D = Date,>(options?: DateTypeOptions<D>): ReturnType<SchemaCreator<Date | D, DateTypeOptions<D>>> => {
+
+export const DateType: SchemaCreator<Date | undefined, DateTypeOptions> = (options?: DateTypeOptions) => {
   return (value: any, extraConfig?: any) => toDate(value, { ...extraConfig, ...options});
 }
 
-export const toSafeDate = <D = Date,>(value: any, options?: { defaultValue: D }): Date | D | undefined => {
-  if(isValid(value)) return value;
+export const toSafeDate = (value: Date, options?: { defaultValue?: Date }) => {
+  if(value && isValid(value)) return value;
 
   return options?.defaultValue || undefined;
 }
 
-export const toDate = <D = Date,>(value: any, options?: DateTypeOptions<D>) => {
-  if (options?.safeMode) {
-    return toSafeDate<D>(value, { defaultValue: options?.defaultValue });
-  }
+export const toDate = (value: Date, options?: DateTypeOptions) => {
+  if(!options?.safeMode) return value;
 
-  return new Date(value);
+  return toSafeDate(value, { defaultValue: options?.defaultValue });
 }

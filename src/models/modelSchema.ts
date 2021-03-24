@@ -9,7 +9,7 @@ const defaultConfig: Partial<ModelConfig> = {
   safeMode: true
 }
 
-export class Model<O> {
+export class Model<O extends { [key: string]: unknown }> {
   private _config: ModelConfig;
   private _schema: Schema<O>;
   constructor(schema: SchemaType<O>, config?: ModelConfig) {
