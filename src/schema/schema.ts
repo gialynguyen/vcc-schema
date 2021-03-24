@@ -7,7 +7,7 @@ export class Schema<O extends { [key: string]: unknown }> {
   }
 }
 
-export const schemaParser = <O extends { [key: string]: unknown }>(schemaInstance: Schema<O>, data: any, options?: { safeMode?: boolean }) => {
+export const schemaParser = <O extends { [key: string]: any }>(schemaInstance: Schema<O>, data: any, options?: { safeMode?: boolean }) => {
   const parserData = {} as { [key: string]: unknown };
   const schema = schemaInstance.schema;
   for (const field of Object.keys(schema)) {
