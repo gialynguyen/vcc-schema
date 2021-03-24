@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
-  "author": "Gialynguyen",
+  "author": "VCTeam",
   "license": "MIT",
   "private": false,
   "scripts": {
