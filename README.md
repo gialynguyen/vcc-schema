@@ -6,4 +6,4 @@
    - [x] Boolean
    - [x] Enum
    - [x] Number
-   - [ ] Date
+   - [x] Date

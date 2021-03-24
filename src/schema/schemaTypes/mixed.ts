@@ -6,7 +6,7 @@ export interface MixedTypeOptions {
   defaultValue?: number;
 }
 
-export function Mixed<O>(mixedSchema: SchemaType<O>, options?: MixedTypeOptions) {
+export function Mixed<O extends { [key: string]: unknown }>(mixedSchema: SchemaType<O>, options?: MixedTypeOptions) {
   const schema = new Schema(mixedSchema);
 
   return (value: any, extraConfig?: any) => {
