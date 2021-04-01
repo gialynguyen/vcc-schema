@@ -9,7 +9,6 @@ function isValid(date: Date) {
   return date.getTime() === date.getTime();
 }
 
-
 export const DateType: SchemaCreator<Date | undefined, DateTypeOptions> = (options?: DateTypeOptions) => {
   return (value: any, extraConfig?: any) => toDate(value, { ...extraConfig, ...options});
 }
