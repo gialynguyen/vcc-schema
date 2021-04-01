@@ -1,5 +1,5 @@
 ### Features:
- - [ ] Schema Type
+ - [x] Schema Type
    - [x] Mixed (Object)
    - [x] Array
    - [x] String
@@ -7,3 +7,4 @@
    - [x] Enum
    - [x] Number
    - [x] Date
+   - [x] ModelType
