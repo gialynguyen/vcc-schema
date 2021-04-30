@@ -7,6 +7,9 @@
   "author": "VCTeam",
   "license": "MIT",
   "private": false,
+  "moduleDirectories": [
+    "src"
+  ],
   "repository": {
     "url": "https://github.com/VC-Team/hardcore-react-schema"
   },
@@ -16,8 +19,11 @@
   "devDependencies": {
     "esbuild": "^0.9.3",
     "rollup": "^2.41.5",
-    "rollup-plugin-esbuild": "^3.0.2",
     "rollup-plugin-dts": "^3.0.1",
+    "rollup-plugin-esbuild": "^3.0.2",
     "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "hardcore-react-utils": "^0.0.6"
   }
 }
