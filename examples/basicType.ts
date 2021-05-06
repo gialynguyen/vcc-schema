@@ -10,9 +10,12 @@ import {
 
 const UserModel = mixed({
   age: number().optional(),
-  name: string(),
+  name: string()
+    .min(4, { errorMessage: "Tên phải dài hơn 4 ký tự" })
+    .max(15, { errorMessage: "Tên phải ngắn hơn 15 ký tự" }),
 
-  addressIds: string().array().noempty(),
+  addressIds: string()
+    .array(),
 
   addressDetails: mixed({
     name: string(),
@@ -26,18 +29,15 @@ const UserModel = mixed({
   birthDate: date(),
 });
 
-type UserEntity = ValueType<typeof UserModel>
+type UserEntity = ValueType<typeof UserModel>;
+
 type UserEntityTryParse = DeepPartial<UserEntity>;
 
-const customer = UserModel.parser({
-  age: 10,
+const customer = UserModel.silentParser({
+  age: 23,
   name: "gialynguyen",
   addressIds: [],
-  addressDetails: [
-    {
-      name: 123,
-    },
-  ],
+  addressDetails: [],
   address: {
     name: "Gialynguyen",
     detail: "Detail",
@@ -46,4 +46,4 @@ const customer = UserModel.parser({
   birthDate: "2021-04-30T07:47:24.168Z",
 });
 
-console.log("customer: ", customer);
+console.log("customer: ", customer.error?.errors[0].message);

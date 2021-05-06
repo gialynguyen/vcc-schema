@@ -5,12 +5,8 @@ export type ICallback<R = any, Args extends unknown[] = any[]> = (
 
 export type ICheckerFunction = ICallback<boolean, any[]>;
 
-export type PartialDeep<T> = {
-  [P in keyof T]?: PartialDeep<T[P]>;
-};
-
-export type PartialRestoreArrays<K> = {
-  [P in keyof K]?: K[P];
-};
-
-export type DeepPartial<T, K = any> = PartialDeep<T> & PartialRestoreArrays<K>;
+export type DeepPartial<Type> = Type extends IObject
+  ? { [key in keyof Type]?: DeepPartial<Type[key]> }
+  : Type extends any[]
+  ? DeepPartial<Type[number]>
+  : Type | undefined;

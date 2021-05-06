@@ -2,12 +2,12 @@ import { isBoolean } from "hardcore-react-utils";
 import { IObject } from "../@types";
 import {
   BaseType,
-  ErrorCode,
   ICheckSubject,
-  makeErrorSubject,
   SchemaDefine,
   Types,
-} from "../core";
+} from "./type";
+
+import { ErrorCode, makeErrorSubject } from "../core";
 
 export interface BooleanSchemeTypeDefine extends SchemaDefine {
   type: Types.boolean;

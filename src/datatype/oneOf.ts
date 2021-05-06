@@ -1,13 +1,12 @@
 import {
   BaseType,
-  ErrorCode,
-  ErrorSubject,
   ICheckTypeError,
-  makeErrorSubject,
   SchemaDefine,
   Types,
   ValueType,
-} from "../core";
+} from "./type";
+
+import { ErrorCode, ErrorSubject, makeErrorSubject } from "../core";
 
 export interface OneOfSchemeTypeDefine extends SchemaDefine {
   type: Types.oneOf;
@@ -41,7 +40,7 @@ export class OneOfType<
           checker: (raw: any) => {
             const errorSubject = new ErrorSubject();
             const hasSomeonePassed = types.some((type) => {
-              const { success, error } = type.parserSilent(raw);
+              const { success, error } = type.silentParser(raw);
               if (!success && error) {
                 errorSubject.addErrors(error.errors);
               }

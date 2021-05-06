@@ -1,5 +1,4 @@
-import { isArray, isDate, isNull, isObject } from "hardcore-react-utils";
-import { ICheckSubject } from "./type";
+import { isArray, isDate, isNull } from "hardcore-react-utils";
 
 import {
   BaseError,
@@ -8,26 +7,64 @@ import {
   ErrorSubject,
   makeErrorSubject,
 } from "./error";
-import { Types, BaseType } from "./type";
-import { IObject } from "../@types";
+
+import { ArrayType, MixedType, Types, BaseType } from "../datatype";
 
 const addErrorBase = (
   subject: ErrorSubject,
-  errorBase:
-    | BaseError
-    | ((params: ErrorBuilderPayload<any>) => BaseError)
-    | undefined,
-  fieldPath: string,
-  data: any,
-  receiveType: string
+  errorBase: BaseError | ((params: ErrorBuilderPayload<any>) => BaseError),
+  errorMessage?: string,
+  fieldPath?: string,
+  options?: {
+    data?: any;
+    receiveType?: string;
+    customError?: {
+      [key: string]:
+        | BaseError
+        | ((params: ErrorBuilderPayload<any>) => BaseError);
+    };
+    customErrorMessage?: {
+      [key: string]: string;
+    };
+  }
 ) => {
   if (typeof errorBase === "function") {
+    const errorPayload = {
+      data: options?.data,
+      fieldPath: fieldPath,
+      receiveType: options?.receiveType,
+    };
+    let error: BaseError | undefined;
+    if (typeof errorBase === "function") {
+      error = errorBase(errorPayload);
+    } else {
+      error = errorBase;
+    }
+
+    if (!error) return;
+
+    if (options?.customError && options?.customError[error.code]) {
+      const customError = options?.customError[error.code];
+      if (typeof customError === "function") {
+        error = customError(errorPayload);
+      } else {
+        error = customError;
+      }
+    }
+
+    if (
+      options?.customErrorMessage &&
+      options?.customErrorMessage[error.code]
+    ) {
+      error.message = options?.customErrorMessage[error.code];
+    }
+
+    if (errorMessage) {
+      error.message = errorMessage;
+    }
+
     subject.addError({
-      ...errorBase({
-        data,
-        fieldPath: fieldPath,
-        receiveType,
-      }),
+      ...error,
       fieldPath: fieldPath,
     });
   } else if (errorBase) {
@@ -44,24 +81,18 @@ export interface ParseContext {
   options?: ParseContextOptions;
 }
 
-export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
+export const runtimeParser = (params: BaseType<any, any>) => (
   raw: any,
-  context: ParseContext = {
-    options: { strict: true },
-  }
+  context?: ParseContext
 ) => {
-  const { checkers } = params;
+  const { _checkers: checkers, _customError, _customMessage } = params;
   let returnValue = raw;
   const errorSubject = new ErrorSubject();
 
   for (let index = 0; index < checkers.length; index++) {
-    const {
-      checker,
-      error,
-      childrenPropertyChecker,
-      type,
-      transform = [],
-    } = checkers[index];
+    const { checker, error, errorMessage, type, transform = [] } = checkers[
+      index
+    ];
 
     let receiveType: string = typeof raw;
     if (receiveType === "object") {
@@ -75,16 +106,26 @@ export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
       try {
         const passed = checker(raw);
         if (passed === false) {
-          addErrorBase(errorSubject, error, defaultFieldPath, raw, receiveType);
+          addErrorBase(errorSubject, error, errorMessage, defaultFieldPath, {
+            data: raw,
+            receiveType,
+            customError: _customError,
+            customErrorMessage: _customMessage,
+          });
         }
       } catch (error) {
         (error as ErrorSubject).errors.forEach((errorItem) => {
           addErrorBase(
             errorSubject,
             errorItem,
+            errorMessage,
             defaultFieldPath,
-            raw,
-            receiveType
+            {
+              data: raw,
+              receiveType,
+              customError: _customError,
+              customErrorMessage: _customMessage,
+            }
           );
         });
       }
@@ -99,40 +140,45 @@ export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
       }
     }
 
-    if (
-      type === Types.mixed &&
-      childrenPropertyChecker &&
-      isObject(childrenPropertyChecker)
-    ) {
-      if (context.options?.strict) {
+    if (type === Types.mixed) {
+      const { childrenPropertyTypes, strict } = params as MixedType<any, any>;
+      const strictMode = context?.options?.strict ?? strict ?? true;
+
+      if (strictMode) {
         returnValue = {};
         const rawObjectKeys = Object.keys(raw);
-        const propertyCheckerKeys = Object.keys(childrenPropertyChecker);
+        const propertyCheckerKeys = Object.keys(childrenPropertyTypes);
         const diffKeys = rawObjectKeys.filter(
           (key) => !propertyCheckerKeys.includes(key)
         );
         if (diffKeys.length > 0) {
-          const invalidFieldErrors = diffKeys.map((key) =>
-            makeErrorSubject({
-              code: ErrorCode.invalid_field,
-              message: `${key} is an invalid field`,
-              fieldPath: `${
-                defaultFieldPath ? `${defaultFieldPath}.` : ""
-              }${key}`,
-            })
+          diffKeys.forEach((key) =>
+            addErrorBase(
+              errorSubject,
+              () =>
+                makeErrorSubject({
+                  code: ErrorCode.invalid_field,
+                  message: `${key} is an invalid field`,
+                  fieldPath: `${
+                    defaultFieldPath ? `${defaultFieldPath}.` : ""
+                  }${key}`,
+                }),
+              undefined,
+              defaultFieldPath,
+              {
+                data: raw,
+                receiveType,
+                customError: _customError,
+                customErrorMessage: _customMessage,
+              }
+            )
           );
-
-          errorSubject.addErrors(invalidFieldErrors);
         }
       }
 
-      for (const key in childrenPropertyChecker) {
-        if (
-          Object.prototype.hasOwnProperty.call(childrenPropertyChecker, key)
-        ) {
-          const propertySubjectChecker = (childrenPropertyChecker as IObject<
-            BaseType<unknown, any>
-          >)[key];
+      for (const key in childrenPropertyTypes) {
+        if (Object.prototype.hasOwnProperty.call(childrenPropertyTypes, key)) {
+          const propertySubjectChecker = childrenPropertyTypes[key];
 
           let propertyValue = raw[key];
           const mergedFieldPath = `${
@@ -157,13 +203,9 @@ export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
       }
     }
 
-    if (
-      type === Types.array &&
-      childrenPropertyChecker &&
-      isArray(childrenPropertyChecker)
-    ) {
+    if (type === Types.array) {
       returnValue = raw;
-      const itemTypeObject = childrenPropertyChecker[0];
+      const { itemType: itemTypeObject } = params as ArrayType<any>;
       for (let index = 0; index < raw.length; index++) {
         let rawItem = raw[index];
 
@@ -179,6 +221,7 @@ export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
         } catch (error) {
           errorSubject.addErrors((error as ErrorSubject).errors);
         }
+
         returnValue[index] = rawItem;
       }
 
@@ -191,7 +234,7 @@ export const runtimeParser = (params: { checkers: ICheckSubject[] }) => (
   return returnValue as any;
 };
 
-export const runtimeParserSilent = (
+export const runtimeSilentParser = (
   ...params: Parameters<typeof runtimeParser>
 ) => {
   const parser = (

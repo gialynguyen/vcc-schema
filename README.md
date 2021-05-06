@@ -21,3 +21,16 @@
     2.2 Safe Parser (with default value)
     2.3 Validate
   3. Mapper
+### Type API
+  1. Base
+
+  2. String
+
+  3. Mixed (Object)
+    3.1 modifiers
+    3.2 omit
+    3.4 nonstrict
+    3.5 children
+### Parser
+
+### Mapper (Dto)

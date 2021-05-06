@@ -1,14 +1,9 @@
 import { isFunction } from "hardcore-react-utils";
 import { IObject } from "../@types";
 import { ICallback } from "../@types";
-import {
-  BaseType,
-  ErrorCode,
-  ICheckSubject,
-  makeErrorSubject,
-  SchemaDefine,
-  Types,
-} from "../core";
+import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
+
+import { ErrorCode, makeErrorSubject } from "../core";
 
 export interface VoidSchemeTypeDefine extends SchemaDefine {
   type: Types.void;

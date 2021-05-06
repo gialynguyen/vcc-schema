@@ -1,18 +1,25 @@
-import { isObject } from "hardcore-react-utils";
+import { isObject, omit, pick } from "hardcore-react-utils";
 import { IObject } from "../@types";
 import {
   BaseType,
-  ErrorCode,
   ICheckSubject,
   ICheckTypeError,
-  makeErrorSubject,
   SchemaDefine,
   Types,
   ValueType,
-} from "../core";
+} from "./type";
 
-export interface MixedSchemeTypeDefine extends SchemaDefine {
+import { ErrorCode, makeErrorSubject } from "../core";
+
+export interface MixedSchemeTypeDefine<
+  TypeMap extends IObject<BaseType<any, any>>,
+  Keys extends keyof TypeMap = keyof TypeMap
+> extends SchemaDefine {
   type: Types.mixed;
+  strict?: boolean;
+  childrenPropertyTypes: {
+    [key in Keys]: TypeMap[key];
+  };
 }
 
 export const defaultMixedCheckSubject: ICheckSubject<Types.mixed, IObject> = {
@@ -27,26 +34,83 @@ export const defaultMixedCheckSubject: ICheckSubject<Types.mixed, IObject> = {
   type: Types.mixed,
 };
 
-export class MixedType<TypeMap extends IObject> extends BaseType<
+const defaultMixedError = () =>
+  makeErrorSubject({
+    code: ErrorCode.custom_error,
+  });
+
+export class MixedType<
+  TypeMap extends IObject<BaseType<any, any>>,
+  Keys extends keyof TypeMap
+> extends BaseType<
   { [key in keyof TypeMap]: ValueType<TypeMap[key]> },
-  MixedSchemeTypeDefine
+  MixedSchemeTypeDefine<TypeMap, Keys>
 > {
-  static create = <TypeMap extends IObject<BaseType<unknown, any>>>(
-    types?: TypeMap,
-    errorOptions?: ICheckTypeError<Types.number>
+  childrenPropertyTypes: { [key in Keys]: BaseType<any, any> };
+  strict?: boolean;
+
+  constructor(props: MixedSchemeTypeDefine<TypeMap, Keys>) {
+    super(props);
+    this.strict = props.strict ?? true;
+    this.childrenPropertyTypes = props.childrenPropertyTypes;
+  }
+  static create = <
+    TypeMap extends IObject<BaseType<any, any>>,
+    Keys extends keyof TypeMap
+  >(
+    types: TypeMap,
+    options?: {
+      errorOptions?: ICheckTypeError<Types.mixed>;
+      strict?: boolean;
+    }
   ) => {
-    return new MixedType<TypeMap>({
+    return new MixedType<TypeMap, Keys>({
       type: Types.mixed,
       checkers: [
         defaultMixedCheckSubject,
         {
           type: Types.mixed,
-          childrenPropertyChecker: types,
-          error: errorOptions,
+          error: options?.errorOptions || defaultMixedError,
         },
       ],
+      childrenPropertyTypes: types,
+      strict: options?.strict,
     });
   };
+
+  pick(
+    keys: Keys[] = [],
+    options?: {
+      errorOptions?: ICheckTypeError<Types.mixed>;
+    }
+  ) {
+    const childrenPropertyTypes = this.childrenPropertyTypes;
+    const newChildrenPropertyTypes = pick(childrenPropertyTypes, keys);
+
+    return MixedType.create<Pick<TypeMap, Keys>, keyof Pick<TypeMap, Keys>>(
+      newChildrenPropertyTypes as Pick<TypeMap, Keys>,
+      options
+    );
+  }
+
+  omit(
+    keys: Keys[] = [],
+    options?: {
+      errorOptions?: ICheckTypeError<Types.mixed>;
+    }
+  ) {
+    const childrenPropertyTypes = this.childrenPropertyTypes;
+    const newChildrenPropertyTypes = omit(childrenPropertyTypes, keys);
+
+    return MixedType.create<
+      Pick<TypeMap, Exclude<keyof TypeMap, Keys>>,
+      keyof Pick<TypeMap, Exclude<keyof TypeMap, Keys>>
+    >(newChildrenPropertyTypes as Omit<TypeMap, Keys>, options);
+  }
+
+  get children() {
+    return this.childrenPropertyTypes;
+  }
 }
 
 export const mixed = MixedType.create;

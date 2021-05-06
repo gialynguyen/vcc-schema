@@ -1,6 +1,11 @@
 import { ICallback, ICheckerFunction, IObject } from "../@types";
-import { ParseContext, runtimeParser, runtimeParserSilent } from "./parser";
-import { BaseError, ErrorBuilderPayload, ErrorSubject } from "./error";
+import {
+  ErrorCodeType,
+  ParseContext,
+  runtimeParser,
+  runtimeSilentParser,
+} from "../core";
+import { BaseError, ErrorBuilderPayload, ErrorSubject } from "../core";
 import {
   nullable,
   NullType,
@@ -10,7 +15,7 @@ import {
   UndefinedType,
   array,
   ArrayType,
-} from "../datatype";
+} from ".";
 
 export enum Types {
   string = "string",
@@ -39,14 +44,12 @@ export interface ICheckSubject<
   DataType = unknown
 > {
   checker?: ICheckerFunction;
-  error?: BaseError | ((params: ErrorBuilderPayload<Type>) => BaseError);
+  error: ICheckTypeError<Type>;
+  errorMessage?: string;
   options?: Options;
   type: Types;
   desc?: string;
   fieldPath?: string;
-  childrenPropertyChecker?:
-    | IObject<BaseType<unknown, any>>
-    | BaseType<unknown, any>[];
   transform?: ICallback<DataType, any[]>[];
 }
 
@@ -65,14 +68,27 @@ export abstract class BaseType<
   SDef extends SchemaDefine<Options>,
   Options extends IObject = IObject
 > {
+  _optional: boolean;
+
   _checkers: ICheckSubject[];
+
   _initialSchemaDefine: SDef;
+
   _type: Types;
+
   _options?: Options;
+
+  _customError?: {
+    [errorCode in ErrorCodeType]: ICheckTypeError<SDef["type"]>;
+  };
+
+  _customMessage?: {
+    [errorCode in ErrorCodeType]: string;
+  };
 
   parser: (x: Type | unknown, context?: ParseContext) => Type;
 
-  parserSilent: (
+  silentParser: (
     x: Type | unknown,
     context?: ParseContext
   ) =>
@@ -80,34 +96,79 @@ export abstract class BaseType<
     | { success: boolean; data: any; error?: undefined };
 
   optional: () => OneOfType<[this, UndefinedType]>;
+
   nullable: () => OneOfType<[this, NullType]>;
+
   array: () => ArrayType<Type>;
 
-  constructor(schemaDefine: SDef) {
+  constructor(
+    schemaDefine: SDef,
+    options?: {
+      customError: {
+        [errorCode in ErrorCodeType]: ICheckTypeError<SDef["type"]>;
+      };
+      customMessage?: {
+        [errorCode in ErrorCodeType]: string;
+      };
+    }
+  ) {
     this._checkers = [...schemaDefine.checkers];
 
     this._initialSchemaDefine = schemaDefine;
+
     this._type = schemaDefine.type;
-    this.parser = runtimeParser({
-      checkers: this._checkers,
-    });
+
+    this.parser = runtimeParser(this);
 
     this._options = schemaDefine.options;
 
-    this.parserSilent = runtimeParserSilent({
-      checkers: this._checkers,
-    });
-    this.optional = () => oneOf([this, undefined()]);
-    this.nullable = () => oneOf([this, nullable()]);
+    this.silentParser = runtimeSilentParser(this);
+
+    this._optional = schemaDefine.options?.optional || false;
+
+    this.optional = () => {
+      const newTypeInstance = oneOf([this, undefined()]);
+      newTypeInstance._optional = true;
+      return newTypeInstance;
+    };
+
+    this.nullable = () => {
+      const newTypeInstance = oneOf([this, nullable()]);
+      newTypeInstance._optional = true;
+      return newTypeInstance;
+    };
+
+    this._customError = options?.customError;
+    this._customMessage = options?.customMessage;
+
     this.array = () => array(this);
   }
 
   _extends = (payload: { checkers: ICheckSubject[] }): this => {
-    return new (this as any).constructor({
-      ...this._initialSchemaDefine,
-      checkers: [...this._checkers, ...payload.checkers],
-    });
+    return new (this as any).constructor(
+      {
+        ...this._initialSchemaDefine,
+        checkers: [...this._checkers, ...payload.checkers],
+      },
+      { customError: this._customError, customMessage: this._customMessage }
+    );
   };
+
+  error(
+    error: {
+      [errorCode in ErrorCodeType | string]: ICheckTypeError<SDef["type"]>;
+    }
+  ) {
+    if (!this._customError) this._customError = {} as any;
+    Object.assign(this._customError, error);
+    return this;
+  }
+
+  errorMessage(error: { [errorCode in ErrorCodeType | string]: string }) {
+    if (!this._customMessage) this._customMessage = {} as any;
+    Object.assign(this._customMessage, error);
+    return this;
+  }
 
   joinCheckerDesc = () =>
     this._checkers.map(({ type, desc }) => desc || type).join(", ");

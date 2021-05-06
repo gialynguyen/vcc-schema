@@ -1,5 +1,5 @@
 import { enumFromArray } from "../utils/enumFromArray";
-import { Types } from "./type";
+import { Types } from "../datatype/type";
 
 export const ErrorCode = enumFromArray([
   "invalid_type",
@@ -16,27 +16,27 @@ export const ErrorCode = enumFromArray([
 export type ErrorCodeType = keyof typeof ErrorCode;
 
 export interface BaseError {
-  code: ErrorCodeType;
+  code: ErrorCodeType | string;
   message: string;
   fieldPath?: string;
 }
 
 export type BaseErrorPayload = {
-  readonly code: ErrorCodeType;
+  readonly code: ErrorCodeType | string;
   readonly fieldPath?: string;
 };
 
 export type BaseErrorPayloadByType = BaseErrorPayload & {
-  readonly code: keyof typeof ErrorCode;
+  readonly code: ErrorCodeType | string;
   readonly rightType?: Types;
   readonly receiveType?: string;
   readonly message?: string;
 };
 
-export type ErrorBuilderPayload<Type extends Types> = {
-  data: Type;
-  fieldPath: string;
-  receiveType: string;
+export type ErrorBuilderPayload<Type extends Types | string> = {
+  data?: Type;
+  fieldPath?: string;
+  receiveType?: string;
 };
 
 export const makeErrorSubject = (payload: BaseErrorPayloadByType) => {
@@ -75,7 +75,6 @@ export class ErrorSubject extends Error {
   };
 
   get message() {
-    // return JSON.stringify(this.errors, null, 2);
     const errorMessage: string[] = [
       `${this.errors.length} issue(s) has found`,
       "",

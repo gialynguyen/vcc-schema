@@ -10,3 +10,4 @@ export * from "./any";
 export * from "./unknown";
 export * from "./date";
 export * from "./array";
+export * from "./type";

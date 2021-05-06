@@ -2,14 +2,13 @@ import { isNumber } from "hardcore-react-utils";
 import { IObject } from "../@types";
 import {
   BaseType,
-  ErrorBuilderPayload,
-  ErrorCode,
   ICheckSubject,
   ICheckTypeError,
-  makeErrorSubject,
   SchemaDefine,
   Types,
-} from "../core";
+} from "./type";
+
+import { ErrorCode, makeErrorSubject, ErrorBuilderPayload } from "../core";
 
 export interface NumberSchemeTypeDefine extends SchemaDefine {
   type: Types.number;
@@ -39,10 +38,16 @@ export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
     });
   };
 
-  max = (maxValue: number, errorOptions?: ICheckTypeError<Types.number>) => {
+  max = (
+    maxValue: number,
+    options?: {
+      error?: ICheckTypeError<Types.number>;
+      errorMessage?: string;
+    }
+  ) => {
     let errorBuilder: ICheckTypeError<Types.number>;
-    if (errorOptions) {
-      errorBuilder = errorOptions;
+    if (options?.error) {
+      errorBuilder = options?.error;
     } else {
       errorBuilder = ({ data, fieldPath }: ErrorBuilderPayload<Types.number>) =>
         makeErrorSubject({
@@ -57,6 +62,7 @@ export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
         {
           checker: (data: number) => data <= maxValue,
           error: errorBuilder,
+          errorMessage: options?.errorMessage,
           type: Types.number,
           desc: `less than ${maxValue}`,
         },
@@ -64,10 +70,16 @@ export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
     });
   };
 
-  min = (minValue: number, errorOptions?: ICheckTypeError<Types.number>) => {
+  min = (
+    minValue: number,
+    options?: {
+      error?: ICheckTypeError<Types.number>;
+      errorMessage?: string;
+    }
+  ) => {
     let errorBuilder: ICheckTypeError<Types.number>;
-    if (errorOptions) {
-      errorBuilder = errorOptions;
+    if (options?.error) {
+      errorBuilder = options?.error;
     } else {
       errorBuilder = ({ data, fieldPath }) =>
         makeErrorSubject({
@@ -82,6 +94,7 @@ export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
         {
           checker: (data) => data >= minValue,
           error: errorBuilder,
+          errorMessage: options?.errorMessage,
           type: Types.number,
           desc: `greater than ${minValue}`,
         },
