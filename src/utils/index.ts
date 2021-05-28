@@ -1,1 +1,2 @@
-export * from './enumFromArray'
+export * from "./enumFromArray";
+export * from "./path";

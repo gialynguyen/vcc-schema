@@ -1,29 +1,32 @@
-import { IObject } from "../@types";
-import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
+import { CoreType, Types } from "./base";
 
-import { ErrorCode, makeErrorSubject } from "../core";
+import {
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
+import { isNull } from "hardcore-react-utils";
+import { typeOf } from "../utils/type";
 
-export interface AnySchemeTypeDefine extends SchemaDefine {
-  type: Types.any;
-}
-
-export const defaultAnyCheckSubject: ICheckSubject<Types.any, IObject, any> = {
-  checker: () => true,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.any,
-    }),
-  type: Types.any,
-};
-
-export class AnyType extends BaseType<any, AnySchemeTypeDefine> {
-  static create = () => {
+export class AnyType extends CoreType<any> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new AnyType({
       type: Types.any,
-      checkers: [defaultAnyCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = !isNull(value) && typeof value !== "undefined";
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.any,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }

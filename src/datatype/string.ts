@@ -1,70 +1,55 @@
 import { isString } from "hardcore-react-utils";
-import { IObject } from "../@types";
+import { Types, CoreType } from "./base";
+
 import {
-  BaseType,
-  ICheckSubject,
-  ICheckTypeError,
-  SchemaDefine,
-  Types,
-} from "./type";
+  ErrorConstructorMessage,
+  IncorrectSizeError,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+  SizeErrorPayload,
+  TooBigError,
+  TooSmallError,
+} from "../error";
 
-import { ErrorCode, makeErrorSubject } from "../core";
+import { typeOf } from "../utils/type";
 
-export interface StringSchemeTypeDefine extends SchemaDefine {
-  type: Types.string;
-}
-
-export const defaultStringCheckSubject: ICheckSubject<
-  Types.string,
-  IObject,
-  string
-> = {
-  checker: isString,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.string,
-    }),
-  type: Types.string,
-};
-
-export class StringType extends BaseType<string, StringSchemeTypeDefine> {
-  static create = () => {
+export class StringType extends CoreType<string> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new StringType({
       type: Types.string,
-      checkers: [defaultStringCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isString(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.string,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 
   max = (
     maxLength: number,
-    options?: {
-      error?: ICheckTypeError<Types.string>;
-      errorMessage?: string;
-    }
+    error?: ErrorConstructorMessage<SizeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.string>;
-    if (options?.error) {
-      errorBuilder = options.error;
-    } else {
-      errorBuilder = ({ data, fieldPath }) =>
-        makeErrorSubject({
-          code: ErrorCode.max_size,
-          message: `Length must be less than ${maxLength}, but received ${data?.length}`,
-          fieldPath,
-        });
-    }
-
     return this._extends({
       checkers: [
-        {
-          checker: (data: string) => data.length <= maxLength,
-          error: errorBuilder,
-          type: Types.string,
-          desc: `less than ${maxLength}`,
-          errorMessage: options?.errorMessage,
+        (data: string, { ctx: { paths } }) => {
+          if (data.length <= maxLength) return true;
+
+          return new TooBigError({
+            expectedSize: maxLength,
+            receivedSize: data.length,
+            message: error,
+            paths,
+          });
         },
       ],
     });
@@ -72,31 +57,19 @@ export class StringType extends BaseType<string, StringSchemeTypeDefine> {
 
   min = (
     minLength: number,
-    options?: {
-      error?: ICheckTypeError<Types.string>;
-      errorMessage?: string;
-    }
+    error?: ErrorConstructorMessage<SizeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.string>;
-    if (options?.error) {
-      errorBuilder = options?.error;
-    } else {
-      errorBuilder = ({ data, fieldPath }) =>
-        makeErrorSubject({
-          code: ErrorCode.too_small,
-          message: `Length must be greater than ${minLength}, but received ${data?.length}`,
-          fieldPath,
-        });
-    }
-
     return this._extends({
       checkers: [
-        {
-          checker: (data) => data.length >= minLength,
-          error: errorBuilder,
-          type: Types.string,
-          desc: `greater than ${minLength}`,
-          errorMessage: options?.errorMessage,
+        (data: string, { ctx: { paths } }) => {
+          if (data.length >= minLength) return true;
+
+          return new TooSmallError({
+            expectedSize: minLength,
+            receivedSize: data.length,
+            message: error,
+            paths,
+          });
         },
       ],
     });
@@ -104,26 +77,22 @@ export class StringType extends BaseType<string, StringSchemeTypeDefine> {
 
   length = (
     length: number,
-    options?: {
-      error?: ICheckTypeError<Types.string>;
-      errorMessage?: string;
-    }
+    error?: ErrorConstructorMessage<SizeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.string>;
-    if (options?.error) {
-      errorBuilder = options?.error;
-    } else {
-      errorBuilder = ({ data, fieldPath }) =>
-        makeErrorSubject({
-          code: ErrorCode.incorrect_size,
-          message: `Length must be equal to ${length}, but received ${data?.length}`,
-          fieldPath,
-        });
-    }
+    return this._extends({
+      checkers: [
+        (data: string, { ctx: { paths } }) => {
+          if (data.length === length) return true;
 
-    const _options = Object.assign({ errorOptions: errorBuilder }, options);
-
-    return this.max(length, _options).min(length, _options);
+          return new IncorrectSizeError({
+            expectedSize: length,
+            receivedSize: data.length,
+            message: error,
+            paths,
+          });
+        },
+      ],
+    });
   };
 }
 

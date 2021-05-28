@@ -1,39 +1,31 @@
 import { isBoolean } from "hardcore-react-utils";
-import { IObject } from "../@types";
 import {
-  BaseType,
-  ICheckSubject,
-  SchemaDefine,
-  Types,
-} from "./type";
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
+import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
-import { ErrorCode, makeErrorSubject } from "../core";
-
-export interface BooleanSchemeTypeDefine extends SchemaDefine {
-  type: Types.boolean;
-}
-
-export const defaultBooleanCheckSubject: ICheckSubject<
-  Types.boolean,
-  IObject,
-  boolean
-> = {
-  checker: isBoolean,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.boolean,
-    }),
-  type: Types.boolean,
-};
-
-export class BooleanType extends BaseType<boolean, BooleanSchemeTypeDefine> {
-  static create = () => {
+export class BooleanType extends CoreType<boolean> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new BooleanType({
       type: Types.boolean,
-      checkers: [defaultBooleanCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isBoolean(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.boolean,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }

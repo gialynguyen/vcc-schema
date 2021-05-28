@@ -1,66 +1,65 @@
 import {
-  BaseType,
-  ICheckTypeError,
-  SchemaDefine,
-  Types,
-  ValueType,
-} from "./type";
-
-import { ErrorCode, ErrorSubject, makeErrorSubject } from "../core";
-
-export interface OneOfSchemeTypeDefine extends SchemaDefine {
-  type: Types.oneOf;
-}
+  ErrorConstructorMessage,
+  ErrorSet,
+  ErrorSubject,
+  InvalidTypeError,
+  InvalidUnionTypeError,
+  InvalidUnionTypeErrorPayload,
+} from "../error";
+import { typeOf } from "../utils/type";
+import { CoreType, Types, ValueType } from "./base";
 
 export class OneOfType<
-  TypeSet extends Array<BaseType<unknown, any>>
-> extends BaseType<ValueType<TypeSet[number]>, OneOfSchemeTypeDefine> {
-  static create = <TypeSet extends Array<BaseType<unknown, any>>>(
+  TypeSet extends Array<CoreType<unknown>>
+> extends CoreType<ValueType<TypeSet[number]>> {
+  static create = <TypeSet extends Array<CoreType<unknown>>>(
     types: TypeSet,
-    errorOptions?: ICheckTypeError<Types.number>
+    error?: ErrorConstructorMessage<InvalidUnionTypeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.number>;
-    if (errorOptions) {
-      errorBuilder = errorOptions;
-    } else {
-      errorBuilder = ({ receiveType, fieldPath }) =>
-        makeErrorSubject({
-          code: ErrorCode.invalid_type,
-          fieldPath,
-          message: `Expected ${types
-            .map(({ joinCheckerDesc }) => joinCheckerDesc())
-            .join(" or ")}, received ${receiveType}`,
-        });
-    }
     return new OneOfType<TypeSet>({
       type: Types.oneOf,
-      checkers: [
-        {
-          type: Types.oneOf,
-          checker: (raw: any) => {
-            const errorSubject = new ErrorSubject();
-            const hasSomeonePassed = types.some((type) => {
-              const { success, error } = type.silentParser(raw);
-              if (!success && error) {
-                errorSubject.addErrors(error.errors);
+      defaultCheckers: [
+        (value: any, { ctx }) => {
+          const errorSubject = new ErrorSet();
+          const expectedType = types.map(({ type }) => type);
+          const receivedType = typeOf(value);
+
+          const hasSomeonePassed = types.some((type) => {
+            try {
+              type.parser(value, { ...ctx });
+              return true;
+            } catch (error) {
+              errorSubject.addErrors((error as ErrorSet).errors);
+              return false;
+            }
+          });
+
+          if (hasSomeonePassed) return true;
+          const notInvaidTypeError: ErrorSubject[] = [];
+          errorSubject.errors.forEach((_error, index) => {
+            if (!InvalidTypeError.is(_error)) {
+              if (error) {
+                errorSubject.errors[index] = new InvalidUnionTypeError({
+                  expectedType,
+                  receivedType,
+                  message: error,
+                  paths: ctx.paths,
+                });
               }
 
-              return success;
-            });
+              notInvaidTypeError.push(errorSubject.errors[index]);
+            }
+          });
 
-            const withoutInvalidType = errorSubject.errors.filter(
-              ({ code }) => code !== ErrorCode.invalid_type
-            );
+          if (notInvaidTypeError.length > 0)
+            return new ErrorSet(notInvaidTypeError);
 
-            if (
-              errorSubject.errors.length - withoutInvalidType.length !==
-              types.length
-            )
-              throw new ErrorSubject(withoutInvalidType);
-
-            return hasSomeonePassed;
-          },
-          error: errorBuilder,
+          return new InvalidUnionTypeError({
+            expectedType,
+            receivedType,
+            message: error,
+            paths: ctx.paths,
+          });
         },
       ],
     });

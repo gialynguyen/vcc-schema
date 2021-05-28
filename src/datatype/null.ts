@@ -1,34 +1,32 @@
 import { isNull } from "hardcore-react-utils";
-import { IObject } from "../@types";
-import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
+import { CoreType, Types } from "./base";
 
-import { ErrorCode, makeErrorSubject } from "../core";
+import { typeOf } from "../utils/type";
+import {
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
 
-export interface NullSchemeTypeDefine extends SchemaDefine {
-  type: Types.null;
-}
-
-export const defaultNullCheckSubject: ICheckSubject<
-  Types.null,
-  IObject,
-  null
-> = {
-  checker: isNull,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.null,
-    }),
-  type: Types.null,
-};
-
-export class NullType extends BaseType<null, NullSchemeTypeDefine> {
-  static create = () => {
+export class NullType extends CoreType<null> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new NullType({
       type: Types.null,
-      checkers: [defaultNullCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isNull(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.null,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }

@@ -1,39 +1,37 @@
 import { isFunction } from "hardcore-react-utils";
-import { IObject } from "../@types";
 import { ICallback } from "../@types";
-import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
+import { CoreType, Types } from "./base";
 
-import { ErrorCode, makeErrorSubject } from "../core";
-
-export interface VoidSchemeTypeDefine extends SchemaDefine {
-  type: Types.void;
-}
-
-export const defaultVoidCheckSubject: ICheckSubject<
-  Types.void,
-  IObject,
-  void
-> = {
-  checker: isFunction,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.void,
-    }),
-  type: Types.void,
-};
+import {
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
+import { typeOf } from "../utils/type";
 
 export class VoidType<
   RType = void,
   AType extends any[] = [],
   BType extends ICallback<RType, AType> = ICallback<RType, AType>
-> extends BaseType<BType, VoidSchemeTypeDefine> {
-  static create = <RType = void, AType extends any[] = []>() => {
+> extends CoreType<BType> {
+  static create = <RType = void, AType extends any[] = []>(
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new VoidType<RType, AType, ICallback<RType, AType>>({
       type: Types.void,
-      checkers: [defaultVoidCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isFunction(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.void,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }

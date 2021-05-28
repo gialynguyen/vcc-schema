@@ -1,70 +1,55 @@
 import { isNumber } from "hardcore-react-utils";
-import { IObject } from "../@types";
+import { CoreType, Types } from "./base";
+
 import {
-  BaseType,
-  ICheckSubject,
-  ICheckTypeError,
-  SchemaDefine,
-  Types,
-} from "./type";
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+  NoEqualError,
+  NoEqualErrorPayload,
+  SizeErrorPayload,
+  TooBigError,
+  TooSmallError,
+} from "../error";
+import { typeOf } from "../utils/type";
 
-import { ErrorCode, makeErrorSubject, ErrorBuilderPayload } from "../core";
-
-export interface NumberSchemeTypeDefine extends SchemaDefine {
-  type: Types.number;
-}
-
-export const defaultNumberCheckSubject: ICheckSubject<
-  Types.number,
-  IObject,
-  number
-> = {
-  checker: isNumber,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.number,
-    }),
-  type: Types.number,
-};
-
-export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
-  static create = () => {
+export class NumberType extends CoreType<number> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new NumberType({
       type: Types.number,
-      checkers: [defaultNumberCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isNumber(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.number,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 
   max = (
     maxValue: number,
-    options?: {
-      error?: ICheckTypeError<Types.number>;
-      errorMessage?: string;
-    }
+    error?: ErrorConstructorMessage<SizeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.number>;
-    if (options?.error) {
-      errorBuilder = options?.error;
-    } else {
-      errorBuilder = ({ data, fieldPath }: ErrorBuilderPayload<Types.number>) =>
-        makeErrorSubject({
-          code: ErrorCode.too_big,
-          message: `Value must be less than ${maxValue}, but received ${data}`,
-          fieldPath,
-        });
-    }
-
     return this._extends({
       checkers: [
-        {
-          checker: (data: number) => data <= maxValue,
-          error: errorBuilder,
-          errorMessage: options?.errorMessage,
-          type: Types.number,
-          desc: `less than ${maxValue}`,
+        (data: number, { ctx: { paths } }) => {
+          if (data <= maxValue) return true;
+
+          return new TooBigError({
+            expectedSize: maxValue,
+            receivedSize: data,
+            message: error,
+            paths,
+          });
         },
       ],
     });
@@ -72,31 +57,39 @@ export class NumberType extends BaseType<number, NumberSchemeTypeDefine> {
 
   min = (
     minValue: number,
-    options?: {
-      error?: ICheckTypeError<Types.number>;
-      errorMessage?: string;
-    }
+    error?: ErrorConstructorMessage<SizeErrorPayload>
   ) => {
-    let errorBuilder: ICheckTypeError<Types.number>;
-    if (options?.error) {
-      errorBuilder = options?.error;
-    } else {
-      errorBuilder = ({ data, fieldPath }) =>
-        makeErrorSubject({
-          code: ErrorCode.too_small,
-          message: `Value must be greater than ${minValue}, but received ${data}`,
-          fieldPath,
-        });
-    }
-
     return this._extends({
       checkers: [
-        {
-          checker: (data) => data >= minValue,
-          error: errorBuilder,
-          errorMessage: options?.errorMessage,
-          type: Types.number,
-          desc: `greater than ${minValue}`,
+        (data: number, { ctx: { paths } }) => {
+          if (data >= minValue) return true;
+
+          return new TooSmallError({
+            expectedSize: minValue,
+            receivedSize: data,
+            message: error,
+            paths,
+          });
+        },
+      ],
+    });
+  };
+
+  equal = (
+    value: number,
+    error?: ErrorConstructorMessage<NoEqualErrorPayload<number>>
+  ) => {
+    return this._extends({
+      checkers: [
+        (data: number, { ctx: { paths } }) => {
+          if (data === value) return true;
+
+          return new NoEqualError<number>({
+            expectedValue: value,
+            receivedValue: data,
+            message: error,
+            paths,
+          });
         },
       ],
     });

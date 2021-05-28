@@ -1,35 +1,30 @@
-import { IObject } from "../@types";
-import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
-import { ErrorCode, makeErrorSubject } from "../core";
+import { CoreType, Types } from "./base";
+import {
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
+import { typeOf } from "../utils/type";
 
-export interface UndefinedSchemeTypeDefine extends SchemaDefine {
-  type: Types.undefined;
-}
-
-export const defaultUndefinedCheckSubject: ICheckSubject<
-  Types.undefined,
-  IObject,
-  undefined
-> = {
-  checker: (value: any) => typeof value === "undefined",
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.undefined,
-    }),
-  type: Types.undefined,
-};
-
-export class UndefinedType extends BaseType<
-  undefined,
-  UndefinedSchemeTypeDefine
-> {
-  static create = () => {
+export class UndefinedType extends CoreType<undefined> {
+  static create = (
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) => {
     return new UndefinedType({
       type: Types.undefined,
-      checkers: [defaultUndefinedCheckSubject],
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = typeof value === "undefined";
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.undefined,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }

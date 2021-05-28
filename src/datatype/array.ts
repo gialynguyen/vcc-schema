@@ -1,69 +1,74 @@
 import { isArray } from "hardcore-react-utils";
-import { IObject } from "../@types";
-import { BaseType, ICheckTypeError, SchemaDefine, Types } from "./type";
+import { CoreType, Types } from "./base";
 
-import { ErrorCode, makeErrorSubject } from "../core";
+import {
+  ErrorConstructorMessage,
+  ErrorSet,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+  SizeErrorPayload,
+  TooSmallError,
+} from "../error";
+import { typeOf } from "../utils/type";
 
-export interface ArraySchemeTypeDefine extends SchemaDefine {
-  type: Types.array;
-  itemType: BaseType<any, any>;
-}
-
-export class ArrayType<Item> extends BaseType<Item[], ArraySchemeTypeDefine> {
-  itemType: BaseType<any, any>;
-
-  constructor(props: ArraySchemeTypeDefine) {
-    super(props);
-    this.itemType = props.itemType;
-  }
-
-  static create = <
-    Item,
-    SDef extends SchemaDefine<Options>,
-    Options extends IObject = IObject
-  >(
-    itemType: BaseType<Item, SDef>
+export class ArrayType<Item> extends CoreType<Item[]> {
+  static create = <Item>(
+    elementType: CoreType<Item>,
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
     return new ArrayType<Item>({
       type: Types.array,
-      itemType: itemType,
-      checkers: [
-        {
-          checker: isArray,
-          error: (builderPayload) =>
-            makeErrorSubject({
-              fieldPath: builderPayload.fieldPath,
-              code: ErrorCode.invalid_type,
-              receiveType: builderPayload.receiveType,
-              rightType: Types.array,
-            }),
-          type: Types.array,
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const isValidArray = isArray(value);
+          if (isValidArray) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.array,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+        (value: any, { ctx: { paths, ...otherCtxState } }) => {
+          const returnValue = value;
+          const errorSubject = new ErrorSet();
+
+          for (let index = 0; index < value.length; index++) {
+            let rawItem = value[index];
+
+            try {
+              rawItem = elementType.parser(rawItem, {
+                ...otherCtxState,
+                paths: [...paths, `[${index}]`],
+              });
+            } catch (error) {
+              errorSubject.addErrors((error as ErrorSet).errors);
+            }
+
+            returnValue[index] = rawItem;
+          }
+
+          if (!errorSubject.isEmpty) {
+            return errorSubject;
+          }
+
+          return returnValue;
         },
       ],
     });
   };
 
-  noempty(options?: {
-    error?: ICheckTypeError<Types.array>;
-    errorMessage?: string;
-  }) {
-    let errorBuilder: ICheckTypeError<Types.array>;
-    if (options?.error) {
-      errorBuilder = options?.error;
-    } else {
-      errorBuilder = () =>
-        makeErrorSubject({
-          code: ErrorCode.no_empty,
-          message: `Expected no empty`,
-        });
-    }
+  noempty(error?: ErrorConstructorMessage<SizeErrorPayload>) {
     return this._extends({
       checkers: [
-        {
-          checker: (value) => value.length > 0,
-          type: Types.array,
-          error: errorBuilder,
-          errorMessage: options?.errorMessage,
+        (value: Array<any>) => {
+          if (value.length > 0) return true;
+          return new TooSmallError({
+            expectedSize: 1,
+            receivedSize: value.length,
+            message: error || "Expected no empty",
+          });
         },
       ],
     });

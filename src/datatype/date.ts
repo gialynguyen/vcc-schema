@@ -1,60 +1,33 @@
-import { isDate, isValidDate } from "hardcore-react-utils";
-import { IObject } from "../@types";
-import { BaseType, ICheckSubject, SchemaDefine, Types } from "./type";
+import { isDate } from "hardcore-react-utils";
 
-import { ErrorCode, makeErrorSubject } from "../core";
+import { CoreType, Types } from "./base";
 
-export interface DateSchemeTypeDefineOptions {
-  autoParse: boolean;
-}
+import {
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+} from "../error";
+import { typeOf } from "../utils/type";
 
-export interface DateSchemeTypeDefine
-  extends SchemaDefine<DateSchemeTypeDefineOptions> {
-  type: Types.date;
-  options?: DateSchemeTypeDefineOptions;
-}
-
-export const defaultDateCheckSubject: ICheckSubject<Types.date> = {
-  checker: isDate,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.date,
-    }),
-  type: Types.date,
-};
-
-export const defaultDateAutoParseCheckSubject: ICheckSubject<
-  Types.date,
-  IObject,
-  Date
-> = {
-  checker: isValidDate,
-  error: (builderPayload) =>
-    makeErrorSubject({
-      fieldPath: builderPayload.fieldPath,
-      code: ErrorCode.invalid_type,
-      receiveType: builderPayload.receiveType,
-      rightType: Types.date,
-    }),
-  type: Types.date,
-  transform: [(value) => new Date(value)],
-};
-
-export class DateType extends BaseType<Date, DateSchemeTypeDefine> {
+export class DateType extends CoreType<Date> {
   static create = (
-    options: DateSchemeTypeDefineOptions = { autoParse: true }
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
-    const defaultCheckSubject = options.autoParse
-      ? defaultDateAutoParseCheckSubject
-      : defaultDateCheckSubject;
-
     return new DateType({
       type: Types.date,
-      checkers: [defaultCheckSubject],
-      options,
+      defaultCheckers: [
+        (value: any, { ctx: { paths } }) => {
+          const valid = isDate(value);
+          if (valid) return true;
+
+          return new InvalidTypeError({
+            expectedType: Types.date,
+            receivedType: typeOf(value),
+            message: error,
+            paths,
+          });
+        },
+      ],
     });
   };
 }
