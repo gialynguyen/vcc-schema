@@ -9,10 +9,19 @@ export interface ParserPayload {
 
 export interface ParserContext {
   paths: string[];
+  tryParser?: boolean;
+  deepTryParser?: boolean;
 }
 
 export const runnerParser = ({ checkers }: ParserPayload) => {
-  return (raw: any, { paths }: ParserContext = { paths: [] }) => {
+  return (
+    raw: any,
+    { paths, tryParser, deepTryParser }: ParserContext = {
+      paths: [],
+      tryParser: false,
+      deepTryParser: false,
+    }
+  ) => {
     let returnValue = raw;
     const errorSubject = new ErrorSet();
     for (let index = 0; index < checkers.length; index++) {
@@ -28,7 +37,9 @@ export const runnerParser = ({ checkers }: ParserPayload) => {
       }
 
       try {
-        const passed = checker(raw, { ctx: { paths } });
+        const passed = checker(raw, {
+          ctx: { paths, tryParser, deepTryParser },
+        });
         if (passed instanceof ErrorSubject) {
           errorSubject.addError(passed);
         }
@@ -38,12 +49,17 @@ export const runnerParser = ({ checkers }: ParserPayload) => {
         }
       } catch (error) {}
 
+      if (!errorSubject.isEmpty && tryParser) {
+        returnValue = undefined;
+        break;
+      }
+
       if (errorSubject.hasPrerequisiteError) {
         throw errorSubject;
       }
     }
 
-    if (!errorSubject.isEmpty) {
+    if (!errorSubject.isEmpty && !tryParser) {
       throw errorSubject;
     }
 

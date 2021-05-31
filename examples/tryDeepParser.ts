@@ -1,12 +1,4 @@
-import {
-  string,
-  number,
-  mixed,
-  oneOf,
-  ValueType,
-  date,
-  DeepPartial,
-} from "../dist";
+import { string, number, mixed, oneOf, date } from "../dist";
 
 const NormalName = string()
   .min(4, "Tên phải dài hơn 4 ký tự")
@@ -29,18 +21,14 @@ const UserModel = mixed({
     name: NormalName,
     detail: string(),
   }),
-  
+
   birthDate: date(),
 });
 
-type UserEntity = ValueType<typeof UserModel>;
-
-type UserEntityTryParse = DeepPartial<UserEntity>;
-
-const customer = UserModel.parser({
+const customer = UserModel.tryDeepParser({
   name: "gialynguyen",
   age: 23,
-  addressIds: [],
+  addressIds: [1, "abc"],
   addressDetails: [],
   address: {
     name: "GL",
@@ -49,3 +37,17 @@ const customer = UserModel.parser({
   stringOrNumber: 4,
   birthDate: new Date("2021-04-30T07:47:24.168Z"),
 });
+
+/*
+	value of customer will like this:
+	{
+	  name: 'gialynguyen',
+		age: 23,
+		addressIds: [ undefined, 'abc' ],
+		addressDetails: [],
+		address: { name: undefined, detail: 'Detail' },
+		stringOrNumber: 4,
+		birthDate: 2021-04-30T07:47:24.168Z
+	}
+*/
+console.log("customer: ", customer);

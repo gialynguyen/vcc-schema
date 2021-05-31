@@ -41,16 +41,19 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             try {
               rawItem = elementType.parser(rawItem, {
                 ...otherCtxState,
+                tryParser: otherCtxState.deepTryParser
+                  ? otherCtxState.tryParser
+                  : false,
                 paths: [...paths, `[${index}]`],
               });
+              returnValue[index] = rawItem;
             } catch (error) {
               errorSubject.addErrors((error as ErrorSet).errors);
+              if (otherCtxState.tryParser) returnValue[index] = undefined;
             }
-
-            returnValue[index] = rawItem;
           }
 
-          if (!errorSubject.isEmpty) {
+          if (!errorSubject.isEmpty && !otherCtxState.tryParser) {
             return errorSubject;
           }
 

@@ -11,6 +11,7 @@ import {
   oneOf,
   OneOfType,
 } from "./";
+import { DeepPartial, NoneDeepPartial } from "../@types";
 
 export enum Types {
   string = "string",
@@ -29,11 +30,9 @@ export enum Types {
   custom = "custom",
 }
 
-export type ValueType<Type extends CoreType<unknown>> = Type extends CoreType<
-  infer T
->
-  ? T
-  : never;
+export type ValueType<Type extends CoreType<unknown>> = ReturnType<
+  Type["parser"]
+>;
 
 export interface CoreTypeConstructorParams {
   defaultCheckers: Checker[];
@@ -48,6 +47,16 @@ export abstract class CoreType<Type> {
 
   parser: (x: any, ctx?: ParserContext) => Type;
 
+  tryParser: (
+    x: any,
+    ctx?: Omit<ParserContext, "tryParser">
+  ) => NoneDeepPartial<Type>;
+
+  tryDeepParser: (
+    x: any,
+    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser">
+  ) => DeepPartial<Type>;
+
   optional: () => OneOfType<[this, UndefinedType]>;
 
   nullable: () => OneOfType<[this, NullType]>;
@@ -57,7 +66,23 @@ export abstract class CoreType<Type> {
   constructor(params: CoreTypeConstructorParams) {
     this._checkers = params.defaultCheckers || [];
     this._type = params.type;
+
     this.parser = runnerParser({ checkers: this._checkers });
+
+    this.tryParser = (raw: any, ctx?: Omit<ParserContext, "tryParser">) =>
+      this.parser(raw, {
+        paths: [],
+        ...ctx,
+        tryParser: true,
+      }) as NoneDeepPartial<Type>;
+
+    this.tryDeepParser = (raw: any, ctx?: Omit<ParserContext, "tryParser">) =>
+      this.parser(raw, {
+        paths: [],
+        ...ctx,
+        tryParser: true,
+        deepTryParser: true,
+      }) as DeepPartial<Type>;
 
     this.optional = () => {
       return oneOf([this, undefined()]);

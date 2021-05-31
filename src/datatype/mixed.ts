@@ -31,7 +31,7 @@ export class MixedType<
   }
 
   static create = <
-    TypeMap extends IObject<CoreType<any>>,
+    TypeMap extends IObject<ValueType<CoreType<any>>>,
     Keys extends keyof TypeMap
   >(
     types: TypeMap,
@@ -61,7 +61,7 @@ export class MixedType<
           let returnValue = value;
           const errorSubject = new ErrorSet();
 
-          if (strict) {
+          if (strict && !otherCtxState.tryParser) {
             const rawObjectKeys = Object.keys(value);
             const propertyCheckerKeys = Object.keys(types);
             const diffKeys = rawObjectKeys.filter(
@@ -87,17 +87,21 @@ export class MixedType<
               try {
                 propertyValue = propertySubjectChecker.parser(propertyValue, {
                   ...otherCtxState,
+                  tryParser: otherCtxState.deepTryParser
+                    ? otherCtxState.tryParser
+                    : false,
                   paths: [...paths, key],
                 });
 
                 returnValue[key] = propertyValue;
               } catch (error) {
                 errorSubject.addErrors((error as ErrorSet).errors);
+                if (otherCtxState.tryParser) returnValue[key] = undefined;
               }
             }
           }
 
-          if (!errorSubject.isEmpty) {
+          if (!errorSubject.isEmpty && !otherCtxState.tryParser) {
             return errorSubject;
           }
 

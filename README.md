@@ -14,13 +14,15 @@
    - [X] Any
    - [X] Unknown
    - [ ] Custom
+   
 ### Definition:
   1. Type
   2. Parser Modes:
     2.1 Parser
-    2.2 Safe Parser (with default value)
+    2.2 Try Parser (if has error, value of type will be undefined)
     2.3 Validate
   3. Mapper
+
 ### Type API
   1. Base
 
@@ -31,7 +33,7 @@
     3.2 omit
     3.4 nonstrict
     3.5 children
-    
+
 ### Parser
 
 ### Mapper (Dto)
