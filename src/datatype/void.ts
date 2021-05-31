@@ -29,6 +29,7 @@ export class VoidType<
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

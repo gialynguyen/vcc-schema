@@ -16,7 +16,7 @@ export class ErrorSubject extends Subject<IError> {
     if (!("prerequisite" in error)) {
       error.prerequisite = false;
     }
-    
+
     super({ initialState: error });
     this.error = this.proxyState;
   }
@@ -24,6 +24,8 @@ export class ErrorSubject extends Subject<IError> {
 
 export class ErrorSet extends Error {
   errors: ErrorSubject[];
+
+  hasPrerequisiteError: boolean;
 
   constructor(errors?: ErrorSubject[]) {
     super();
@@ -35,6 +37,10 @@ export class ErrorSet extends Error {
       (this as any).__proto__ = actualProto;
     }
     this.errors = errors || [];
+
+    this.hasPrerequisiteError = this.errors.some(
+      (error) => error.error.prerequisite
+    );
   }
 
   get message() {
@@ -62,9 +68,12 @@ export class ErrorSet extends Error {
 
   addError = (sub: ErrorSubject) => {
     this.errors = [...this.errors, sub];
+    if (sub.error.prerequisite) {
+      this.hasPrerequisiteError = true;
+    }
   };
 
   addErrors = (sub: ErrorSubject[] = []) => {
-    this.errors = [...this.errors, ...sub];
+    sub.forEach((error) => this.addError(error));
   };
 }

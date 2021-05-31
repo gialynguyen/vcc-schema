@@ -28,6 +28,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
         (value: any, { ctx: { paths, ...otherCtxState } }) => {

@@ -59,6 +59,7 @@ export class OneOfType<
             receivedType,
             message: error,
             paths: ctx.paths,
+            prerequisite: true,
           });
         },
       ],

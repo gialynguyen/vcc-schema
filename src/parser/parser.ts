@@ -38,9 +38,13 @@ export const runnerParser = ({ checkers }: ParserPayload) => {
         }
       } catch (error) {}
 
-      if (!errorSubject.isEmpty) {
+      if (errorSubject.hasPrerequisiteError) {
         throw errorSubject;
       }
+    }
+
+    if (!errorSubject.isEmpty) {
+      throw errorSubject;
     }
 
     return returnValue;

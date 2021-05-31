@@ -24,6 +24,7 @@ export class NullType extends CoreType<null> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

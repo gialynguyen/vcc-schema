@@ -22,6 +22,7 @@ export class UndefinedType extends CoreType<undefined> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

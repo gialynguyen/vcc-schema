@@ -43,6 +43,7 @@ export class InvalidTypeError extends ErrorSubject {
       code: ErrorCode.invalid_type,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedType = payload.expectedType;
@@ -98,6 +99,7 @@ export class InvalidUnionTypeError extends ErrorSubject {
       code: ErrorCode.invalid_type,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedType = payload.expectedType;
@@ -147,6 +149,7 @@ export class TooSmallError extends ErrorSubject {
       code: ErrorCode.too_small,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -187,6 +190,7 @@ export class TooBigError extends ErrorSubject {
       code: ErrorCode.too_big,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -227,6 +231,7 @@ export class IncorrectSizeError extends ErrorSubject {
       code: ErrorCode.incorrect_size,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -274,6 +279,7 @@ export class NoEqualError<Type> extends ErrorSubject {
       code: ErrorCode.not_equal,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.expectedValue = payload.expectedValue;
@@ -313,6 +319,7 @@ export class InvalidFieldError extends ErrorSubject {
       code: ErrorCode.not_equal,
       message: message as string,
       paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
     });
 
     this.invalidFieldPaths = payload.invalidFieldPaths;

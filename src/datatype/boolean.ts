@@ -23,6 +23,7 @@ export class BooleanType extends CoreType<boolean> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

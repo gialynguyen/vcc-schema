@@ -29,6 +29,7 @@ export class NumberType extends CoreType<number> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

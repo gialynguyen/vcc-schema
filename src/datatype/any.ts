@@ -24,6 +24,7 @@ export class AnyType extends CoreType<any> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

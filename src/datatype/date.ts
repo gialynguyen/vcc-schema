@@ -25,6 +25,7 @@ export class DateType extends CoreType<Date> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

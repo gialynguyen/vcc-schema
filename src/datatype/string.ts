@@ -29,6 +29,7 @@ export class StringType extends CoreType<string> {
             receivedType: typeOf(value),
             message: error,
             paths,
+            prerequisite: true,
           });
         },
       ],

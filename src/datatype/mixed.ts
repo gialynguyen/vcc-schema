@@ -54,6 +54,7 @@ export class MixedType<
             receivedType: typeOf(value),
             message: options?.error,
             paths,
+            prerequisite: true,
           });
         },
         (value: any, { ctx: { paths, ...otherCtxState } }) => {
