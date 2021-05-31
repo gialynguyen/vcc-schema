@@ -1,4 +1,4 @@
-import { isArray } from "hardcore-react-utils";
+import { isArray } from "vcc-utils";
 import { CoreType, Types } from "./base";
 
 import {

@@ -1,4 +1,4 @@
-import { isNumber } from "hardcore-react-utils";
+import { isNumber } from "vcc-utils";
 import { CoreType, Types } from "./base";
 
 import {

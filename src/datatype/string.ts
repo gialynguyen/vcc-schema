@@ -1,4 +1,4 @@
-import { isString } from "hardcore-react-utils";
+import { isString } from "vcc-utils";
 import { Types, CoreType } from "./base";
 
 import {

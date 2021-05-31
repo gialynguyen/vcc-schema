@@ -3,16 +3,16 @@ lockfileVersion: 5.3
 specifiers:
   '@types/jest': ^26.0.23
   esbuild: ^0.9.3
-  hardcore-react-utils: ^0.0.6
   jest: ^27.0.1
   rollup: ^2.41.5
   rollup-plugin-dts: ^3.0.1
   rollup-plugin-esbuild: ^3.0.2
   ts-jest: ^27.0.0
   typescript: ^4.2.3
+  vcc-utils: ^0.0.2
 
 dependencies:
-  hardcore-react-utils: 0.0.6
+  vcc-utils: 0.0.2
 
 devDependencies:
   '@types/jest': 26.0.23
@@ -1275,10 +1275,6 @@ packages:
   /graceful-fs/4.2.6:
     resolution: {integrity: sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==}
     dev: true
-
-  /hardcore-react-utils/0.0.6:
-    resolution: {integrity: sha512-Az0znxS+yvLvSV65+5RV46medJ6yH7Jy947ZXBt7bK3ufP/5uLzSxXKJ7m8RRlR9GRa/GKURlcMU0i+55T1miw==}
-    dev: false
 
   /has-flag/3.0.0:
     resolution: {integrity: sha1-tdRU3CGZriJWmfNGfloH87lVuv0=}
@@ -2644,6 +2640,10 @@ packages:
       convert-source-map: 1.7.0
       source-map: 0.7.3
     dev: true
+
+  /vcc-utils/0.0.2:
+    resolution: {integrity: sha512-JRdO0vKqKPfxuff23G6+dKNA1mf9u4FIbiP2ceznCqbKAQm6+2dmz3wTCmvIAwMYc8RIa5BiF+A9vF4P9+Jv8Q==}
+    dev: false
 
   /w3c-hr-time/1.0.2:
     resolution: {integrity: sha512-z8P5DvDNjKDoFIHK7q8r8lackT6l+jo/Ye3HOle7l9nICP9lf1Ci25fy9vHd0JOWewkIFzXIEig3TdKT7JQ5fQ==}

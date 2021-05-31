@@ -5,7 +5,7 @@ import {
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
-import { isNull } from "hardcore-react-utils";
+import { isNull } from "vcc-utils";
 import { typeOf } from "../utils/type";
 
 export class AnyType extends CoreType<any> {

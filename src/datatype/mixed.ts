@@ -1,4 +1,4 @@
-import { isObject, omit, pick } from "hardcore-react-utils";
+import { isObject, omit, pick } from "vcc-utils";
 import { IObject } from "../@types";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
 

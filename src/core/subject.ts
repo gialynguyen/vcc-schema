@@ -1,4 +1,4 @@
-import { isArray, isObject } from "hardcore-react-utils";
+import { isArray, isObject } from "vcc-utils";
 import { IObject } from "../@types";
 
 const PRIVATE_STATE = Symbol("PRIVATE_STATE");

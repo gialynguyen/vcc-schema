@@ -1,4 +1,4 @@
-import { isFunction } from "hardcore-react-utils";
+import { isFunction } from "vcc-utils";
 import { ICallback } from "../@types";
 import { CoreType, Types } from "./base";
 

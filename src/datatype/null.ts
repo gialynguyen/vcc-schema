@@ -1,4 +1,4 @@
-import { isNull } from "hardcore-react-utils";
+import { isNull } from "vcc-utils";
 import { CoreType, Types } from "./base";
 
 import { typeOf } from "../utils/type";

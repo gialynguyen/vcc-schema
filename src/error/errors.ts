@@ -1,4 +1,4 @@
-import { isFunction } from "hardcore-react-utils";
+import { isFunction } from "vcc-utils";
 import { ErrorSubject } from "./creator";
 import { ErrorCode } from "./type";
 
@@ -14,6 +14,7 @@ export interface InvalidTypeErrorPayload {
 export type ErrorConstructorParams<Params> = Params & {
   message?: ErrorConstructorMessage<Params>;
   paths?: string[];
+  prerequisite?: boolean;
 };
 
 export class InvalidTypeError extends ErrorSubject {

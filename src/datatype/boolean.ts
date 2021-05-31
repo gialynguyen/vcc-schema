@@ -1,4 +1,4 @@
-import { isBoolean } from "hardcore-react-utils";
+import { isBoolean } from "vcc-utils";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,

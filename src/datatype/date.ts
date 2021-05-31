@@ -1,4 +1,4 @@
-import { isDate } from "hardcore-react-utils";
+import { isDate } from "vcc-utils";
 
 import { CoreType, Types } from "./base";
 

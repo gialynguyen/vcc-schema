@@ -1,4 +1,4 @@
-import { isArray, isDate, isNull } from "hardcore-react-utils";
+import { isArray, isDate, isNull } from "vcc-utils";
 
 import { ErrorSet, ErrorSubject } from "../error";
 import { Checker } from "./checker";

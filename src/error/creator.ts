@@ -6,12 +6,17 @@ export interface IError {
   code: ErrorCodeType;
   message: string;
   paths: string[];
+  prerequisite?: boolean;
 }
 
 export class ErrorSubject extends Subject<IError> {
   public error: IError;
 
   constructor(error: IError) {
+    if (!("prerequisite" in error)) {
+      error.prerequisite = false;
+    }
+    
     super({ initialState: error });
     this.error = this.proxyState;
   }
