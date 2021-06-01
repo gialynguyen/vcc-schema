@@ -12,5 +12,5 @@ const UserModel = mixed({
 
 UserModel.parser({
   password: "123456789",
-  cPassword: "123456"
+  cPassword: "123456",
 });

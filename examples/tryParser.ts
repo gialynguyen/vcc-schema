@@ -1,4 +1,12 @@
-import { string, number, mixed, oneOf, date } from "../dist";
+import {
+  string,
+  number,
+  mixed,
+  oneOf,
+  date,
+  NoneDeepPartial,
+  ValueType,
+} from "../dist";
 
 const NormalName = string()
   .min(4, "Tên phải dài hơn 4 ký tự")
@@ -37,6 +45,8 @@ const customer = UserModel.tryParser({
   stringOrNumber: 4,
   birthDate: new Date("2021-04-30T07:47:24.168Z"),
 });
+
+type CustomerTryParserType = NoneDeepPartial<ValueType<typeof UserModel>>;
 
 /*
   value of customer will like this:

@@ -76,4 +76,27 @@ export class ErrorSet extends Error {
   addErrors = (sub: ErrorSubject[] = []) => {
     sub.forEach((error) => this.addError(error));
   };
+
+  format = () => {
+    const { errors } = this;
+    const objectError = {} as any;
+    for (let index = 0; index < errors.length; index++) {
+      let pointer = objectError;
+      const { error } = errors[index];
+      const { paths } = error;
+
+      const pathsSize = paths.length - 1;
+
+      paths.forEach((path, index) => {
+        const isLastPath = index === pathsSize;
+        if (!isLastPath) {
+          pointer = pointer[path] = {};
+        } else {
+          Reflect.set(pointer, path, error);
+        }
+      });
+    }
+
+    return objectError;
+  };
 }

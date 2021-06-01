@@ -18,6 +18,7 @@ import {
 } from "./";
 import { DeepPartial, IObject, NoneDeepPartial } from "../@types";
 import { isArray } from "vcc-utils";
+import { ErrorSubject } from "../error";
 
 export enum Types {
   string = "string",
@@ -39,6 +40,12 @@ export enum Types {
 export type ValueType<Type> = Type extends CoreType<infer T>
   ? ReturnType<Type["parser"]>
   : never;
+
+export type ErrorType<Type> = Type extends IObject
+  ? { [key in keyof Type]: ErrorType<Type[key]> }
+  : Type extends any[]
+  ? ErrorType<Type[number]>
+  : ErrorSubject;
 
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker[];

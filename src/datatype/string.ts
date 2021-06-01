@@ -4,6 +4,8 @@ import { Types, CoreType } from "./base";
 import {
   ErrorConstructorMessage,
   IncorrectSizeError,
+  InvalidStringFormat,
+  InvalidStringFormatPayload,
   InvalidTypeError,
   InvalidTypeErrorPayload,
   SizeErrorPayload,
@@ -12,6 +14,10 @@ import {
 } from "../error";
 
 import { typeOf } from "../utils/type";
+
+// from https://stackoverflow.com/a/46181/1550155
+const emailRegex =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 export class StringType extends CoreType<string> {
   static create = (
@@ -88,6 +94,22 @@ export class StringType extends CoreType<string> {
           return new IncorrectSizeError({
             expectedSize: length,
             receivedSize: data.length,
+            message: error,
+            paths,
+          });
+        },
+      ],
+    });
+  };
+
+  email = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
+    return this._extends({
+      checkers: [
+        (data: string, { ctx: { paths } }) => {
+          if (emailRegex.test(data)) return true;
+
+          return new InvalidStringFormat({
+            receivedString: data,
             message: error,
             paths,
           });

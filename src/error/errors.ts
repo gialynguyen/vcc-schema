@@ -335,3 +335,41 @@ export class InvalidFieldError extends ErrorSubject {
     return error instanceof InvalidFieldError;
   }
 }
+
+export interface InvalidStringFormatPayload {
+  receivedString: unknown;
+}
+
+export class InvalidStringFormat extends ErrorSubject {
+  private static defaultMessage:
+    | string
+    | ((errorPayload: { receivedString: unknown }) => string) = ({
+    receivedString,
+  }) => `${receivedString} is not a valid email`;
+
+  constructor(payload: ErrorConstructorParams<InvalidStringFormatPayload>) {
+    let message = payload.message || InvalidStringFormat.defaultMessage;
+    if (isFunction(message)) {
+      message = (message as Function)({
+        receivedString: payload.receivedString,
+      });
+    }
+
+    super({
+      code: ErrorCode.invalid_string_format,
+      message: message as string,
+      paths: payload.paths || [],
+      prerequisite: payload.prerequisite,
+    });
+  }
+
+  static set setDefaultMessage(
+    config: typeof InvalidStringFormat.defaultMessage
+  ) {
+    InvalidStringFormat.defaultMessage = config;
+  }
+
+  static is(error: any) {
+    return error instanceof InvalidStringFormat;
+  }
+}

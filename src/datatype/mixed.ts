@@ -10,7 +10,6 @@ import {
   InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
-import { LazyObjectType, LazyType } from "../parser/checker";
 
 export class MixedType<
   TypeMap extends IObject<CoreType<any>>,
