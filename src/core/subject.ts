@@ -31,7 +31,7 @@ const implementProxy = <State extends IObject>(
 ) => {
   if (isArray(target) || isObject(target)) {
     Object.entries(target).forEach(function ([key, val]) {
-      if (isArray(target) || isObject(target)) {
+      if (isArray(val) || isObject(val)) {
         target[key] = implementProxy(val, handler);
       }
     });
