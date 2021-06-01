@@ -34,7 +34,7 @@ describe("mixed type", () => {
         new InvalidTypeError({
           expectedType: "string",
           receivedType: "number",
-          paths: ["[0]"],
+          paths: [0],
         }),
       ]).message
     );
@@ -48,7 +48,7 @@ describe("mixed type", () => {
         new TooSmallError({
           expectedSize: 5,
           receivedSize: 3,
-          paths: ["[0]"],
+          paths: [0],
         }),
       ]).message
     );
