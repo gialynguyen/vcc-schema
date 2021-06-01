@@ -10,7 +10,7 @@ export interface ParserPayload {
 }
 
 export interface ParserContext {
-  paths: string[];
+  paths: (string | number)[];
   tryParser?: boolean;
   deepTryParser?: boolean;
 }

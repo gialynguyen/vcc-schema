@@ -13,7 +13,7 @@ export interface InvalidTypeErrorPayload {
 
 export type ErrorConstructorParams<Params> = Params & {
   message?: ErrorConstructorMessage<Params>;
-  paths?: string[];
+  paths?: (string | number)[];
   prerequisite?: boolean;
 };
 

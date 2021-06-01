@@ -36,9 +36,9 @@ export enum Types {
   custom = "custom",
 }
 
-export type ValueType<Type extends CoreType<unknown>> = ReturnType<
-  Type["parser"]
->;
+export type ValueType<Type> = Type extends CoreType<infer T>
+  ? ReturnType<Type["parser"]>
+  : never;
 
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker[];

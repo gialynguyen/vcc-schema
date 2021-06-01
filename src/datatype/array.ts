@@ -44,7 +44,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
                 tryParser: otherCtxState.deepTryParser
                   ? otherCtxState.tryParser
                   : false,
-                paths: [...paths, `[${index}]`],
+                paths: [...paths, index],
               });
               returnValue[index] = rawItem;
             } catch (error) {

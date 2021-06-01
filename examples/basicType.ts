@@ -35,13 +35,13 @@ const UserModel = mixed({
 
 type UserEntity = ValueType<typeof UserModel>;
 
-type UserEntityTryParse = DeepPartial<UserEntity>;
+// type UserEntityTryParse = DeepPartial<UserEntity>;
 
 const customer = UserModel.parser({
   name: "gialynguyen",
   age: 23,
-  addressIds: [],
-  addressDetails: [],
+  addressIds: [12],
+  addressDetails: [{ name: 12 }],
   address: {
     name: "GL",
     detail: "Detail",

@@ -3,7 +3,7 @@ import { ErrorSet, ErrorSubject } from "../error/creator";
 import { ErrorCodeType } from "../error/type";
 
 export interface CheckerContext {
-  paths: string[];
+  paths: (string | number)[];
   tryParser?: boolean;
   deepTryParser?: boolean;
 }

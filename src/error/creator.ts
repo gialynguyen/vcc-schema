@@ -5,7 +5,7 @@ import { ErrorCodeType } from "./type";
 export interface IError {
   code: ErrorCodeType;
   message: string;
-  paths: string[];
+  paths: (string | number)[];
   prerequisite?: boolean;
 }
 
