@@ -12,4 +12,4 @@ export const ErrorCode = enumFromArray([
   "custom_error",
 ]);
 
-export type ErrorCodeType = keyof typeof ErrorCode;
+export type ErrorCodeType = keyof typeof ErrorCode | string;

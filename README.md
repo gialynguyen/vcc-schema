@@ -29,10 +29,6 @@
   2. String
 
   3. Mixed (Object)
-    3.1 modifiers
-    3.2 omit
-    3.4 nonstrict
-    3.5 children
 
 ### Parser
 

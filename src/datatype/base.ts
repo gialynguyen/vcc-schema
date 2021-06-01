@@ -1,5 +1,10 @@
 import { ParserContext, runnerParser } from "../parser/parser";
-import { Checker } from "../parser/checker";
+import {
+  Checker,
+  LazyObjectType,
+  LazyObjectTypeChecker,
+  LazyType,
+} from "../parser/checker";
 
 import {
   array,
@@ -11,7 +16,8 @@ import {
   oneOf,
   OneOfType,
 } from "./";
-import { DeepPartial, NoneDeepPartial } from "../@types";
+import { DeepPartial, IObject, NoneDeepPartial } from "../@types";
+import { isArray } from "vcc-utils";
 
 export enum Types {
   string = "string",
@@ -34,16 +40,20 @@ export type ValueType<Type extends CoreType<unknown>> = ReturnType<
   Type["parser"]
 >;
 
-export interface CoreTypeConstructorParams {
+export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker[];
   type: Types;
-  ref?: boolean;
+  defaultLazyCheckers?: Type extends IObject
+    ? LazyObjectType<any>[]
+    : LazyType<any>[];
 }
 
 export abstract class CoreType<Type> {
   protected _type: Types;
 
   protected _checkers: Checker[];
+
+  protected _lazyCheckers: LazyType<any>[];
 
   parser: (x: any, ctx?: ParserContext) => Type;
 
@@ -63,11 +73,15 @@ export abstract class CoreType<Type> {
 
   array: () => ArrayType<Type>;
 
-  constructor(params: CoreTypeConstructorParams) {
+  constructor(params: CoreTypeConstructorParams<Type>) {
     this._checkers = params.defaultCheckers || [];
     this._type = params.type;
+    this._lazyCheckers = params.defaultLazyCheckers || ([] as any);
 
-    this.parser = runnerParser({ checkers: this._checkers });
+    this.parser = runnerParser({
+      checkers: this._checkers,
+      lazyCheckers: this._lazyCheckers,
+    });
 
     this.tryParser = (raw: any, ctx?: Omit<ParserContext, "tryParser">) =>
       this.parser(raw, {
@@ -95,18 +109,56 @@ export abstract class CoreType<Type> {
     this.array = () => array(this);
   }
 
-  _extends(payload: { checkers: Checker[] }): this {
+  _extends(payload: { checkers?: Checker[]; lazy?: LazyType<Type>[] }): this {
     return new (this as any).constructor({
-      defaultCheckers: [...this._checkers, ...payload.checkers],
+      defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
+      defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
       type: this._type,
     });
   }
 
   check(checker: Checker) {
-    return new (this as any).constructor({
-      defaultCheckers: [...this._checkers, checker],
-      type: this._type,
+    return this._extends({
+      checkers: [...this._checkers, checker],
     });
+  }
+
+  _lazy(lazyOption: LazyType<any>[]) {
+    return this._extends({
+      lazy: [...lazyOption],
+    });
+  }
+
+  lazy(
+    lazyOption: Type extends Record<any, any>
+      ? LazyObjectType<Type>
+      : LazyType<Type> | LazyType<Type>[]
+  ) {
+    if ([Types.mixed].includes(this._type)) {
+      const lazyCheckers = [] as LazyType<Type>[];
+      for (const key in lazyOption) {
+        if (Object.prototype.hasOwnProperty.call(lazyOption, key)) {
+          const {
+            checker,
+            defaultPaths = [],
+            ...otherOptions
+          } = lazyOption[key] as LazyObjectTypeChecker<Type, keyof Type>;
+          lazyCheckers.push({
+            checker: (parsedValue: Type) => {
+              const fieldValue = (parsedValue as any)[key];
+              return checker(fieldValue, parsedValue);
+            },
+            defaultPaths: [...defaultPaths, key],
+            ...otherOptions,
+          });
+        }
+      }
+
+      return this._lazy(lazyCheckers);
+    } else {
+      const _lazyOptionSet = isArray(lazyOption) ? lazyOption : [lazyOption];
+      return this._lazy([...(_lazyOptionSet as LazyType<Type>[])]);
+    }
   }
 
   get type() {

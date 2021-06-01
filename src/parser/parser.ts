@@ -1,10 +1,12 @@
 import { isArray, isDate, isNull } from "vcc-utils";
 
 import { ErrorSet, ErrorSubject } from "../error";
-import { Checker } from "./checker";
+import { ErrorCode } from "../error/type";
+import { Checker, LazyType } from "./checker";
 
 export interface ParserPayload {
   checkers: Checker[];
+  lazyCheckers: LazyType<any>[];
 }
 
 export interface ParserContext {
@@ -13,7 +15,7 @@ export interface ParserContext {
   deepTryParser?: boolean;
 }
 
-export const runnerParser = ({ checkers }: ParserPayload) => {
+export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
   return (
     raw: any,
     { paths, tryParser, deepTryParser }: ParserContext = {
@@ -40,6 +42,7 @@ export const runnerParser = ({ checkers }: ParserPayload) => {
         const passed = checker(raw, {
           ctx: { paths, tryParser, deepTryParser },
         });
+
         if (passed instanceof ErrorSubject) {
           errorSubject.addError(passed);
         }
@@ -56,6 +59,22 @@ export const runnerParser = ({ checkers }: ParserPayload) => {
 
       if (errorSubject.hasPrerequisiteError) {
         throw errorSubject;
+      }
+    }
+
+    if (errorSubject.isEmpty) {
+      for (let index = 0; index < lazyCheckers.length; index++) {
+        const { checker, message, defaultPaths, errorType } =
+          lazyCheckers[index];
+        const passed = checker(raw);
+        if (!passed) {
+          const error = new ErrorSubject({
+            code: errorType || ErrorCode.custom_error,
+            message,
+            paths: defaultPaths || [],
+          });
+          errorSubject.addError(error);
+        }
       }
     }
 

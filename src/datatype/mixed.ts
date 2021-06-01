@@ -10,6 +10,7 @@ import {
   InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
+import { LazyObjectType, LazyType } from "../parser/checker";
 
 export class MixedType<
   TypeMap extends IObject<CoreType<any>>,
@@ -20,7 +21,9 @@ export class MixedType<
   _strict?: boolean;
 
   constructor(
-    props: CoreTypeConstructorParams & {
+    props: CoreTypeConstructorParams<
+      { [key in keyof TypeMap]: ValueType<TypeMap[key]> }
+    > & {
       strict?: boolean;
       childrenPropertyTypes: TypeMap;
     }
