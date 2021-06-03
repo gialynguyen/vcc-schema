@@ -3,6 +3,8 @@ export type ICallback<R = any, Args extends unknown[] = any[]> = (
   ...args: Args
 ) => R;
 
+export type NotUndefined<T> = T extends undefined ? never: T;
+
 export type ICheckerFunction = ICallback<boolean, any[]>;
 
 export type NoneDeepPartial<Type> = Type extends IObject

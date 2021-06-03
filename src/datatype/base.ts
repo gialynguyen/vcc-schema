@@ -18,7 +18,7 @@ import {
 } from "./";
 import { DeepPartial, IObject, NoneDeepPartial } from "../@types";
 import { isArray } from "vcc-utils";
-import { ErrorSubject } from "../error";
+import { ErrorSet, ErrorSubject } from "../error";
 
 export enum Types {
   string = "string",
@@ -62,7 +62,7 @@ export abstract class CoreType<Type> {
 
   protected _lazyCheckers: LazyType<any>[];
 
-  parser: (x: any, ctx?: ParserContext) => Type;
+  parser: (raw: any, ctx?: ParserContext) => Type;
 
   tryParser: (
     x: any,
@@ -79,6 +79,8 @@ export abstract class CoreType<Type> {
   nullable: () => OneOfType<[this, NullType]>;
 
   array: () => ArrayType<Type>;
+
+  validate: (raw: any) => { success: boolean; data?: Type; error?: ErrorSet };
 
   constructor(params: CoreTypeConstructorParams<Type>) {
     this._checkers = params.defaultCheckers || [];
@@ -104,6 +106,24 @@ export abstract class CoreType<Type> {
         tryParser: true,
         deepTryParser: true,
       }) as DeepPartial<Type>;
+
+    this.validate = (raw: any) => {
+      try {
+        const successData = this.parser(raw, {
+          paths: [],
+        });
+
+        return {
+          success: true,
+          data: successData,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error as ErrorSet,
+        };
+      }
+    };
 
     this.optional = () => {
       return oneOf([this, undefined()]);

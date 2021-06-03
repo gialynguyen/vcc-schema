@@ -1,5 +1,5 @@
 import { isObject, omit, pick } from "vcc-utils";
-import { IObject } from "../@types";
+import { ICallback, IObject, NotUndefined } from "../@types";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
 
 import {
@@ -15,7 +15,7 @@ export class MixedType<
   TypeMap extends IObject<CoreType<any>>,
   Keys extends keyof TypeMap
 > extends CoreType<{ [key in keyof TypeMap]: ValueType<TypeMap[key]> }> {
-  childrenPropertyTypes: { [key in Keys]: CoreType<any> };
+  childrenPropertyTypes: TypeMap;
 
   _strict?: boolean;
 
@@ -115,8 +115,12 @@ export class MixedType<
     });
   };
 
-  pick(
-    keys: Keys[] = [],
+  get children() {
+    return this.childrenPropertyTypes;
+  }
+
+  pick<K extends keyof TypeMap>(
+    keys: K[] = [],
     options?: {
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
       strict?: boolean;
@@ -125,14 +129,14 @@ export class MixedType<
     const childrenPropertyTypes = this.childrenPropertyTypes;
     const newChildrenPropertyTypes = pick(childrenPropertyTypes, keys);
 
-    return MixedType.create<Pick<TypeMap, Keys>, keyof Pick<TypeMap, Keys>>(
-      newChildrenPropertyTypes as Pick<TypeMap, Keys>,
-      { strict: this._strict, ...options }
-    );
+    return MixedType.create(newChildrenPropertyTypes, {
+      strict: this._strict,
+      ...options,
+    });
   }
 
-  omit(
-    keys: Keys[] = [],
+  omit<K extends keyof TypeMap>(
+    keys: K[] = [],
     options?: {
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
       strict?: boolean;
@@ -141,17 +145,69 @@ export class MixedType<
     const childrenPropertyTypes = this.childrenPropertyTypes;
     const newChildrenPropertyTypes = omit(childrenPropertyTypes, keys);
 
-    return MixedType.create<
-      Pick<TypeMap, Exclude<keyof TypeMap, Keys>>,
-      keyof Pick<TypeMap, Exclude<keyof TypeMap, Keys>>
-    >(newChildrenPropertyTypes as Omit<TypeMap, Keys>, {
+    return MixedType.create(newChildrenPropertyTypes, {
       strict: this._strict,
       ...options,
     });
   }
 
-  get children() {
-    return this.childrenPropertyTypes;
+  modifiers<
+    Modifiers extends {
+      [key in Keys]?: ICallback<CoreType<unknown>, [base: TypeMap[key]]>;
+    },
+    ModifiersTypeValue extends {
+      [key in keyof Modifiers]: ReturnType<NotUndefined<Modifiers[key]>>;
+    }
+  >(childrens: Modifiers) {
+    const { childrenPropertyTypes: currentChildrenTypes } = this;
+    const modifiedChildren = {} as ModifiersTypeValue;
+
+    for (const key in childrens) {
+      const childTransform = childrens[key];
+      const currentChildType = currentChildrenTypes[key];
+      if (childTransform) {
+        modifiedChildren[key] = childTransform(
+          currentChildType
+        ) as ModifiersTypeValue[Extract<keyof Modifiers, string>];
+      }
+    }
+
+    const children = {
+      ...currentChildrenTypes,
+      ...modifiedChildren,
+    };
+
+    return MixedType.create(children, {
+      strict: this._strict,
+    });
+  }
+
+  pickAndModifers<
+    PickModifiers extends {
+      [key in Keys]?: ICallback<CoreType<unknown>, [base: TypeMap[key]]>;
+    },
+    PickModifiersTypeValue extends {
+      [key in keyof PickModifiers]: ReturnType<
+        NotUndefined<PickModifiers[key]>
+      >;
+    }
+  >(childrens: PickModifiers) {
+    const { childrenPropertyTypes: currentChildrenTypes } = this;
+    const modifiedChildren = {} as PickModifiersTypeValue;
+
+    for (const key in childrens) {
+      const childTransform = childrens[key];
+      const currentChildType = currentChildrenTypes[key];
+      if (childTransform) {
+        modifiedChildren[key] = childTransform(
+          currentChildType
+        ) as PickModifiersTypeValue[Extract<keyof PickModifiers, string>];
+      }
+    }
+
+    return MixedType.create(modifiedChildren, {
+      strict: this._strict,
+    });
   }
 
   strict(
