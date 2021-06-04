@@ -78,6 +78,8 @@ export abstract class CoreType<Type> {
 
   nullable: () => OneOfType<[this, NullType]>;
 
+  nullish: () => OneOfType<[this, NullType, UndefinedType]>;
+
   array: () => ArrayType<Type>;
 
   validate: (raw: any) => { success: boolean; data?: Type; error?: ErrorSet };
@@ -134,6 +136,10 @@ export abstract class CoreType<Type> {
     };
 
     this.array = () => array(this);
+
+    this.nullish = (): OneOfType<[this, NullType, UndefinedType]> => {
+      return oneOf([this, nullable(), undefined()]);
+    };
   }
 
   _extends(payload: { checkers?: Checker[]; lazy?: LazyType<Type>[] }): this {
