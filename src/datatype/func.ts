@@ -18,14 +18,14 @@ export class VoidType<
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
     return new VoidType<RType, AType, ICallback<RType, AType>>({
-      type: Types.void,
+      type: Types.func,
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isFunction(value);
           if (valid) return true;
 
           return new InvalidTypeError({
-            expectedType: Types.void,
+            expectedType: Types.func,
             receivedType: typeOf(value),
             message: error,
             paths,

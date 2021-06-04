@@ -29,7 +29,7 @@ export enum Types {
   array = "array",
   undefined = "undefined",
   null = "null",
-  void = "void",
+  func = "function",
   any = "any",
   unknown = "unknown",
   enum = "enum",

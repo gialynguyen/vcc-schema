@@ -4,7 +4,7 @@ export * from "./mixed";
 export * from "./oneOf";
 export * from "./undefined";
 export * from "./null";
-export * from "./void";
+export * from "./func";
 export * from "./boolean";
 export * from "./any";
 export * from "./unknown";
