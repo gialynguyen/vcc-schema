@@ -74,4 +74,4 @@ describe("Error Creator", () => {
             expect(subject).toBeInstanceOf(ErrorSet);
         });
     });
-});
+})
