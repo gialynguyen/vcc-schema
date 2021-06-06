@@ -15,7 +15,9 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "test": "jest"
+    "test:unit": "jest -c jest.config.unit.js",
+    "test:unit:watch": "yarn test:unit --watch",
+    "test:unit-update": "jest -c jest.config.unit.js -u"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
