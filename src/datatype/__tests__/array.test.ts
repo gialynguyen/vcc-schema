@@ -1,5 +1,3 @@
-// @ts-ignore TS6133
-import { expect, test } from "@jest/globals";
 import { string, array } from "../";
 
 import { ErrorSet, InvalidTypeError, TooSmallError } from "../../error";
