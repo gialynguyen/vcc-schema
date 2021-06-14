@@ -40,19 +40,17 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
         if (receiveType === "object") receiveType = "mixed";
       }
 
-      try {
-        const passed = checker(raw, {
-          ctx: { paths, tryParser, deepTryParser },
-        });
+      const passed = checker(raw, {
+        ctx: { paths, tryParser, deepTryParser },
+      });
 
-        if (passed instanceof ErrorSubject) {
-          errorSubject.addError(passed);
-        }
+      if (passed instanceof ErrorSubject) {
+        errorSubject.addError(passed);
+      }
 
-        if (passed instanceof ErrorSet) {
-          errorSubject.addErrors(passed.errors);
-        }
-      } catch (error) {}
+      if (passed instanceof ErrorSet) {
+        errorSubject.addErrors(passed.errors);
+      }
 
       if (!errorSubject.isEmpty && tryParser) {
         returnValue = undefined;
