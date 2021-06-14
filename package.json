@@ -4,6 +4,10 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
+  "exports": {
+    "import": "./lib/index.es.js",
+    "require": "./lib/index.cjs"
+  },
   "author": "VCTeam",
   "license": "MIT",
   "private": false,
@@ -16,8 +20,10 @@
   "scripts": {
     "build": "rollup -c",
     "test:unit": "jest -c jest.config.unit.js",
-    "test:unit:watch": "yarn test:unit --watch",
-    "test:unit-update": "jest -c jest.config.unit.js -u"
+    "test:unit:watch": "pnpm test:unit --watch",
+    "test:unit-update": "jest -c jest.config.unit.js -u",
+    "prerelease": "pnpm test & pnpm build",
+    "release": "pnpm prerelease & npm publish"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
@@ -31,5 +37,15 @@
   },
   "dependencies": {
     "vcc-utils": "^0.0.2"
-  }
+  },
+  "keywords": [
+    "type",
+    "types",
+    "valid",
+    "validate",
+    "validation",
+    "validator",
+    "schema",
+    "parser"
+  ]
 }

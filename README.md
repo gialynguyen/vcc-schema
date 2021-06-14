@@ -10,7 +10,7 @@
    - [X] Optional 
    - [X] Undefined
    - [X] Null
-   - [X] Void
+   - [X] Function
    - [X] Any
    - [X] Unknown
    - [ ] Custom
