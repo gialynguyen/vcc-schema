@@ -94,14 +94,14 @@ export abstract class CoreType<Type> {
       lazyCheckers: this._lazyCheckers,
     });
 
-    this.tryParser = (raw: any, ctx?: Omit<ParserContext, "tryParser">) =>
+    this.tryParser = (raw, ctx) =>
       this.parser(raw, {
         paths: [],
         ...ctx,
         tryParser: true,
       }) as NoneDeepPartial<Type>;
 
-    this.tryDeepParser = (raw: any, ctx?: Omit<ParserContext, "tryParser">) =>
+    this.tryDeepParser = (raw, ctx) =>
       this.parser(raw, {
         paths: [],
         ...ctx,
