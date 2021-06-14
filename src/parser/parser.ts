@@ -13,15 +13,17 @@ export interface ParserContext {
   paths: (string | number)[];
   tryParser?: boolean;
   deepTryParser?: boolean;
+  nestedParser?: boolean;
 }
 
 export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
   return (
     raw: any,
-    { paths, tryParser, deepTryParser }: ParserContext = {
+    { paths, tryParser, deepTryParser, nestedParser }: ParserContext = {
       paths: [],
       tryParser: false,
       deepTryParser: false,
+      nestedParser: false,
     }
   ) => {
     let returnValue = raw;
@@ -58,6 +60,7 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
       }
 
       if (errorSubject.hasPrerequisiteError) {
+        if (nestedParser) return errorSubject;
         throw errorSubject;
       }
     }
@@ -79,6 +82,7 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
     }
 
     if (!errorSubject.isEmpty && !tryParser) {
+      if (nestedParser) return errorSubject;
       throw errorSubject;
     }
 

@@ -81,24 +81,30 @@ export class MixedType<
               );
             }
           }
+
           for (const key in types) {
             if (Object.prototype.hasOwnProperty.call(types, key)) {
               const propertySubjectChecker = types[key];
+              const propertyValue = value[key];
 
-              let propertyValue = value[key];
-              try {
-                propertyValue = propertySubjectChecker.parser(propertyValue, {
+              const propertyValueOrError = propertySubjectChecker.parser(
+                propertyValue,
+                {
                   ...otherCtxState,
                   tryParser: otherCtxState.deepTryParser
                     ? otherCtxState.tryParser
                     : false,
                   paths: [...paths, key],
-                });
-
-                returnValue[key] = propertyValue;
-              } catch (error) {
-                errorSubject.addErrors((error as ErrorSet).errors);
+                  nestedParser: true,
+                }
+              );
+              if (propertyValueOrError instanceof ErrorSet) {
+                errorSubject.addErrors(
+                  (propertyValueOrError as ErrorSet).errors
+                );
                 if (otherCtxState.tryParser) returnValue[key] = undefined;
+              } else {
+                returnValue[key] = propertyValueOrError;
               }
             }
           }

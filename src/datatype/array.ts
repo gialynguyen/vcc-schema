@@ -36,20 +36,20 @@ export class ArrayType<Item> extends CoreType<Item[]> {
           const errorSubject = new ErrorSet();
 
           for (let index = 0; index < value.length; index++) {
-            let rawItem = value[index];
-
-            try {
-              rawItem = elementType.parser(rawItem, {
-                ...otherCtxState,
-                tryParser: otherCtxState.deepTryParser
-                  ? otherCtxState.tryParser
-                  : false,
-                paths: [...paths, index],
-              });
-              returnValue[index] = rawItem;
-            } catch (error) {
-              errorSubject.addErrors((error as ErrorSet).errors);
+            const rawItem = value[index];
+            const rawItemOrError = elementType.parser(rawItem, {
+              ...otherCtxState,
+              tryParser: otherCtxState.deepTryParser
+                ? otherCtxState.tryParser
+                : false,
+              paths: [...paths, index],
+              nestedParser: true,
+            });
+            if (rawItemOrError instanceof ErrorSet) {
+              errorSubject.addErrors((rawItemOrError as ErrorSet).errors);
               if (otherCtxState.tryParser) returnValue[index] = undefined;
+            } else {
+              returnValue[index] = rawItemOrError;
             }
           }
 

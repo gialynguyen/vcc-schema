@@ -25,12 +25,15 @@ export class OneOfType<
           const receivedType = typeOf(value);
 
           const hasSomeonePassed = types.some((type) => {
-            try {
-              type.parser(value, { ...ctx });
-              return true;
-            } catch (error) {
-              errorSubject.addErrors((error as ErrorSet).errors);
+            const validOrError = type.parser(value, {
+              ...ctx,
+              nestedParser: true,
+            });
+            if (validOrError instanceof ErrorSet) {
+              errorSubject.addErrors((validOrError as ErrorSet).errors);
               return false;
+            } else {
+              return true;
             }
           });
 
