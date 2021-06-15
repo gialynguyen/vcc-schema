@@ -15,7 +15,10 @@ export interface CheckerOptions {
 export type Checker<
   ErrorParser extends ErrorSubject = ErrorSubject,
   Input = any
-> = (value: Input, options: CheckerOptions) => true | ErrorParser | ErrorSet;
+> = (
+  value: Input,
+  options: CheckerOptions
+) => true | ErrorParser | ErrorSet | ErrorSubject | ErrorSubject[];
 
 export type LazyObjectTypeChecker<
   Type extends IObject,

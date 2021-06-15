@@ -27,7 +27,7 @@ export class OneOfType<
 
           for (let index = 0; index < types.length; index++) {
             const type = types[index];
-            const validOrError = type.parser(value, {
+            const validOrError: any = type.parser(value, {
               deepTryParser: ctx.deepTryParser,
               tryParser: ctx.tryParser,
               paths: ctx.paths,
@@ -36,6 +36,8 @@ export class OneOfType<
 
             if (validOrError instanceof ErrorSet) {
               errors = errors.concat((validOrError as ErrorSet).errors);
+            } else if (ErrorSubject.isArrayErrorSubject(validOrError)) {
+              errors = errors.concat(validOrError);
             } else {
               hasSomeonePassed = true;
               break;
@@ -60,8 +62,7 @@ export class OneOfType<
             }
           }
 
-          if (notInvaidTypeError.length > 0)
-            return new ErrorSet(notInvaidTypeError);
+          if (notInvaidTypeError.length > 0) return notInvaidTypeError;
 
           return new InvalidUnionTypeError({
             expectedType,

@@ -2,7 +2,7 @@ import { string, array } from "../";
 
 import { ErrorSet, InvalidTypeError, TooSmallError } from "../../error";
 
-describe("mixed type", () => {
+describe("array type", () => {
   const addresses = array(string().min(5));
 
   test("valid type", () => {

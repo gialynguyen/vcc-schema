@@ -20,6 +20,10 @@ export class ErrorSubject extends Subject<IError> {
     super({ initialState: error });
     this.error = this.proxyState;
   }
+
+  static isArrayErrorSubject(subject: unknown) {
+    return Array.isArray(subject) && subject[0] instanceof ErrorSubject;
+  }
 }
 
 export class ErrorSet extends Error {

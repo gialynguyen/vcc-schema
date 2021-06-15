@@ -34,7 +34,6 @@ const dummyData = Array(51861).fill({
   addressDetails: [{ name: "Gialynguyen123" }],
   address: {
     name: "GL123123123",
-    detail: "Detail",
   },
   stringOrNumber: 4,
   birthDate: new Date("2021-04-30T07:47:24.168Z"),
@@ -42,7 +41,9 @@ const dummyData = Array(51861).fill({
 
 const startTime = Date.now();
 
-UserModel.parser(dummyData);
+try {
+  UserModel.parser(dummyData);
+} catch (error) {}
 
 const endTime = Date.now();
 

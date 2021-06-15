@@ -43,6 +43,18 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
         } else if (passed instanceof ErrorSet) {
           if (passed.hasPrerequisiteError) shouldThrowError = true;
           errors = errors.concat(passed.errors);
+        } else if (ErrorSubject.isArrayErrorSubject(passed)) {
+          let hasPrerequisiteError = false;
+          for (let index = 0; index < passed.length; index++) {
+            const error = passed[index];
+            if (error.error.prerequisite) {
+              hasPrerequisiteError = true;
+              break;
+            }
+          }
+
+          if (hasPrerequisiteError) shouldThrowError = true;
+          errors = errors.concat(passed);
         }
 
         if (errors.length && tryParser) {
@@ -51,8 +63,8 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
         }
 
         if (shouldThrowError) {
+          if (nestedParser) return errors;
           const errorSubject = new ErrorSet(errors);
-          if (nestedParser) return errorSubject;
           throw errorSubject;
         }
       }
@@ -75,8 +87,8 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
     }
 
     if (errors.length && !tryParser) {
+      if (nestedParser) return errors;
       const errorSubject = new ErrorSet(errors);
-      if (nestedParser) return errorSubject;
       throw errorSubject;
     }
 

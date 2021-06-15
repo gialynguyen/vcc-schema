@@ -97,9 +97,12 @@ export class MixedType<
                 nestedParser: true,
               }
             );
-            
+
             if (propertyValueOrError instanceof ErrorSet) {
               errors = errors.concat((propertyValueOrError as ErrorSet).errors);
+              if (ctx.tryParser) returnValue[key] = undefined;
+            } else if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
+              errors = errors.concat(propertyValueOrError);
               if (ctx.tryParser) returnValue[key] = undefined;
             } else {
               returnValue[key] = propertyValueOrError;
@@ -107,7 +110,7 @@ export class MixedType<
           }
 
           if (errors.length && !ctx.tryParser) {
-            return new ErrorSet(errors);
+            return errors;
           }
 
           return returnValue;
