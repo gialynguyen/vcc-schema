@@ -34,6 +34,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
         (value: any, { ctx }) => {
           const returnValue = value;
           let errors: ErrorSubject[] = [];
+          const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
 
           for (let index = 0; index < value.length; index++) {
             const rawItem = value[index];
@@ -42,14 +43,19 @@ export class ArrayType<Item> extends CoreType<Item[]> {
               tryParser: ctx.deepTryParser ? ctx.tryParser : false,
               paths: [...ctx.paths, index],
               nestedParser: true,
+              throwOnFirstError: ctx.throwOnFirstError,
             });
-            
+
             if (rawItemOrError instanceof ErrorSet) {
               errors = errors.concat(rawItemOrError.errors);
+
               if (ctx.tryParser) returnValue[index] = undefined;
+              if (throwOnFirstError) break;
             } else if (ErrorSubject.isArrayErrorSubject(rawItemOrError)) {
               errors = errors.concat(rawItemOrError);
+
               if (ctx.tryParser) returnValue[index] = undefined;
+              if (throwOnFirstError) break;
             } else {
               returnValue[index] = rawItemOrError;
             }

@@ -64,14 +64,19 @@ export abstract class CoreType<Type> {
 
   parser: (raw: any, ctx?: ParserContext) => Type;
 
+  strictParser: (
+    raw: any,
+    ctx?: Omit<ParserContext, "nestedParser" | "throwOnFirstError">
+  ) => Type;
+
   tryParser: (
     x: any,
-    ctx?: Omit<ParserContext, "tryParser">
+    ctx?: Omit<ParserContext, "tryParser" | "nestedParser">
   ) => NoneDeepPartial<Type>;
 
   tryDeepParser: (
     x: any,
-    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser">
+    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser" | "nestedParser">
   ) => DeepPartial<Type>;
 
   optional: () => OneOfType<[this, UndefinedType]>;
@@ -94,17 +99,26 @@ export abstract class CoreType<Type> {
       lazyCheckers: this._lazyCheckers,
     });
 
+    this.strictParser = (raw, ctx) =>
+      this.parser(raw, {
+        paths: ctx?.paths || [],
+        deepTryParser: ctx?.deepTryParser,
+        tryParser: ctx?.tryParser,
+        throwOnFirstError: true,
+      });
+
     this.tryParser = (raw, ctx) =>
       this.parser(raw, {
-        paths: [],
-        ...ctx,
+        paths: ctx?.paths || [],
+        deepTryParser: ctx?.deepTryParser,
+        throwOnFirstError: ctx?.throwOnFirstError,
         tryParser: true,
       }) as NoneDeepPartial<Type>;
 
     this.tryDeepParser = (raw, ctx) =>
       this.parser(raw, {
-        paths: [],
-        ...ctx,
+        paths: ctx?.paths || [],
+        throwOnFirstError: ctx?.throwOnFirstError,
         tryParser: true,
         deepTryParser: true,
       }) as DeepPartial<Type>;
@@ -170,21 +184,21 @@ export abstract class CoreType<Type> {
     if ([Types.mixed].includes(this._type)) {
       const lazyCheckers = [] as LazyType<Type>[];
       for (const key in lazyOption) {
-        if (Object.prototype.hasOwnProperty.call(lazyOption, key)) {
-          const {
-            checker,
-            defaultPaths = [],
-            ...otherOptions
-          } = lazyOption[key] as LazyObjectTypeChecker<Type, keyof Type>;
-          lazyCheckers.push({
-            checker: (parsedValue: Type) => {
-              const fieldValue = (parsedValue as any)[key];
-              return checker(fieldValue, parsedValue);
-            },
-            defaultPaths: [...defaultPaths, key],
-            ...otherOptions,
-          });
-        }
+        const {
+          checker,
+          defaultPaths = [],
+          message,
+          errorType,
+        } = lazyOption[key] as LazyObjectTypeChecker<Type, keyof Type>;
+        lazyCheckers.push({
+          checker: (parsedValue: Type) => {
+            const fieldValue = (parsedValue as any)[key];
+            return checker(fieldValue, parsedValue);
+          },
+          defaultPaths: [...defaultPaths, key],
+          message,
+          errorType,
+        });
       }
 
       return this._lazy(lazyCheckers);

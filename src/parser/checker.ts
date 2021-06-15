@@ -6,6 +6,7 @@ export interface CheckerContext {
   paths: (string | number)[];
   tryParser?: boolean;
   deepTryParser?: boolean;
+  throwOnFirstError?: boolean;
 }
 
 export interface CheckerOptions {

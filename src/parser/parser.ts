@@ -1,5 +1,3 @@
-import { isArray, isDate, isNull } from "vcc-utils";
-
 import { ErrorSet, ErrorSubject } from "../error";
 import { ErrorCode } from "../error/type";
 import { Checker, LazyType } from "./checker";
@@ -10,20 +8,28 @@ export interface ParserPayload {
 }
 
 export interface ParserContext {
-  paths: (string | number)[];
+  paths?: (string | number)[];
   tryParser?: boolean;
   deepTryParser?: boolean;
   nestedParser?: boolean;
+  throwOnFirstError?: boolean;
 }
 
 export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
   return (
     raw: any,
-    { paths, tryParser, deepTryParser, nestedParser }: ParserContext = {
+    {
+      paths,
+      tryParser,
+      deepTryParser,
+      nestedParser,
+      throwOnFirstError,
+    }: ParserContext = {
       paths: [],
       tryParser: false,
       deepTryParser: false,
       nestedParser: false,
+      throwOnFirstError: false,
     }
   ) => {
     let returnValue = raw;
@@ -33,7 +39,12 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
       const checker = checkers[index];
 
       const passed = checker(raw, {
-        ctx: { paths, tryParser, deepTryParser },
+        ctx: {
+          paths: paths || [],
+          tryParser,
+          deepTryParser,
+          throwOnFirstError,
+        },
       });
 
       if (passed !== true) {
@@ -62,6 +73,8 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
           break;
         }
 
+        if (throwOnFirstError) shouldThrowError = true;
+
         if (shouldThrowError) {
           if (nestedParser) return errors;
           const errorSubject = new ErrorSet(errors);
@@ -82,6 +95,7 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
             paths: defaultPaths || [],
           });
           errors.push(error);
+          if (throwOnFirstError) break;
         }
       }
     }

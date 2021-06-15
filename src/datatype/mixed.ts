@@ -64,13 +64,20 @@ export class MixedType<
         (value: any, { ctx }) => {
           let returnValue = value;
           let errors: ErrorSubject[] = [];
+          const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
 
           if (strict && !ctx.tryParser) {
             const rawObjectKeys = Object.keys(value);
             const propertyCheckerKeys = Object.keys(types);
-            const diffKeys = rawObjectKeys.filter(
-              (key) => !propertyCheckerKeys.includes(key)
-            );
+            const diffKeys: string[] = [];
+            for (let index = 0; index < rawObjectKeys.length; index++) {
+              const key = rawObjectKeys[index];
+              if (!propertyCheckerKeys.includes(key)) {
+                diffKeys.push(key);
+                if (throwOnFirstError) break;
+              }
+            }
+
             if (diffKeys.length > 0) {
               errors = errors.concat(
                 diffKeys.map(
@@ -84,6 +91,10 @@ export class MixedType<
             }
           }
 
+          if (errors.length && throwOnFirstError) {
+            return errors;
+          }
+
           for (const key in types) {
             const propertySubjectChecker = types[key];
             const propertyValue = value[key];
@@ -95,15 +106,18 @@ export class MixedType<
                 tryParser: ctx.deepTryParser ? ctx.tryParser : false,
                 paths: [...ctx.paths, key],
                 nestedParser: true,
+                throwOnFirstError: ctx.throwOnFirstError,
               }
             );
 
             if (propertyValueOrError instanceof ErrorSet) {
               errors = errors.concat((propertyValueOrError as ErrorSet).errors);
               if (ctx.tryParser) returnValue[key] = undefined;
+              if (throwOnFirstError) break;
             } else if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
               errors = errors.concat(propertyValueOrError);
               if (ctx.tryParser) returnValue[key] = undefined;
+              if (throwOnFirstError) break;
             } else {
               returnValue[key] = propertyValueOrError;
             }

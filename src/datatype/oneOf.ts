@@ -32,6 +32,7 @@ export class OneOfType<
               tryParser: ctx.tryParser,
               paths: ctx.paths,
               nestedParser: true,
+              throwOnFirstError: ctx.throwOnFirstError,
             });
 
             if (validOrError instanceof ErrorSet) {
@@ -43,9 +44,11 @@ export class OneOfType<
               break;
             }
           }
-
+          
           if (hasSomeonePassed) return true;
+
           const notInvaidTypeError: ErrorSubject[] = [];
+
           for (let index = 0; index < errors.length; index++) {
             const _error = errors[index];
             if (!InvalidTypeError.is(_error)) {
