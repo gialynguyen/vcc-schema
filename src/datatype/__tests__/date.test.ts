@@ -1,14 +1,13 @@
-import { array, string, ArrayType } from '../';
+import { date, DateType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
-describe("DataType Array", () => {
-    const subject = array(string());
+describe("DataType Date", () => {
+    const subject = date();
 
-    it('should have instance of ArrayType', () => {
-        expect(subject).toBeInstanceOf(ArrayType);
-
-        const dataParser = ["1"];
-        expect(subject.parser(dataParser)).toEqual(dataParser);
+    it('should have instance of DateType', () => {
+        expect(subject).toBeInstanceOf(DateType);
+        const dateData = new Date();
+        expect(subject.parser(dateData)).toEqual(dateData);
     });
 
     it('should throw an invalid error type', () => {

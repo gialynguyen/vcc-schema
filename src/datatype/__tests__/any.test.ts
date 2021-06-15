@@ -1,14 +1,12 @@
-import { array, string, ArrayType } from '../';
+import { any, AnyType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
-describe("DataType Array", () => {
-    const subject = array(string());
+describe("DataType Any", () => {
+    const subject = any();
 
-    it('should have instance of ArrayType', () => {
-        expect(subject).toBeInstanceOf(ArrayType);
-
-        const dataParser = ["1"];
-        expect(subject.parser(dataParser)).toEqual(dataParser);
+    it('should have instance of AnyType', () => {
+        expect(subject).toBeInstanceOf(AnyType);
+        expect(subject.parser(1)).toBe(1);
     });
 
     it('should throw an invalid error type', () => {

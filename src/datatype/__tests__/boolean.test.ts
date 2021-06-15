@@ -1,14 +1,13 @@
-import { array, string, ArrayType } from '../';
+import { boolean, BooleanType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
-describe("DataType Array", () => {
-    const subject = array(string());
+describe("DataType Boolean", () => {
+    const subject = boolean();
 
-    it('should have instance of ArrayType', () => {
-        expect(subject).toBeInstanceOf(ArrayType);
-
-        const dataParser = ["1"];
-        expect(subject.parser(dataParser)).toEqual(dataParser);
+    it('should have instance of BooleanType', () => {
+        expect(subject).toBeInstanceOf(BooleanType);
+        expect(subject.parser(true)).toBeTruthy();
+        expect(subject.parser(false)).toBeFalsy();
     });
 
     it('should throw an invalid error type', () => {
