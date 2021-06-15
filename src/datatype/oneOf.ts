@@ -20,29 +20,35 @@ export class OneOfType<
       type: Types.oneOf,
       defaultCheckers: [
         (value: any, { ctx }) => {
-          const errorSubject = new ErrorSet();
+          let errors: ErrorSubject[] = [];
           const expectedType = types.map(({ type }) => type);
           const receivedType = typeOf(value);
+          let hasSomeonePassed = false;
 
-          const hasSomeonePassed = types.some((type) => {
+          for (let index = 0; index < types.length; index++) {
+            const type = types[index];
             const validOrError = type.parser(value, {
-              ...ctx,
+              deepTryParser: ctx.deepTryParser,
+              tryParser: ctx.tryParser,
+              paths: ctx.paths,
               nestedParser: true,
             });
+
             if (validOrError instanceof ErrorSet) {
-              errorSubject.addErrors((validOrError as ErrorSet).errors);
-              return false;
+              errors = errors.concat((validOrError as ErrorSet).errors);
             } else {
-              return true;
+              hasSomeonePassed = true;
+              break;
             }
-          });
+          }
 
           if (hasSomeonePassed) return true;
           const notInvaidTypeError: ErrorSubject[] = [];
-          errorSubject.errors.forEach((_error, index) => {
+          for (let index = 0; index < errors.length; index++) {
+            const _error = errors[index];
             if (!InvalidTypeError.is(_error)) {
               if (error) {
-                errorSubject.errors[index] = new InvalidUnionTypeError({
+                errors[index] = new InvalidUnionTypeError({
                   expectedType,
                   receivedType,
                   message: error,
@@ -50,9 +56,9 @@ export class OneOfType<
                 });
               }
 
-              notInvaidTypeError.push(errorSubject.errors[index]);
+              notInvaidTypeError.push(errors[index]);
             }
-          });
+          }
 
           if (notInvaidTypeError.length > 0)
             return new ErrorSet(notInvaidTypeError);

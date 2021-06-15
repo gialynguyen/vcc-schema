@@ -1,10 +1,11 @@
-import { isObject, omit, pick } from "vcc-utils";
+import { omit, pick, isObject } from "vcc-utils";
 import { ICallback, IObject, NotUndefined } from "../@types";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
 
 import {
   ErrorConstructorMessage,
   ErrorSet,
+  ErrorSubject,
   InvalidFieldError,
   InvalidTypeError,
   InvalidTypeErrorPayload,
@@ -49,6 +50,7 @@ export class MixedType<
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const isValidObject = isObject(value);
+
           if (isValidObject) return true;
 
           return new InvalidTypeError({
@@ -59,23 +61,23 @@ export class MixedType<
             prerequisite: true,
           });
         },
-        (value: any, { ctx: { paths, ...otherCtxState } }) => {
+        (value: any, { ctx }) => {
           let returnValue = value;
-          const errorSubject = new ErrorSet();
+          let errors: ErrorSubject[] = [];
 
-          if (strict && !otherCtxState.tryParser) {
+          if (strict && !ctx.tryParser) {
             const rawObjectKeys = Object.keys(value);
             const propertyCheckerKeys = Object.keys(types);
             const diffKeys = rawObjectKeys.filter(
               (key) => !propertyCheckerKeys.includes(key)
             );
             if (diffKeys.length > 0) {
-              errorSubject.addErrors(
+              errors = errors.concat(
                 diffKeys.map(
                   (key) =>
                     new InvalidFieldError({
                       invalidFieldPaths: key,
-                      paths: [...paths, key],
+                      paths: [...ctx.paths, key],
                     })
                 )
               );
@@ -83,34 +85,29 @@ export class MixedType<
           }
 
           for (const key in types) {
-            if (Object.prototype.hasOwnProperty.call(types, key)) {
-              const propertySubjectChecker = types[key];
-              const propertyValue = value[key];
+            const propertySubjectChecker = types[key];
+            const propertyValue = value[key];
 
-              const propertyValueOrError = propertySubjectChecker.parser(
-                propertyValue,
-                {
-                  ...otherCtxState,
-                  tryParser: otherCtxState.deepTryParser
-                    ? otherCtxState.tryParser
-                    : false,
-                  paths: [...paths, key],
-                  nestedParser: true,
-                }
-              );
-              if (propertyValueOrError instanceof ErrorSet) {
-                errorSubject.addErrors(
-                  (propertyValueOrError as ErrorSet).errors
-                );
-                if (otherCtxState.tryParser) returnValue[key] = undefined;
-              } else {
-                returnValue[key] = propertyValueOrError;
+            const propertyValueOrError = propertySubjectChecker.parser(
+              propertyValue,
+              {
+                deepTryParser: ctx.deepTryParser,
+                tryParser: ctx.deepTryParser ? ctx.tryParser : false,
+                paths: [...ctx.paths, key],
+                nestedParser: true,
               }
+            );
+            
+            if (propertyValueOrError instanceof ErrorSet) {
+              errors = errors.concat((propertyValueOrError as ErrorSet).errors);
+              if (ctx.tryParser) returnValue[key] = undefined;
+            } else {
+              returnValue[key] = propertyValueOrError;
             }
           }
 
-          if (!errorSubject.isEmpty && !otherCtxState.tryParser) {
-            return errorSubject;
+          if (errors.length && !ctx.tryParser) {
+            return new ErrorSet(errors);
           }
 
           return returnValue;

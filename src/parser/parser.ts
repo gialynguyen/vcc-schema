@@ -27,43 +27,38 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
     }
   ) => {
     let returnValue = raw;
-    const errorSubject = new ErrorSet();
+    let errors: ErrorSubject[] = [];
+    let shouldThrowError = false;
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
-
-      let receiveType: string = typeof raw;
-      if (receiveType === "object") {
-        if (isArray(raw)) receiveType = "array";
-        if (isDate(raw)) receiveType = "date";
-        if (isNull(raw)) receiveType = "null";
-
-        if (receiveType === "object") receiveType = "mixed";
-      }
 
       const passed = checker(raw, {
         ctx: { paths, tryParser, deepTryParser },
       });
 
-      if (passed instanceof ErrorSubject) {
-        errorSubject.addError(passed);
-      }
+      if (passed !== true) {
+        if (passed instanceof ErrorSubject) {
+          if (passed.error.prerequisite) shouldThrowError = true;
+          errors.push(passed);
+        } else if (passed instanceof ErrorSet) {
+          if (passed.hasPrerequisiteError) shouldThrowError = true;
+          errors = errors.concat(passed.errors);
+        }
 
-      if (passed instanceof ErrorSet) {
-        errorSubject.addErrors(passed.errors);
-      }
+        if (errors.length && tryParser) {
+          returnValue = undefined;
+          break;
+        }
 
-      if (!errorSubject.isEmpty && tryParser) {
-        returnValue = undefined;
-        break;
-      }
-
-      if (errorSubject.hasPrerequisiteError) {
-        if (nestedParser) return errorSubject;
-        throw errorSubject;
+        if (shouldThrowError) {
+          const errorSubject = new ErrorSet(errors);
+          if (nestedParser) return errorSubject;
+          throw errorSubject;
+        }
       }
     }
 
-    if (errorSubject.isEmpty) {
+    if (!errors.length) {
       for (let index = 0; index < lazyCheckers.length; index++) {
         const { checker, message, defaultPaths, errorType } =
           lazyCheckers[index];
@@ -74,12 +69,13 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
             message,
             paths: defaultPaths || [],
           });
-          errorSubject.addError(error);
+          errors.push(error);
         }
       }
     }
 
-    if (!errorSubject.isEmpty && !tryParser) {
+    if (errors.length && !tryParser) {
+      const errorSubject = new ErrorSet(errors);
       if (nestedParser) return errorSubject;
       throw errorSubject;
     }

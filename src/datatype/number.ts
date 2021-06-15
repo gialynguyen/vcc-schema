@@ -1,4 +1,4 @@
-import { isNumber } from "vcc-utils";
+import { isNumber } from 'vcc-utils';
 import { CoreType, Types } from "./base";
 
 import {
@@ -21,7 +21,7 @@ export class NumberType extends CoreType<number> {
       type: Types.number,
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
-          const valid = isNumber(value);
+          const valid = isNumber(value)
           if (valid) return true;
 
           return new InvalidTypeError({

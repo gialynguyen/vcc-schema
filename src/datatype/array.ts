@@ -1,9 +1,9 @@
-import { isArray } from "vcc-utils";
 import { CoreType, Types } from "./base";
 
 import {
   ErrorConstructorMessage,
   ErrorSet,
+  ErrorSubject,
   InvalidTypeError,
   InvalidTypeErrorPayload,
   SizeErrorPayload,
@@ -19,42 +19,41 @@ export class ArrayType<Item> extends CoreType<Item[]> {
     return new ArrayType<Item>({
       type: Types.array,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
-          const isValidArray = isArray(value);
+        (value: any, { ctx }) => {
+          const isValidArray = Array.isArray(value);
           if (isValidArray) return true;
 
           return new InvalidTypeError({
             expectedType: Types.array,
             receivedType: typeOf(value),
             message: error,
-            paths,
+            paths: ctx.paths,
             prerequisite: true,
           });
         },
-        (value: any, { ctx: { paths, ...otherCtxState } }) => {
+        (value: any, { ctx }) => {
           const returnValue = value;
-          const errorSubject = new ErrorSet();
+          let errors: ErrorSubject[] = [];
 
           for (let index = 0; index < value.length; index++) {
             const rawItem = value[index];
             const rawItemOrError = elementType.parser(rawItem, {
-              ...otherCtxState,
-              tryParser: otherCtxState.deepTryParser
-                ? otherCtxState.tryParser
-                : false,
-              paths: [...paths, index],
+              deepTryParser: ctx.deepTryParser,
+              tryParser: ctx.deepTryParser ? ctx.tryParser : false,
+              paths: [...ctx.paths, index],
               nestedParser: true,
             });
+
             if (rawItemOrError instanceof ErrorSet) {
-              errorSubject.addErrors((rawItemOrError as ErrorSet).errors);
-              if (otherCtxState.tryParser) returnValue[index] = undefined;
+              errors = errors.concat(rawItemOrError.errors);
+              if (ctx.tryParser) returnValue[index] = undefined;
             } else {
               returnValue[index] = rawItemOrError;
             }
           }
 
-          if (!errorSubject.isEmpty && !otherCtxState.tryParser) {
-            return errorSubject;
+          if (errors.length && !ctx.tryParser) {
+            return new ErrorSet(errors);
           }
 
           return returnValue;
