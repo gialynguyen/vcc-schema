@@ -1,13 +1,12 @@
-import { date, DateType } from '../';
+import { func, VoidType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
-describe("DataType Date", () => {
-    const subject = date();
+describe("DataType Function", () => {
+    const subject = func();
 
-    it('should have instance of DateType', () => {
-        expect(subject).toBeInstanceOf(DateType);
-        const dateData = new Date();
-        expect(subject.parser(dateData)).toEqual(dateData);
+    it('should have instance of VoidType', () => {
+        expect(subject).toBeInstanceOf(VoidType);
+        expect(subject.parser(() => {})).toBeInstanceOf(Function);
     });
 
     it('should throw an InvalidTypeError error', () => {

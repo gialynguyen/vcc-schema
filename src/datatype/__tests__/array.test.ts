@@ -1,5 +1,5 @@
 import { array, string, ArrayType } from '../';
-import { ErrorSet, InvalidTypeError } from '../../error';
+import { ErrorSet, InvalidTypeError, TooSmallError } from '../../error';
 
 describe("DataType Array", () => {
     const subject = array(string());
@@ -11,12 +11,27 @@ describe("DataType Array", () => {
         expect(subject.parser(dataParser)).toEqual(dataParser);
     });
 
-    it('should throw an invalid error type', () => {
+    it('should throw an InvalidTypeError error', () => {
         try {
             subject.parser(null)
         } catch (err) {
             expect(err).toBeInstanceOf(ErrorSet);
             expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
         }
+    });
+
+    describe('NoEmpty', () => {
+        const subject = array(string()).noempty();
+        expect(subject).toBeInstanceOf(ArrayType);
+        expect(subject.parser(["1"]).length).toBeGreaterThan(0);
+
+        it('should throw a TooSmallError error', () => {
+            try {
+                subject.parser(subject.parser([]))
+            } catch (err) {
+                expect(err).toBeInstanceOf(ErrorSet);
+                expect(err.errors[0]).toBeInstanceOf(TooSmallError);
+            }
+        });
     });
 });

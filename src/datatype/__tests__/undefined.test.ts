@@ -1,13 +1,12 @@
-import { date, DateType } from '../';
+import { undefined as undefinedType, UndefinedType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
-describe("DataType Date", () => {
-    const subject = date();
+describe("DataType Undefined", () => {
+    const subject = undefinedType();
 
-    it('should have instance of DateType', () => {
-        expect(subject).toBeInstanceOf(DateType);
-        const dateData = new Date();
-        expect(subject.parser(dateData)).toEqual(dateData);
+    it('should have instance of UndefinedType', () => {
+        expect(subject).toBeInstanceOf(UndefinedType);
+        expect(subject.parser(undefined)).toBeUndefined();
     });
 
     it('should throw an InvalidTypeError error', () => {

@@ -10,7 +10,7 @@ describe("DataType Boolean", () => {
         expect(subject.parser(false)).toBeFalsy();
     });
 
-    it('should throw an invalid error type', () => {
+    it('should throw an InvalidTypeError error', () => {
         try {
             subject.parser(null)
         } catch (err) {
