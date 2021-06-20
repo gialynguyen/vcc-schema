@@ -20,6 +20,17 @@ describe("DataType Array", () => {
         }
     });
 
+    it('should throw an InvalidTypeError error when given a deepTryParser', () => {
+        const subject = array(string());
+        
+        try {
+            subject.parser(["deepTryParser", 1], { deepTryParser: true, paths: [] });
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
+        }
+    })
+
     describe('NoEmpty', () => {
         const subject = array(string()).noempty();
         expect(subject).toBeInstanceOf(ArrayType);
