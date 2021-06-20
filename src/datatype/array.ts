@@ -48,7 +48,6 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             
             if (ErrorSubject.isArrayErrorSubject(rawItemOrError)) {
               errors = errors.concat(rawItemOrError);
-
               if (ctx.tryParser) returnValue[index] = undefined;
               if (throwOnFirstError) break;
             } else {
