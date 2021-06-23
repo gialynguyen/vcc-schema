@@ -1,5 +1,5 @@
 import { mixed, MixedType, string, StringType, number } from '../';
-import { ErrorSet, InvalidTypeError, InvalidFieldError } from '../../error';
+import { ErrorSet, InvalidTypeError, InvalidFieldError, TooBigError } from '../../error';
 
 describe("DataType Mixed", () => {
     const subject = mixed({
@@ -57,6 +57,35 @@ describe("DataType Mixed", () => {
             const pickSubject = subject.omit(['name']);
             expect(pickSubject).toBeInstanceOf(MixedType);
             expect(pickSubject.parser({ age: 24 })['age']).toBe(24);
+        })
+    });
+
+    describe('modifiers', () => {
+        it('should have instance of MixedType', () => {
+            const modifiersSubject = subject.modifiers({ age: (age) => age.max(7) });
+            expect(modifiersSubject).toBeInstanceOf(MixedType);
+            expect(modifiersSubject.parser({ name: 'modifiers', age: 7 })['age']).toBe(7);
+
+            try {
+                modifiersSubject.parser({ name: 'modifiers', age: 24 });
+            } catch (err) {
+                expect(err.errors[0]).toBeInstanceOf(TooBigError);
+            }
+        })
+    });
+
+    describe('pickAndModifers', () => {
+        it('should have instance of MixedType', () => {
+            const pickAndModifersSubject = subject.pickAndModifers({ age: (age) => age.max(7) });
+            expect(pickAndModifersSubject).toBeInstanceOf(MixedType);
+            expect(pickAndModifersSubject.parser({ age: 7 })['age']).toBe(7);
+            expect(pickAndModifersSubject).not.toContain('name');
+
+            try {
+                pickAndModifersSubject.parser({ age: 24 });
+            } catch (err) {
+                expect(err.errors[0]).toBeInstanceOf(TooBigError);
+            }
         })
     });
 
