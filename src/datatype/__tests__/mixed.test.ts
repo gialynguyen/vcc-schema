@@ -5,15 +5,18 @@ describe("DataType Mixed", () => {
     const subject = mixed({
         name: string(),
         age: number(),
+        company: mixed({
+            name: string()
+        })
     });
 
     it('should have instance of MixedType', () => {
-        const mixedValue = { name: 'Người Da Màu', age: 24 };
+        const mixedValue = { name: 'Người Da Màu', age: 24, company: { name: '3dacam' } };
         expect(subject).toBeInstanceOf(MixedType);
         expect(subject.children['name']).toBeInstanceOf(StringType);
         expect(subject.parser(mixedValue)).toEqual(mixedValue);
         expect(subject.parser({ age: 24 }, { tryParser: true, paths: [] }).name).toBeUndefined();
-        expect(subject.parser({ age: 20 }, { deepTryParser: true, tryParser: true, paths: [] }).name).toBeUndefined();
+        expect(subject.parser({ age: 20, company: {} }, { deepTryParser: true, tryParser: true, paths: [] }).company.name).toBeUndefined();
     });
 
     describe('with errors', () => {
@@ -56,7 +59,7 @@ describe("DataType Mixed", () => {
         it('should have instance of MixedType', () => {
             const pickSubject = subject.omit(['name']);
             expect(pickSubject).toBeInstanceOf(MixedType);
-            expect(pickSubject.parser({ age: 24 })['age']).toBe(24);
+            expect(pickSubject.parser({ age: 24, company: { name: '3dacam' } })['age']).toBe(24);
         })
     });
 
@@ -64,10 +67,10 @@ describe("DataType Mixed", () => {
         it('should have instance of MixedType', () => {
             const modifiersSubject = subject.modifiers({ age: (age) => age.max(7) });
             expect(modifiersSubject).toBeInstanceOf(MixedType);
-            expect(modifiersSubject.parser({ name: 'modifiers', age: 7 })['age']).toBe(7);
+            expect(modifiersSubject.parser({ name: 'modifiers', age: 7, company: { name: '3dacam' } })['age']).toBe(7);
 
             try {
-                modifiersSubject.parser({ name: 'modifiers', age: 24 });
+                modifiersSubject.parser({ name: 'modifiers', age: 24, company: { name: '3dacam' } });
             } catch (err) {
                 expect(err.errors[0]).toBeInstanceOf(TooBigError);
             }
