@@ -235,6 +235,25 @@ export class MixedType<
       error,
     });
   }
+
+  extends<ExtendsFields extends IObject<CoreType<any>>>(fields: ExtendsFields) {
+    const { childrenPropertyTypes: currentChildrenTypes } = this;
+    let finalExtendsFileds = {};
+
+    for (const key in fields) {
+      if(!currentChildrenTypes[key]) {
+        // finalExtendsFileds[key] = fields[key] as Extract<keyof ExtendsFields, string>;
+        finalExtendsFileds = {
+          ...finalExtendsFileds,
+          [key]: fields[key]
+        };
+      }
+    }
+
+    return MixedType.create({...currentChildrenTypes, ...finalExtendsFileds}, {
+      strict: this._strict,
+    });
+  }
 }
 
 export const mixed = MixedType.create;
