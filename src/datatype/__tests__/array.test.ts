@@ -1,54 +1,48 @@
-import { string, array } from "../";
+import { array, string, ArrayType } from '../';
+import { ErrorSet, InvalidTypeError, TooSmallError } from '../../error';
 
-import { ErrorSet, InvalidTypeError, TooSmallError } from "../../error";
+describe("DataType Array", () => {
+    const subject = array(string());
 
-describe("array type", () => {
-  const addresses = array(string().min(5));
+    it('should have instance of ArrayType', () => {
+        expect(subject).toBeInstanceOf(ArrayType);
 
-  test("valid type", () => {
-    const pass = addresses.parser(["Gialynguyen"]);
+        const dataParser = ["1"];
+        expect(subject.parser(dataParser)).toEqual(dataParser);
+    });
 
-    expect(pass).toEqual(["Gialynguyen"]);
-  });
+    it('should throw an InvalidTypeError error', () => {
+        try {
+            subject.parser(null)
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
+        }
+    });
 
-  test("invalid type", () => {
-    expect(() => {
-      addresses.parser(5);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "array",
-          receivedType: "number",
-        }),
-      ]).message
-    );
-  });
+    it('should throw an InvalidTypeError error when given a deepTryParser', () => {
+        const subject = array(string());
+        
+        try {
+            subject.parser(["deepTryParser", 1], { deepTryParser: true, paths: [] });
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
+        }
+    })
 
-  test("invalid element type", () => {
-    expect(() => {
-      addresses.parser([5]);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "string",
-          receivedType: "number",
-          paths: [0],
-        }),
-      ]).message
-    );
-  });
+    describe('NoEmpty', () => {
+        const subject = array(string()).noempty();
+        expect(subject).toBeInstanceOf(ArrayType);
+        expect(subject.parser(["1"]).length).toBeGreaterThan(0);
 
-  test("invalid element format", () => {
-    expect(() => {
-      addresses.parser(["abc"]);
-    }).toThrowError(
-      new ErrorSet([
-        new TooSmallError({
-          expectedSize: 5,
-          receivedSize: 3,
-          paths: [0],
-        }),
-      ]).message
-    );
-  });
+        it('should throw a TooSmallError error', () => {
+            try {
+                subject.parser(subject.parser([]))
+            } catch (err) {
+                expect(err).toBeInstanceOf(ErrorSet);
+                expect(err.errors[0]).toBeInstanceOf(TooSmallError);
+            }
+        });
+    });
 });

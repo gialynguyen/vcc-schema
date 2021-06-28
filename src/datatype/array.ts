@@ -45,15 +45,9 @@ export class ArrayType<Item> extends CoreType<Item[]> {
               nestedParser: true,
               throwOnFirstError: ctx.throwOnFirstError,
             });
-
-            if (rawItemOrError instanceof ErrorSet) {
-              errors = errors.concat(rawItemOrError.errors);
-
-              if (ctx.tryParser) returnValue[index] = undefined;
-              if (throwOnFirstError) break;
-            } else if (ErrorSubject.isArrayErrorSubject(rawItemOrError)) {
+            
+            if (ErrorSubject.isArrayErrorSubject(rawItemOrError)) {
               errors = errors.concat(rawItemOrError);
-
               if (ctx.tryParser) returnValue[index] = undefined;
               if (throwOnFirstError) break;
             } else {

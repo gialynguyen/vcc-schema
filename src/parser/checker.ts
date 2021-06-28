@@ -19,7 +19,7 @@ export type Checker<
 > = (
   value: Input,
   options: CheckerOptions
-) => true | ErrorParser | ErrorSet | ErrorSubject | ErrorSubject[];
+) => true | ErrorParser | ErrorSubject | ErrorSubject[];
 
 export type LazyObjectTypeChecker<
   Type extends IObject,

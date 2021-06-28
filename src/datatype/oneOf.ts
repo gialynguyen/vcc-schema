@@ -35,9 +35,8 @@ export class OneOfType<
               throwOnFirstError: ctx.throwOnFirstError,
             });
 
-            if (validOrError instanceof ErrorSet) {
-              errors = errors.concat((validOrError as ErrorSet).errors);
-            } else if (ErrorSubject.isArrayErrorSubject(validOrError)) {
+
+            if (ErrorSubject.isArrayErrorSubject(validOrError)) {
               errors = errors.concat(validOrError);
             } else {
               hasSomeonePassed = true;

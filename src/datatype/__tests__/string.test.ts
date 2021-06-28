@@ -1,152 +1,80 @@
-// @ts-ignore TS6133
-import { expect, test } from "@jest/globals";
-import { string } from "../";
+import { string, StringType } from '../';
+import { ErrorSet, InvalidTypeError, TooBigError, TooSmallError, IncorrectSizeError, InvalidStringFormat } from '../../error';
 
-import {
-  ErrorSet,
-  InvalidTypeError,
-  TooBigError,
-  TooSmallError,
-} from "../../error";
+describe("DataType String", () => {
+  const subject = string();
 
-describe("string type", () => {
-  const name = string();
-
-  test("valid type", () => {
-    const pass = name.parser("Gialynguyen");
-    expect(pass).toEqual("Gialynguyen");
+  it('should have instance of NullType', () => {
+    expect(subject).toBeInstanceOf(StringType);
+    expect(subject.parser('stringType')).toEqual('stringType')
   });
 
-  test("invalid type", () => {
-    expect(() => {
-      name.parser(5);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "string",
-          receivedType: "number",
-        }),
-      ]).message
-    );
+  it('should throw an InvalidTypeError error', () => {
+    try {
+        subject.parser(null)
+    } catch (err) {
+        expect(err).toBeInstanceOf(ErrorSet);
+        expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
+    }
   });
 
-  test("custom error string", () => {
-    expect(() => {
-      string("Vui lòng nhập một chuỗi").parser(5);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "string",
-          receivedType: "number",
-          message: "Vui lòng nhập một chuỗi",
-        }),
-      ]).message
-    );
+  describe('Max', () => {
+    const subject = string().max(7);
+    expect(subject).toBeInstanceOf(StringType);
+    expect(subject.parser('1234567').length).toBeLessThanOrEqual(7)
+
+    it('should throw a TooBigError error', () => {
+        try {
+            subject.parser('12345678')
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(TooBigError);
+        }
+    });
   });
 
-  test("custom error builder", () => {
-    expect(() => {
-      string(
-        ({ expectedType, receivedType }) =>
-          `Thay vì nhập ${receivedType}, hãy nhập một ${expectedType}`
-      ).parser(5);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "string",
-          receivedType: "number",
-          message: "Thay vì nhập number, hãy nhập một string",
-        }),
-      ]).message
-    );
-  });
-});
+  describe('Min', () => {
+    const subject = string().min(7);
+    expect(subject).toBeInstanceOf(StringType);
+    expect(subject.parser('1234567').length).toBeGreaterThanOrEqual(7)
 
-describe("string max length", () => {
-  const name = string().max(5);
-
-  test("valid length", () => {
-    const pass = name.parser("abcd");
-    expect(pass).toEqual("abcd");
+    it('should throw a TooSmallError error', () => {
+        try {
+            subject.parser('123456')
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(TooSmallError);
+        }
+    });
   });
 
-  test("invalid type", () => {
-    expect(() => {
-      name.parser(5);
-    }).toThrowError(
-      new ErrorSet([
-        new InvalidTypeError({
-          expectedType: "string",
-          receivedType: "number",
-        }),
-      ]).message
-    );
+  describe('Length', () => {
+    const subject = string().length(7);
+    expect(subject).toBeInstanceOf(StringType);
+    expect(subject.parser('1234567').length).toBe(7)
+
+    it('should throw an IncorrectSizeError error', () => {
+        try {
+            subject.parser('123456')
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(IncorrectSizeError);
+        }
+    });
   });
 
-  test("invalid length", () => {
-    expect(() => {
-      name.parser("abcdefgh");
-    }).toThrowError(
-      new ErrorSet([
-        new TooBigError({
-          expectedSize: 5,
-          receivedSize: 8,
-        }),
-      ]).message
-    );
-  });
+  describe('Email', () => {
+    const subject = string().email();
+    expect(subject).toBeInstanceOf(StringType);
+    expect(subject.parser('email@gmail.com')).toEqual('email@gmail.com');
 
-  test("custom error string", () => {
-    expect(() => {
-      string()
-        .max(5, "Vui lòng nhập một chuỗi bé hơn hoặc bằng 5")
-        .parser("abcdefgh");
-    }).toThrowError(
-      new ErrorSet([
-        new TooBigError({
-          expectedSize: 5,
-          receivedSize: 8,
-          message: "Vui lòng nhập một chuỗi bé hơn hoặc bằng 5",
-        }),
-      ]).message
-    );
-  });
-});
-
-describe("string min length", () => {
-  const name = string().min(5);
-
-  test("valid length", () => {
-    const pass = name.parser("abcdefgh");
-    expect(pass).toEqual("abcdefgh");
-  });
-
-  test("invalid length", () => {
-    expect(() => {
-      name.parser("abc");
-    }).toThrowError(
-      new ErrorSet([
-        new TooSmallError({
-          expectedSize: 5,
-          receivedSize: 3,
-        }),
-      ]).message
-    );
-  });
-
-  test("custom error string", () => {
-    expect(() => {
-      string()
-        .min(5, "Vui lòng nhập một chuỗi lớn hơn hoặc bằng 5")
-        .parser("abc");
-    }).toThrowError(
-      new ErrorSet([
-        new TooSmallError({
-          expectedSize: 5,
-          receivedSize: 3,
-          message: "Vui lòng nhập một chuỗi lớn hơn hoặc bằng 5",
-        }),
-      ]).message
-    );
+    it('should throw an InvalidStringFormat error', () => {
+        try {
+            subject.parser('invalidTypeEmail')
+        } catch (err) {
+            expect(err).toBeInstanceOf(ErrorSet);
+            expect(err.errors[0]).toBeInstanceOf(InvalidStringFormat);
+        }
+    });
   });
 });

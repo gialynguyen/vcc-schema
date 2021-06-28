@@ -110,11 +110,7 @@ export class MixedType<
               }
             );
 
-            if (propertyValueOrError instanceof ErrorSet) {
-              errors = errors.concat((propertyValueOrError as ErrorSet).errors);
-              if (ctx.tryParser) returnValue[key] = undefined;
-              if (throwOnFirstError) break;
-            } else if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
+            if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
               errors = errors.concat(propertyValueOrError);
               if (ctx.tryParser) returnValue[key] = undefined;
               if (throwOnFirstError) break;
