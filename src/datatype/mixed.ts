@@ -236,13 +236,12 @@ export class MixedType<
     });
   }
 
-  extends<ExtendsFields extends IObject<CoreType<any>>>(fields: ExtendsFields) {
+  extends<ExtendsFields extends IObject<ValueType<CoreType<any>>>>(fields: ExtendsFields) {
     const { childrenPropertyTypes: currentChildrenTypes } = this;
-    let finalExtendsFileds = {};
+    let finalExtendsFileds = {} as Pick<ExtendsFields, keyof typeof fields>;
 
     for (const key in fields) {
       if(!currentChildrenTypes[key]) {
-        // finalExtendsFileds[key] = fields[key] as Extract<keyof ExtendsFields, string>;
         finalExtendsFileds = {
           ...finalExtendsFileds,
           [key]: fields[key]

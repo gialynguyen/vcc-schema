@@ -1,4 +1,4 @@
-import { mixed, MixedType, string, StringType, number } from '../';
+import { mixed, MixedType, string, StringType, number, array } from '../';
 import { ErrorSet, InvalidTypeError, InvalidFieldError, TooBigError } from '../../error';
 
 describe("DataType Mixed", () => {
@@ -104,6 +104,23 @@ describe("DataType Mixed", () => {
                 strictSubject.parser({ major: 'Software engineer' });
             } catch (err) {
                 expect(err.errors[0]).toBeInstanceOf(InvalidFieldError);
+            }
+        });
+    });
+
+    describe('extends', () => {
+        it('should have instance of MixedType', () => {
+            const extendsSubject = subject.extends({ name: number(), routines: array(string()) });
+            expect(extendsSubject).toBeInstanceOf(MixedType);
+            expect(extendsSubject.children.routines).not.toBeUndefined();
+        })
+
+        it('should throw an InvalidTypeError error', () => {
+            const extendsSubject = subject.extends({ name: number(), routines: array(string()) });
+            try {
+                extendsSubject.parser({ name: 17,  age: 24, company: { name: '3dacam' }, routines: ["drink coffee"] });
+            } catch (err) {
+                expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
             }
         });
     });
