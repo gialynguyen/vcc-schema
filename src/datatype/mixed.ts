@@ -236,22 +236,15 @@ export class MixedType<
     });
   }
 
-  extends<ExtendsFields extends IObject<ValueType<CoreType<any>>>>(fields: ExtendsFields) {
-    const { childrenPropertyTypes: currentChildrenTypes } = this;
-    let finalExtendsFileds = {} as Pick<ExtendsFields, keyof typeof fields>;
-
-    for (const key in fields) {
-      if(!currentChildrenTypes[key]) {
-        finalExtendsFileds = {
-          ...finalExtendsFileds,
-          [key]: fields[key]
-        };
+  extends<ExtendsFields extends IObject<ValueType<CoreType<unknown>>>>(
+    fields: ExtendsFields
+  ) {
+    return MixedType.create(
+      { ...fields, ...this.childrenPropertyTypes },
+      {
+        strict: this._strict,
       }
-    }
-
-    return MixedType.create({...currentChildrenTypes, ...finalExtendsFileds}, {
-      strict: this._strict,
-    });
+    );
   }
 }
 
