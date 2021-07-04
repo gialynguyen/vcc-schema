@@ -235,6 +235,17 @@ export class MixedType<
       error,
     });
   }
+
+  extends<ExtendsFields extends IObject<ValueType<CoreType<unknown>>>>(
+    fields: ExtendsFields
+  ) {
+    return MixedType.create(
+      { ...fields, ...this.childrenPropertyTypes },
+      {
+        strict: this._strict,
+      }
+    );
+  }
 }
 
 export const mixed = MixedType.create;
