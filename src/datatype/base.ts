@@ -66,17 +66,17 @@ export abstract class CoreType<Type> {
 
   strictParser: (
     raw: any,
-    ctx?: Omit<ParserContext, "nestedParser" | "throwOnFirstError">
+    ctx?: Omit<ParserContext, "throwOnFirstError">
   ) => Type;
 
   tryParser: (
     x: any,
-    ctx?: Omit<ParserContext, "tryParser" | "nestedParser">
+    ctx?: Omit<ParserContext, "tryParser">
   ) => NoneDeepPartial<Type>;
 
   tryDeepParser: (
     x: any,
-    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser" | "nestedParser">
+    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser">
   ) => DeepPartial<Type>;
 
   optional: () => OneOfType<[this, UndefinedType]>;
@@ -87,7 +87,9 @@ export abstract class CoreType<Type> {
 
   array: () => ArrayType<Type>;
 
-  validate: (raw: any) => { success: boolean; data?: Type; error?: ErrorSet };
+  validate: (
+    raw: any
+  ) => { success: true; data: Type } | { success: false; error: ErrorSet };
 
   constructor(params: CoreTypeConstructorParams<Type>) {
     this._checkers = params.defaultCheckers || [];

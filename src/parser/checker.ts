@@ -13,13 +13,10 @@ export interface CheckerOptions {
   ctx: CheckerContext;
 }
 
-export type Checker<
-  ErrorParser extends ErrorSubject = ErrorSubject,
-  Input = any
-> = (
+export type Checker<Input = any> = (
   value: Input,
   options: CheckerOptions
-) => true | ErrorParser | ErrorSubject | ErrorSubject[];
+) => true | ErrorSubject | ErrorSubject[];
 
 export type LazyObjectTypeChecker<
   Type extends IObject,
