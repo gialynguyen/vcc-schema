@@ -41,183 +41,183 @@ npm install vcc-schema
 
 Khởi tạo một SchemaType, chúng ta sẽ bắt đầu với những thứ đơn giản nhất:
 
-```
-    import { string } from 'vcc-schema';
+```ts
+import { string } from 'vcc-schema';
 
-	const name = string();
+const name = string();
 
-	name.parser("Gialynguyen"); // "Gialynguyen"
-	name.parser(3); // throw ErrorSet
+name.parser("Gialynguyen"); // "Gialynguyen"
+name.parser(3); // throw ErrorSet
 ```
 
 Tiếp theo là một SchemaType phức tạp hơn:
 
-```
-	import { mixed, string } from 'vcc-schema';
+```ts
+import { mixed, string } from 'vcc-schema';
 
-	const Customer = mixed({
-		name: string(),
-	});
+const Customer = mixed({
+	name: string(),
+});
 
-	Customer.parser({
-		name: "Gialynguyen"
-	}); // { name: "Gialynguyen" }
+Customer.parser({
+	name: "Gialynguyen"
+}); // { name: "Gialynguyen" }
 
-	type CustomerType = ValueType<typeof Customer>; // { name: string }
+type CustomerType = ValueType<typeof Customer>; // { name: string }
 ```
 
 # String
 
-```
-	import { string } from "vcc-schema";
+```ts
+import { string } from "vcc-schema";
 
-	string();
-	string().max(5);
-	string().min(5);
-	string().min(3).max(7);
-	string().length(7);
-	string().email();
+string();
+string().max(5);
+string().min(5);
+string().min(3).max(7);
+string().length(7);
+string().email();
 ```
 
 ##### Tuỳ chỉnh ErrorMessage:
 
-```
-	import { string } from "vcc-schema";
+```ts
+import { string } from "vcc-schema";
 
-	string().email("Vui lòng nhập một email hợp lệ");
+string().email("Vui lòng nhập một email hợp lệ");
 ```
 
 # Number
 
-```
-	import { number } from "vcc-schema";
+```ts
+import { number } from "vcc-schema";
 
-	number();
-	number().max(5);
-	number().min(5);
-	number().min(3).max(7);
-	number().equal(7);
+number();
+number().max(5);
+number().min(5);
+number().min(3).max(7);
+number().equal(7);
 ```
 
 ##### Tuỳ chỉnh ErrorMessage:
 
-```
-	import { number } from "vcc-schema";
+```ts
+import { number } from "vcc-schema";
 
-	number().max(5, "Vui lòng nhập một số không vượt quá 5");
+number().max(5, "Vui lòng nhập một số không vượt quá 5");
 ```
 
 # Mixed (Object)
 
-```
-	import { mixed, string, number } from "vcc-schema"
+```ts
+import { mixed, string, number } from "vcc-schema"
 
-	const Customer = mixed({
-		name: string().min(5),
-		age: number().min(18),
-	});
+const Customer = mixed({
+	name: string().min(5),
+	age: number().min(18),
+});
 ```
 
 ### `.children`
 
 Là một `getter` để truy cập giá trị của các SchemaType con bên trong.
 
-```
-	Customer.children.name
+```ts
+Customer.children.name
 ```
 
 ### `.pick`
 
-```
-	import { mixed, string, number } from "vcc-schema"
+```ts
+import { mixed, string, number } from "vcc-schema"
 
-	const User = mixed({
-		name: string(),
+const User = mixed({
+	name: string(),
+	address: mixed({
+		detail: string(),
+	})
+})
+
+const UserAddress = User.pick(['address'])
+
+/*
+	mixed({
 		address: mixed({
-			detail: string(),
+			detail: string()
 		})
 	})
-
-	const UserAddress = User.pick(['address'])
-
-	/*
-		mixed({
-			address: mixed({
-				detail: string()
-			})
-		})
-	*/
+*/
 
 ```
 
 ### `.omit`
 
-```
-	import { mixed, string, number } from "vcc-schema"
+```ts
+import { mixed, string, number } from "vcc-schema"
 
-	const User = mixed({
-		name: string(),
+const User = mixed({
+	name: string(),
+	address: mixed({
+		detail: string(),
+	})
+})
+
+const UserAddress = User.pick(['name'])
+
+/*
+	mixed({
 		address: mixed({
-			detail: string(),
+			detail: string()
 		})
 	})
-
-	const UserAddress = User.pick(['name'])
-
-	/*
-		mixed({
-			address: mixed({
-				detail: string()
-			})
-		})
-	*/
+*/
 
 ```
 
 ### `.modifiers`
 
-```
-	import { mixed, string, number, ValueType } from "../dist";
+```ts
+import { mixed, string, number, ValueType } from "../dist";
 
-	const UserSchema = mixed({
-		name: string(),
-		age: number(),
-	});
+const UserSchema = mixed({
+	name: string(),
+	age: number(),
+});
 
-	const CreateUserSchema = UserSchema.modifiers({
-		name: (name) => name.optional(),
-	});
+const CreateUserSchema = UserSchema.modifiers({
+	name: (name) => name.optional(),
+});
 
-	type CreateUserType = ValueType<typeof CreateUserSchema>;
-	/*
-		type CreateUserType = {
-			name: string | undefined;
-			age: number;
-		}
-	*/
+type CreateUserType = ValueType<typeof CreateUserSchema>;
+/*
+	type CreateUserType = {
+		name: string | undefined;
+		age: number;
+	}
+*/
 ```
 
 ### `.pickAndModifers`
 
-```
-	import { mixed, string, number, ValueType } from "../dist";
+```ts
+import { mixed, string, number, ValueType } from "../dist";
 
-	const UserSchema = mixed({
-		name: string(),
-		age: number(),
-	});
+const UserSchema = mixed({
+	name: string(),
+	age: number(),
+});
 
 
-	const UpdateUserSchema = UserSchema.pickAndModifers({
-		name: (name) => name.optional(),
-	});
+const UpdateUserSchema = UserSchema.pickAndModifers({
+	name: (name) => name.optional(),
+});
 
-	type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
-	/*
-		type UpdateUserPayload = {
-			name: string | undefined;
-		}
-	*/
+type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
+/*
+	type UpdateUserPayload = {
+		name: string | undefined;
+	}
+*/
 ```
 
 # Array
