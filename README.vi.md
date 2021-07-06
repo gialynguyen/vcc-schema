@@ -6,7 +6,13 @@
 - [String](#string)
 - [Number](#number)
 - [Mixed (Object)](#mixed)
+	- [.children](#children)
+	- [.pick](#pick)
+	- [.omit](#omit)
+	- [.modifiers](#modifiers)
+	- [.pickAndModifers](#pickandmodifers)
 - [Array](#array)
+	- [.noempty](#noempty)
 - [OneOf](#OneOf)
 - [Boolean](#boolean)
 - [Date](#date)
@@ -177,7 +183,7 @@ const UserAddress = User.pick(['name'])
 ### `.modifiers`
 
 ```ts
-import { mixed, string, number, ValueType } from "../dist";
+import { mixed, string, number, ValueType } from "vcc-schema";
 
 const UserSchema = mixed({
 	name: string(),
@@ -200,7 +206,7 @@ type CreateUserType = ValueType<typeof CreateUserSchema>;
 ### `.pickAndModifers`
 
 ```ts
-import { mixed, string, number, ValueType } from "../dist";
+import { mixed, string, number, ValueType } from "vcc-schema";
 
 const UserSchema = mixed({
 	name: string(),
@@ -222,7 +228,39 @@ type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
 
 # Array
 
+```ts
+import { array } from "vcc-schema";
+
+const stringArray = array(string());
+
+// Hoặc có thể viết thuyết cách tương tự (được khuyến khích hơn) như sau:
+
+const stringArray = string().array();
+```
+
+### `.noempty`
+
+Sử dụng hàm này nếu muốn đảm bảo mảng có ít nhất 1 phần tử
+
+```ts
+import { array } from "vcc-schema";
+
+const stringArray = string().array().noempty();
+```
+
+### `.min` / `.max` / `.length` (Cập nhập sau)
+
 # OneOf
+Ý nghĩa tương tự như toán tử `OR`.
+
+Khi nhận `input` vào, VC-S sẽ kiểm tra mỗi SchemaType theo thứ tự và sẽ trả về giá trị đầu tiên hợp lệ, hoặc sẽ trả về lỗi nếu các SchemaType đều cho kết quả không hợp lệ.
+
+```ts
+const stringOrNumber = oneOf([string(), number()]);
+
+stringOrNumber.parse("foo"); // passes
+stringOrNumber.parse(14); // passes
+```
 
 # Boolean
 
@@ -236,11 +274,11 @@ type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
 
 # Any
 
-# Record
+# Record (Cập nhật sau)
 
-# Enum
+# Enum (Cập nhật sau)
 
-# Custom
+# Custom (Cập nhật sau)
 
 # BaseType
 
@@ -251,9 +289,13 @@ Một số interface cần lưu ý:
 ### `ParserContext`
 
 - paths: (default: []) Đường dẫn khởi đầu.
+
 - tryParser: (default: false) Nếu giá trị là `true`, nếu `data` được đưa vào không valid, một ErrorSet sẽ được throw. Ngược lại, nếu giá trị là `false`, error sẽ được bỏ qua và giá trị trả về sẽ là `undefined`.
+
 - deepTryParser: (default: false) tương tự như `tryParser`. Nhưng `tryParser` chỉ có tác động đến cấp độ ngoài cùng của một SchemaType, còn `deepTryParser` thì tác động sẽ được đệ quy đến các cấp con được lồng sâu bên trong.
+
 - nestedParser: (default: false) Nếu giá trị là `true`, điều này cho biết quá trình đang được thực hiện ở một SchemaType cấp độ con nằm bên trong một SchemaType khác. Ngược lại nếu là `false` thì đồng nghĩa với quá trình đang được thực thi ở SchemaType cấp độ ngoài ngoài cùng. Điều khác biệt ở đây là: nếu phát sinh lỗi, thì nếu `nestedParser` là `true` thì một `SubjectError` hoặc `Array<SubjectError>` sẽ được `return` thay vì `throw` ra một `ErrorSet`.
+
 - throwOnFirstError: (default: false) Nếu giá trị là `true`, các quá trình sẽ dừng lại khi một error (ErrorSubject) được phát hiện. Ngược lại, nếu là `false`, tất cả các error(ErrorSubject) được phát hiện sẽ được tổng hợp thành một ErrorSet sau khi quá trình hoàn tất.
 
 ```
