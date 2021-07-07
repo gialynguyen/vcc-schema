@@ -3,6 +3,7 @@
 - [Giới thiệu](#giới-thiệu)
 - [Cài đặt](#cài-đặt)
 - [Trường hợp sử dụng tổng quát](#trường-hợp-sử-dụng-tổng-quát)
+- [Const](#const)
 - [String](#string)
 - [Number](#number)
 - [Mixed (Object)](#mixed)
@@ -71,6 +72,8 @@ Customer.parser({
 
 type CustomerType = ValueType<typeof Customer>; // { name: string }
 ```
+
+# Const (Cập nhật sau)
 
 # String
 
@@ -271,15 +274,55 @@ stringOrNumber.parse(14); // passes
 
 # Boolean
 
+```ts
+import { boolean } from "vcc-schema";
+
+const isBoolean = boolean();
+```
+
 # Date
+
+```ts
+import { date } from "vcc-schema";
+
+const isDate = date();
+```
 
 # Null
 
+```ts
+import { nullable } from "vcc-schema";
+
+const isNull = nullable();
+```
+
 # Undefined
+
+```ts
+import { undefined } from "vcc-schema";
+
+const isUndefined = undefined();
+```
 
 # Unknown
 
+Tất cả `data` đều `valid` đối với `Unknown` SchemaType.
+
+```ts
+import { unknown } from "vcc-schema";
+
+const isUknown = unknown();
+```
+
 # Any
+
+`Any` SchemaType sẽ cho phép những `data` có `giá trị` (khác null và undefined) là `valid`.
+
+```ts
+import { any } from "vcc-schema";
+
+const isAny = any();
+```
 
 # Record (Cập nhật sau)
 
