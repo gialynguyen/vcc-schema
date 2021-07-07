@@ -20,3 +20,12 @@ export type DeepPartial<T> = T extends Function
     ? DeepPartial<T[number]>[]
     : { [P in keyof T]?: DeepPartial<T[P]> }
   : T;
+
+export type Primitive =
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | Symbol;

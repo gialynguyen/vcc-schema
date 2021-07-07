@@ -59,6 +59,7 @@ export class MixedType<
             message: options?.error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
         (value: any, { ctx }) => {

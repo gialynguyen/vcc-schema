@@ -23,6 +23,7 @@ export class UndefinedType extends CoreType<undefined> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

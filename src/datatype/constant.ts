@@ -1,27 +1,26 @@
-import { CoreType, Types } from "./base";
-
+import { Primitive } from "../@types";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
-import { isNull } from "vcc-utils";
-import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
-export class AnyType extends CoreType<any> {
-  static create = (
+export class ConstantType<Value extends any> extends CoreType<Value> {
+  static create = <Value extends Primitive>(
+    constantValue: Value,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
-    return new AnyType({
-      type: Types.any,
+    return new ConstantType<Value>({
+      type: Types.const,
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
-          const valid = !isNull(value) && typeof value !== "undefined";
+          const valid = value === constantValue;
           if (valid) return true;
 
           return new InvalidTypeError({
-            expectedType: Types.any,
-            receivedType: typeOf(value),
+            expectedType: constantValue,
+            receivedType: value,
             message: error,
             paths,
             prerequisite: true,
@@ -33,4 +32,4 @@ export class AnyType extends CoreType<any> {
   };
 }
 
-export const any = AnyType.create;
+export const constant = ConstantType.create;

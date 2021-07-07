@@ -1,4 +1,4 @@
-import { isNumber } from 'vcc-utils';
+import { isNumber } from "vcc-utils";
 import { CoreType, Types } from "./base";
 
 import {
@@ -30,6 +30,7 @@ export class NumberType extends CoreType<number> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],
@@ -42,14 +43,15 @@ export class NumberType extends CoreType<number> {
   ) => {
     return this._extends({
       checkers: [
-        (data: number, { ctx: { paths } }) => {
-          if (data <= maxValue) return true;
+        (value: number, { ctx: { paths } }) => {
+          if (value <= maxValue) return true;
 
           return new TooBigError({
             expectedSize: maxValue,
-            receivedSize: data,
+            receivedSize: value,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -62,14 +64,15 @@ export class NumberType extends CoreType<number> {
   ) => {
     return this._extends({
       checkers: [
-        (data: number, { ctx: { paths } }) => {
-          if (data >= minValue) return true;
+        (value: number, { ctx: { paths } }) => {
+          if (value >= minValue) return true;
 
           return new TooSmallError({
             expectedSize: minValue,
-            receivedSize: data,
+            receivedSize: value,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -90,6 +93,7 @@ export class NumberType extends CoreType<number> {
             receivedValue: data,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],

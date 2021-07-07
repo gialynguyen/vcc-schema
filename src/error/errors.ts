@@ -1,4 +1,5 @@
 import { isFunction } from "vcc-utils";
+import { Primitive } from "../@types";
 import { ErrorSubject } from "./creator";
 import { ErrorCode } from "./type";
 
@@ -7,11 +8,12 @@ export type ErrorConstructorMessage<ParamByErrorType> =
   | ((params: ParamByErrorType) => string);
 
 export interface InvalidTypeErrorPayload {
-  expectedType: string;
-  receivedType: string;
+  expectedType: Primitive;
+  receivedType: Primitive;
 }
 
 export type ErrorConstructorParams<Params> = Params & {
+  inputData?: any;
   message?: ErrorConstructorMessage<Params>;
   paths?: (string | number)[];
   prerequisite?: boolean;
@@ -26,9 +28,9 @@ export class InvalidTypeError extends ErrorSubject {
       }) => string) = (payload) =>
     `Expected ${payload.expectedType}, received ${payload.receivedType}`;
 
-  public expectedType: string;
+  public expectedType: Primitive;
 
-  public receivedType: string;
+  public receivedType: Primitive;
 
   constructor(payload: ErrorConstructorParams<InvalidTypeErrorPayload>) {
     let message = payload.message || InvalidTypeError.defaultMessage;
@@ -44,6 +46,7 @@ export class InvalidTypeError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedType = payload.expectedType;
@@ -100,6 +103,7 @@ export class InvalidUnionTypeError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedType = payload.expectedType;
@@ -150,6 +154,7 @@ export class TooSmallError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -191,6 +196,7 @@ export class TooBigError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -232,6 +238,7 @@ export class IncorrectSizeError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedSize = payload.expectedSize;
@@ -280,6 +287,7 @@ export class NoEqualError<Type> extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.expectedValue = payload.expectedValue;
@@ -320,6 +328,7 @@ export class InvalidFieldError extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
 
     this.invalidFieldPaths = payload.invalidFieldPaths;
@@ -364,6 +373,7 @@ export class InvalidStringFormat extends ErrorSubject {
       message: message as string,
       paths: payload.paths || [],
       prerequisite: payload.prerequisite,
+      inputData: payload.inputData,
     });
   }
 

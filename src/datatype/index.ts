@@ -11,3 +11,4 @@ export * from "./unknown";
 export * from "./date";
 export * from "./array";
 export * from "./base";
+export * from "./constant";

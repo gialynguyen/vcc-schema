@@ -25,6 +25,7 @@ export class NullType extends CoreType<null> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

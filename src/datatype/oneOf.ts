@@ -35,7 +35,6 @@ export class OneOfType<
               throwOnFirstError: ctx.throwOnFirstError,
             });
 
-
             if (ErrorSubject.isArrayErrorSubject(validOrError)) {
               errors = errors.concat(validOrError);
             } else {
@@ -43,7 +42,7 @@ export class OneOfType<
               break;
             }
           }
-          
+
           if (hasSomeonePassed) return true;
 
           const notInvaidTypeError: ErrorSubject[] = [];
@@ -57,6 +56,7 @@ export class OneOfType<
                   receivedType,
                   message: error,
                   paths: ctx.paths,
+                  inputData: value,
                 });
               }
 
@@ -72,6 +72,7 @@ export class OneOfType<
             message: error,
             paths: ctx.paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

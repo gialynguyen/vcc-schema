@@ -35,6 +35,7 @@ export enum Types {
   enum = "enum",
   oneOf = "oneOf",
   custom = "custom",
+  const = "const",
 }
 
 export type ValueType<Type> = Type extends CoreType<infer T>

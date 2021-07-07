@@ -30,6 +30,7 @@ export class VoidType<
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

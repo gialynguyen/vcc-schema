@@ -24,6 +24,7 @@ export class BooleanType extends CoreType<boolean> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

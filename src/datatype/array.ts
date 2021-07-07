@@ -30,6 +30,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             message: error,
             paths: ctx.paths,
             prerequisite: true,
+            inputData: value,
           });
         },
         (value: any, { ctx }) => {
@@ -75,6 +76,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
+            inputData: value,
           });
         },
       ],
@@ -90,6 +92,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
+            inputData: value,
           });
         },
       ],
@@ -105,6 +108,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
+            inputData: value,
           });
         },
       ],
@@ -120,6 +124,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
             expectedSize: 1,
             receivedSize: value.length,
             message: error || "Expected no empty",
+            inputData: value,
           });
         },
       ],

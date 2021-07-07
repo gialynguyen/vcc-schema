@@ -73,7 +73,16 @@ Customer.parser({
 type CustomerType = ValueType<typeof Customer>; // { name: string }
 ```
 
-# Const (Cập nhật sau)
+# Const
+
+```ts
+import { constant, ValueType } from "vcc-schema";
+
+const ConstantSchema = constant("Gialynguyen");
+
+type ConstantType = ValueType<typeof ConstantSchema>; // "Gialynguyen"
+
+```
 
 # String
 

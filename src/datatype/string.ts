@@ -36,6 +36,7 @@ export class StringType extends CoreType<string> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],
@@ -48,14 +49,15 @@ export class StringType extends CoreType<string> {
   ) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
-          if (data.length <= maxLength) return true;
+        (value: string, { ctx: { paths } }) => {
+          if (value.length <= maxLength) return true;
 
           return new TooBigError({
             expectedSize: maxLength,
-            receivedSize: data.length,
+            receivedSize: value.length,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -68,14 +70,15 @@ export class StringType extends CoreType<string> {
   ) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
-          if (data.length >= minLength) return true;
+        (value: string, { ctx: { paths } }) => {
+          if (value.length >= minLength) return true;
 
           return new TooSmallError({
             expectedSize: minLength,
-            receivedSize: data.length,
+            receivedSize: value.length,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -88,14 +91,15 @@ export class StringType extends CoreType<string> {
   ) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
-          if (data.length === length) return true;
+        (value: string, { ctx: { paths } }) => {
+          if (value.length === length) return true;
 
           return new IncorrectSizeError({
             expectedSize: length,
-            receivedSize: data.length,
+            receivedSize: value.length,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -105,14 +109,15 @@ export class StringType extends CoreType<string> {
   email = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
-          if (emailRegex.test(data)) return true;
+        (value: string, { ctx: { paths } }) => {
+          if (emailRegex.test(value)) return true;
 
           return new InvalidStringFormat({
-            receivedString: data,
+            receivedString: value,
             formatName: "email",
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],
@@ -122,16 +127,17 @@ export class StringType extends CoreType<string> {
   url = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths } }) => {
           try {
-            new URL(data);
+            new URL(value);
             return true;
           } catch (e) {
             return new InvalidStringFormat({
-              receivedString: data,
+              receivedString: value,
               formatName: "url",
               message: error,
               paths,
+              inputData: value,
             });
           }
         },
@@ -146,14 +152,15 @@ export class StringType extends CoreType<string> {
   ) => {
     return this._extends({
       checkers: [
-        (data: string, { ctx: { paths } }) => {
-          if (format.test(data)) return true;
+        (value: string, { ctx: { paths } }) => {
+          if (format.test(value)) return true;
 
           return new InvalidStringFormat({
-            receivedString: data,
+            receivedString: value,
             formatName: formatName || `string (should like ${format})`,
             message: error,
             paths,
+            inputData: value,
           });
         },
       ],

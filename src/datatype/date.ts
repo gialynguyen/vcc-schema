@@ -26,6 +26,7 @@ export class DateType extends CoreType<Date> {
             message: error,
             paths,
             prerequisite: true,
+            inputData: value,
           });
         },
       ],

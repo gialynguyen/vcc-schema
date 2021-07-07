@@ -4,6 +4,7 @@ import { ErrorCodeType } from "./type";
 
 export interface IError {
   code: ErrorCodeType;
+  inputData?: any;
   message: string;
   paths: (string | number)[];
   prerequisite?: boolean;
@@ -91,14 +92,18 @@ export class ErrorSet extends Error {
 
       const pathsSize = paths.length - 1;
 
-      paths.forEach((path, index) => {
-        const isLastPath = index === pathsSize;
-        if (!isLastPath) {
-          pointer = pointer[path] = {};
-        } else {
-          Reflect.set(pointer, path, error);
-        }
-      });
+      if (paths.length === 0) {
+        Reflect.set(pointer, "", error);
+      } else {
+        paths.forEach((path, index) => {
+          const isLastPath = index === pathsSize;
+          if (!isLastPath) {
+            pointer = pointer[path] = {};
+          } else {
+            Reflect.set(pointer, path, error);
+          }
+        });
+      }
     }
 
     return objectError;
