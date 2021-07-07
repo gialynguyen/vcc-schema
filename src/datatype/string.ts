@@ -1,4 +1,4 @@
-import { isString } from 'vcc-utils';
+import { isString } from "vcc-utils";
 import { Types, CoreType } from "./base";
 
 import {
@@ -110,12 +110,58 @@ export class StringType extends CoreType<string> {
 
           return new InvalidStringFormat({
             receivedString: data,
+            formatName: "email",
             message: error,
             paths,
           });
         },
       ],
     });
+  };
+
+  url = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
+    return this._extends({
+      checkers: [
+        (data: string, { ctx: { paths } }) => {
+          try {
+            new URL(data);
+            return true;
+          } catch (e) {
+            return new InvalidStringFormat({
+              receivedString: data,
+              formatName: "url",
+              message: error,
+              paths,
+            });
+          }
+        },
+      ],
+    });
+  };
+
+  regex = (
+    format: RegExp,
+    formatName?: string,
+    error?: ErrorConstructorMessage<InvalidStringFormatPayload>
+  ) => {
+    return this._extends({
+      checkers: [
+        (data: string, { ctx: { paths } }) => {
+          if (format.test(data)) return true;
+
+          return new InvalidStringFormat({
+            receivedString: data,
+            formatName: formatName || `string (should like ${format})`,
+            message: error,
+            paths,
+          });
+        },
+      ],
+    });
+  };
+
+  noempty = (error?: ErrorConstructorMessage<SizeErrorPayload>) => {
+    return this.min(1, error || "Expected no empty");
   };
 }
 

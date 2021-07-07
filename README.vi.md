@@ -83,6 +83,9 @@ string().min(5);
 string().min(3).max(7);
 string().length(7);
 string().email();
+string().url();
+string().regex(/gialy/g);
+string().noempty();
 ```
 
 ##### Tuỳ chỉnh ErrorMessage:

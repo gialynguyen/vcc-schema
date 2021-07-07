@@ -338,20 +338,24 @@ export class InvalidFieldError extends ErrorSubject {
 
 export interface InvalidStringFormatPayload {
   receivedString: unknown;
+  formatName?: string;
 }
 
 export class InvalidStringFormat extends ErrorSubject {
   private static defaultMessage:
     | string
-    | ((errorPayload: { receivedString: unknown }) => string) = ({
-    receivedString,
-  }) => `${receivedString} is not a valid email`;
+    | ((errorPayload: {
+        receivedString: unknown;
+        formatName: string;
+      }) => string) = ({ receivedString, formatName = "string" }) =>
+    `${receivedString} is not a valid ${formatName}`;
 
   constructor(payload: ErrorConstructorParams<InvalidStringFormatPayload>) {
     let message = payload.message || InvalidStringFormat.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
         receivedString: payload.receivedString,
+        formatName: payload.formatName,
       });
     }
 

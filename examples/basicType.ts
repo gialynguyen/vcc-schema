@@ -29,7 +29,7 @@ const UserModel = mixed({
 
   address: mixed({
     name: NormalName,
-    detail: string(),
+    detail: string().noempty(),
   }),
 
   birthDate: date(),
@@ -41,12 +41,12 @@ try {
   const user = UserModel.parser({
     name: "gialynguyen",
     age: 23,
-    email: "emthanchet@gmail",
+    email: "emthanchet@gmail.com",
     addressIds: [],
     addressDetails: [{ name: "Gialynguyen123" }],
     address: {
       name: "GL123123123",
-      detail: "Detail",
+      detail: "",
     },
     stringOrNumber: 4,
     birthDate: new Date("2021-04-30T07:47:24.168Z"),
