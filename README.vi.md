@@ -81,7 +81,6 @@ import { constant, ValueType } from "vcc-schema";
 const ConstantSchema = constant("Gialynguyen");
 
 type ConstantType = ValueType<typeof ConstantSchema>; // "Gialynguyen"
-
 ```
 
 # String
@@ -393,15 +392,15 @@ Khi muốn kiểm tra `data` có `valid` so với một SchemaType hay không, n
 
 ### `.optional(): OneOfType<[this, UndefinedType]>`
 
-Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#one-of) SchemaType bao gồm SchemaType hiện tại và [Undefined](#undefined) SchemaType.
+Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#oneof) SchemaType bao gồm SchemaType hiện tại và [Undefined](#undefined) SchemaType.
 
 ### `.nullable(): OneOfType<[this, NullType]>`
 
-Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#one-of) SchemaType bao gồm SchemaType hiện tại và [Null](#null) SchemaType.
+Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#oneof) SchemaType bao gồm SchemaType hiện tại và [Null](#null) SchemaType.
 
 ### `.nullish(): OneOfType<[this, NullType, UndefinedType]>`
 
-Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#one-of) SchemaType bao gồm SchemaType hiện tại, [Null](#null) và [Undefined](#undefined) SchemaType.
+Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#oneof) SchemaType bao gồm SchemaType hiện tại, [Null](#null) và [Undefined](#undefined) SchemaType.
 
 # ErrorSubject
 
