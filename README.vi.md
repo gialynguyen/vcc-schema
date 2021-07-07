@@ -6,13 +6,13 @@
 - [String](#string)
 - [Number](#number)
 - [Mixed (Object)](#mixed)
-	- [.children](#children)
-	- [.pick](#pick)
-	- [.omit](#omit)
-	- [.modifiers](#modifiers)
-	- [.pickAndModifers](#pickandmodifers)
+  - [.children](#children)
+  - [.pick](#pick)
+  - [.omit](#omit)
+  - [.modifiers](#modifiers)
+  - [.pickAndModifers](#pickandmodifers)
 - [Array](#array)
-	- [.noempty](#noempty)
+  - [.noempty](#noempty)
 - [OneOf](#OneOf)
 - [Boolean](#boolean)
 - [Date](#date)
@@ -48,7 +48,7 @@ npm install vcc-schema
 Khởi tạo một SchemaType, chúng ta sẽ bắt đầu với những thứ đơn giản nhất:
 
 ```ts
-import { string } from 'vcc-schema';
+import { string } from "vcc-schema";
 
 const name = string();
 
@@ -59,14 +59,14 @@ name.parser(3); // throw ErrorSet
 Tiếp theo là một SchemaType phức tạp hơn:
 
 ```ts
-import { mixed, string } from 'vcc-schema';
+import { mixed, string } from "vcc-schema";
 
 const Customer = mixed({
-	name: string(),
+  name: string(),
 });
 
 Customer.parser({
-	name: "Gialynguyen"
+  name: "Gialynguyen",
 }); // { name: "Gialynguyen" }
 
 type CustomerType = ValueType<typeof Customer>; // { name: string }
@@ -116,11 +116,11 @@ number().max(5, "Vui lòng nhập một số không vượt quá 5");
 # Mixed (Object)
 
 ```ts
-import { mixed, string, number } from "vcc-schema"
+import { mixed, string, number } from "vcc-schema";
 
 const Customer = mixed({
-	name: string().min(5),
-	age: number().min(18),
+  name: string().min(5),
+  age: number().min(18),
 });
 ```
 
@@ -129,22 +129,22 @@ const Customer = mixed({
 Là một `getter` để truy cập giá trị của các SchemaType con bên trong.
 
 ```ts
-Customer.children.name
+Customer.children.name;
 ```
 
 ### `.pick`
 
 ```ts
-import { mixed, string, number } from "vcc-schema"
+import { mixed, string, number } from "vcc-schema";
 
 const User = mixed({
-	name: string(),
-	address: mixed({
-		detail: string(),
-	})
-})
+  name: string(),
+  address: mixed({
+    detail: string(),
+  }),
+});
 
-const UserAddress = User.pick(['address'])
+const UserAddress = User.pick(["address"]);
 
 /*
 	mixed({
@@ -153,22 +153,21 @@ const UserAddress = User.pick(['address'])
 		})
 	})
 */
-
 ```
 
 ### `.omit`
 
 ```ts
-import { mixed, string, number } from "vcc-schema"
+import { mixed, string, number } from "vcc-schema";
 
 const User = mixed({
-	name: string(),
-	address: mixed({
-		detail: string(),
-	})
-})
+  name: string(),
+  address: mixed({
+    detail: string(),
+  }),
+});
 
-const UserAddress = User.pick(['name'])
+const UserAddress = User.pick(["name"]);
 
 /*
 	mixed({
@@ -177,7 +176,6 @@ const UserAddress = User.pick(['name'])
 		})
 	})
 */
-
 ```
 
 ### `.modifiers`
@@ -186,12 +184,12 @@ const UserAddress = User.pick(['name'])
 import { mixed, string, number, ValueType } from "vcc-schema";
 
 const UserSchema = mixed({
-	name: string(),
-	age: number(),
+  name: string(),
+  age: number(),
 });
 
 const CreateUserSchema = UserSchema.modifiers({
-	name: (name) => name.optional(),
+  name: (name) => name.optional(),
 });
 
 type CreateUserType = ValueType<typeof CreateUserSchema>;
@@ -209,13 +207,12 @@ type CreateUserType = ValueType<typeof CreateUserSchema>;
 import { mixed, string, number, ValueType } from "vcc-schema";
 
 const UserSchema = mixed({
-	name: string(),
-	age: number(),
+  name: string(),
+  age: number(),
 });
 
-
 const UpdateUserSchema = UserSchema.pickAndModifers({
-	name: (name) => name.optional(),
+  name: (name) => name.optional(),
 });
 
 type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
@@ -233,7 +230,7 @@ import { array } from "vcc-schema";
 
 const stringArray = array(string());
 
-// Hoặc có thể viết thuyết cách tương tự (được khuyến khích hơn) như sau:
+// Hoặc có thể viết theo cách tương tự như sau:
 
 const stringArray = string().array();
 ```
@@ -248,9 +245,16 @@ import { array } from "vcc-schema";
 const stringArray = string().array().noempty();
 ```
 
-### `.min` / `.max` / `.length` (Cập nhập sau)
+### `.min` / `.max` / `.length`
+
+```ts
+const lengthStringArray = array(string()).length(5);
+const maxStringArray = array(string()).max(5);
+const minStringArray = array(string()).min(5);
+```
 
 # OneOf
+
 Ý nghĩa tương tự như toán tử `OR`.
 
 Khi nhận `input` vào, VC-S sẽ kiểm tra mỗi SchemaType theo thứ tự và sẽ trả về giá trị đầu tiên hợp lệ, hoặc sẽ trả về lỗi nếu các SchemaType đều cho kết quả không hợp lệ.

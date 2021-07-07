@@ -2,12 +2,13 @@ import { CoreType, Types } from "./base";
 
 import {
   ErrorConstructorMessage,
-  ErrorSet,
   ErrorSubject,
   InvalidTypeError,
   InvalidTypeErrorPayload,
   SizeErrorPayload,
   TooSmallError,
+  IncorrectSizeError,
+  TooBigError,
 } from "../error";
 import { typeOf } from "../utils/type";
 
@@ -45,7 +46,7 @@ export class ArrayType<Item> extends CoreType<Item[]> {
               nestedParser: true,
               throwOnFirstError: ctx.throwOnFirstError,
             });
-            
+
             if (ErrorSubject.isArrayErrorSubject(rawItemOrError)) {
               errors = errors.concat(rawItemOrError);
               if (ctx.tryParser) returnValue[index] = undefined;
@@ -64,6 +65,51 @@ export class ArrayType<Item> extends CoreType<Item[]> {
       ],
     });
   };
+
+  length(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+    return this._extends({
+      checkers: [
+        (value: Array<any>) => {
+          if (value.length === length) return true;
+          return new IncorrectSizeError({
+            expectedSize: length,
+            receivedSize: value.length,
+            message: error,
+          });
+        },
+      ],
+    });
+  }
+
+  min(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+    return this._extends({
+      checkers: [
+        (value: Array<any>) => {
+          if (value.length >= length) return true;
+          return new TooSmallError({
+            expectedSize: length,
+            receivedSize: value.length,
+            message: error,
+          });
+        },
+      ],
+    });
+  }
+
+  max(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+    return this._extends({
+      checkers: [
+        (value: Array<any>) => {
+          if (value.length <= length) return true;
+          return new TooBigError({
+            expectedSize: length,
+            receivedSize: value.length,
+            message: error,
+          });
+        },
+      ],
+    });
+  }
 
   noempty(error?: ErrorConstructorMessage<SizeErrorPayload>) {
     return this._extends({
