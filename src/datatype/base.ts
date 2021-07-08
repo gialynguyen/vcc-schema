@@ -100,6 +100,7 @@ export abstract class CoreType<Type> {
     this.parser = runnerParser({
       checkers: this._checkers,
       lazyCheckers: this._lazyCheckers,
+      schemaType: this,
     });
 
     this.strictParser = (raw, ctx) =>

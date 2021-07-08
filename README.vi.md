@@ -294,6 +294,7 @@ const isBoolean = boolean();
 import { date } from "vcc-schema";
 
 const isDate = date();
+const isISODateString = date("ISO"); // khi thực hiện các quá trình, một `string` có format chuẩn ISO Date sẽ được cho là valid, và kết quả trả về sẽ là 1 object `Date` tương ứng.
 ```
 
 # Null

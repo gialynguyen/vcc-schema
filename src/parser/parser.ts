@@ -1,3 +1,4 @@
+import { CoreType, DateType } from "../datatype";
 import { ErrorSet, ErrorSubject } from "../error";
 import { ErrorCode } from "../error/type";
 import { Checker, LazyType } from "./checker";
@@ -5,6 +6,7 @@ import { Checker, LazyType } from "./checker";
 export interface ParserPayload {
   checkers: Checker[];
   lazyCheckers: LazyType<any>[];
+  schemaType: CoreType<any>;
 }
 
 export interface ParserContext {
@@ -15,7 +17,11 @@ export interface ParserContext {
   throwOnFirstError?: boolean;
 }
 
-export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
+export const runnerParser = ({
+  checkers,
+  lazyCheckers,
+  schemaType,
+}: ParserPayload) => {
   return (
     raw: any,
     {
@@ -79,6 +85,12 @@ export const runnerParser = ({ checkers, lazyCheckers }: ParserPayload) => {
           if (nestedParser) return errors;
           const errorSubject = new ErrorSet(errors);
           throw errorSubject;
+        }
+      } else {
+        if (schemaType instanceof DateType) {
+          const { format } = schemaType;
+          if (format === "ISO" || format === "strictISO")
+            returnValue = new Date(returnValue);
         }
       }
     }
