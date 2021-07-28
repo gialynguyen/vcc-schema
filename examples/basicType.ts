@@ -32,7 +32,7 @@ const UserModel = mixed({
     detail: string().noempty(),
   }),
 
-  birthDate: date("ISO"),
+  birthDate: date("ISO").default(() => new Date()),
 });
 
 type UserEntity = ValueType<typeof UserModel>;
@@ -49,7 +49,6 @@ try {
       detail: "HCM",
     },
     stringOrNumber: 4,
-    birthDate: "2021-04-30T07:47:24.168Z",
   });
 
   console.log("user: ", user);

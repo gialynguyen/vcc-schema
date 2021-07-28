@@ -16,7 +16,7 @@ import {
   oneOf,
   OneOfType,
 } from "./";
-import { DeepPartial, IObject, NoneDeepPartial } from "../@types";
+import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
 import { isArray } from "vcc-utils";
 import { ErrorSet, ErrorSubject } from "../error";
 
@@ -48,9 +48,12 @@ export type ErrorType<Type> = Type extends IObject
   ? ErrorType<Type[number]>
   : ErrorSubject;
 
+export type TypeDefaultValue<Type> = Type | ICallback<Type>;
+
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker[];
   type: Types;
+  defaultValue?: TypeDefaultValue<Type>;
   defaultLazyCheckers?: Type extends IObject
     ? LazyObjectType<any>[]
     : LazyType<any>[];
@@ -62,6 +65,8 @@ export abstract class CoreType<Type> {
   protected _checkers: Checker[];
 
   protected _lazyCheckers: LazyType<any>[];
+
+  protected _defaultValue?: TypeDefaultValue<Type>;
 
   parser: (raw: any, ctx?: ParserContext) => Type;
 
@@ -165,6 +170,7 @@ export abstract class CoreType<Type> {
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
       defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
       type: this._type,
+      defaultValue: this._defaultValue,
     });
   }
 
@@ -210,6 +216,15 @@ export abstract class CoreType<Type> {
       const _lazyOptionSet = isArray(lazyOption) ? lazyOption : [lazyOption];
       return this._lazy([...(_lazyOptionSet as LazyType<Type>[])]);
     }
+  }
+
+  default(defaultValue: TypeDefaultValue<Type>) {
+    this._defaultValue = defaultValue;
+    return this;
+  }
+
+  get defaultValue() {
+    return this._defaultValue;
   }
 
   get type() {

@@ -1,4 +1,4 @@
-import { CoreType, DateType } from "../datatype";
+import { CoreType, DateType, Types } from "../datatype";
 import { ErrorSet, ErrorSubject } from "../error";
 import { ErrorCode } from "../error/type";
 import { Checker, LazyType } from "./checker";
@@ -41,6 +41,9 @@ export const runnerParser = ({
     let returnValue = raw;
     let errors: ErrorSubject[] = [];
     let shouldThrowError = false;
+
+    const { defaultValue, type } = schemaType;
+
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
 
@@ -54,6 +57,16 @@ export const runnerParser = ({
       });
 
       if (passed !== true) {
+        if (defaultValue) {
+          if (typeof defaultValue === "function" && type !== Types.func) {
+            returnValue = defaultValue();
+          } else {
+            returnValue = defaultValue;
+          }
+          
+          continue;
+        }
+
         if (passed instanceof ErrorSubject) {
           if (passed.error.prerequisite) shouldThrowError = true;
           errors.push(passed);
