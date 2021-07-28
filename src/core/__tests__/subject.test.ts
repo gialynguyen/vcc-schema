@@ -42,27 +42,3 @@ test("subject is object", () => {
   instance.destroy();
   expect(instance.subscriberCount).toEqual(0);
 });
-
-test("subject is array", () => {
-  class DemoSubject<State> extends Subject<State> {}
-
-  const instance = new DemoSubject({
-    initialState: [{ age: 12 }],
-  });
-
-  const proxy = instance.proxyState;
-  let nextAge: number | undefined = undefined;
-
-  const subscriber = (state: typeof proxy) => {
-    nextAge = proxy[0].age;
-  };
-
-  instance.on(subscriber);
-
-  expect(proxy[0].age).toEqual(12);
-
-  proxy[0].age++;
-
-  expect(proxy[0].age).toEqual(13);
-  expect(nextAge).toEqual(13);
-});

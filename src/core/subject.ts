@@ -29,17 +29,7 @@ const implementProxy = <State extends IObject>(
   target: any,
   handler: ProxyHandler<State>
 ) => {
-  if (isArray(target) || isObject(target)) {
-    Object.entries(target).forEach(function ([key, val]) {
-      if (isArray(val) || isObject(val)) {
-        target[key] = implementProxy(val, handler);
-      }
-    });
-
-    return new Proxy(target, handler);
-  }
-
-  return target;
+  return new Proxy(target, handler);
 };
 
 export abstract class Subject<State extends IObject | Array<unknown>> {
