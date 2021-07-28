@@ -477,7 +477,7 @@ Hàm `.optional` sẽ giúp bạn sinh ra một [`OneOf`](#oneof) SchemaType bao
 
 Hàm `.nullish` sẽ giúp bạn sinh ra một [`OneOf`](#oneof) SchemaType bao gồm SchemaType hiện tại, [Null](#null) và [Undefined](#undefined) SchemaType.
 
-### `.default()`
+### `.default(defaultValue: Type | () => Type)`
 
 Hàm `.default` sẽ trả về giá trị mặc định tương ứng với kiểu dữ liễu của SchemaType khi có lỗi sinh ra trong các quá trình.
 
