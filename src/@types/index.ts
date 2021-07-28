@@ -21,6 +21,19 @@ export type DeepPartial<T> = T extends Function
     : { [P in keyof T]?: DeepPartial<T[P]> }
   : T;
 
+export type Nullish = never | undefined | null | void;
+
+export type ObjectWithoutNullishProperty<O extends IObject> = Pick<
+  O,
+  {
+    [Key in keyof O]-?: Key extends keyof O
+      ? O[Key] extends Nullish
+        ? never
+        : Key
+      : never;
+  }[keyof O]
+>;
+
 export type Primitive =
   | string
   | number

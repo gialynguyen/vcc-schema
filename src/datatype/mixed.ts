@@ -1,20 +1,74 @@
 import { omit, pick, isObject } from "vcc-utils";
-import { ICallback, IObject, NotUndefined } from "../@types";
+import {
+  ICallback,
+  IObject,
+  NotUndefined,
+  ObjectWithoutNullishProperty,
+} from "../@types";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
 
 import {
   ErrorConstructorMessage,
-  ErrorSet,
   ErrorSubject,
   InvalidFieldError,
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
+
 import { typeOf } from "../utils/type";
+
+type PickBySchemaMap<TypeMap> = {
+  [Key in keyof TypeMap]?: TypeMap[Key] extends MixedType<any, any>
+    ? PickBySchemaMap<TypeMap[Key]["children"]>
+    : boolean;
+};
+
+type PickByMixedType<Origin, Schema> = Origin extends MixedType<any, any>
+  ? Pick<
+      Origin["children"],
+      {
+        [Key in keyof Schema]-?: Key extends keyof Origin["children"]
+          ? Schema[Key] extends Exclude<boolean, false>
+            ? Key
+            : never
+          : never;
+      }[keyof Schema]
+    > &
+      ObjectWithoutNullishProperty<
+        {
+          [Key in keyof Origin["children"]]: Key extends keyof Schema
+            ? Origin["children"][Key] extends MixedType<any, any>
+              ? MixedType<PickByMixedType<Origin["children"][Key], Schema[Key]>>
+              : PickByMixedType<Origin["children"][Key], Schema[Key]>
+            : undefined;
+        }
+      >
+  : Origin;
+
+type OmitByMixedType<Origin, Schema> = Origin extends MixedType<any, any>
+  ? Omit<
+      {
+        [Key in keyof Origin["children"]]: Key extends keyof Schema
+          ? Origin["children"][Key] extends MixedType<any, any>
+            ? MixedType<OmitByMixedType<Origin["children"][Key], Schema[Key]>>
+            : Origin["children"][Key]
+          : Origin["children"][Key];
+      },
+      {
+        [Key in keyof Schema]-?: Key extends keyof Origin["children"]
+          ? Schema[Key] extends Exclude<boolean, false>
+            ? Key
+            : never
+          : never;
+      }[keyof Schema]
+    >
+  : Schema extends Exclude<boolean, false>
+  ? never
+  : Origin;
 
 export class MixedType<
   TypeMap extends IObject<CoreType<any>>,
-  Keys extends keyof TypeMap
+  Keys extends keyof TypeMap = keyof TypeMap
 > extends CoreType<{ [key in keyof TypeMap]: ValueType<TypeMap[key]> }> {
   childrenPropertyTypes: TypeMap;
 
@@ -152,6 +206,39 @@ export class MixedType<
     });
   }
 
+  pickBy<Schema extends PickBySchemaMap<TypeMap>>(
+    pickSchema: Schema,
+    options?: {
+      error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
+      strict?: boolean;
+    }
+  ): MixedType<
+    PickByMixedType<this, Schema>,
+    keyof PickByMixedType<this, Schema>
+  > {
+    const childrenPropertyTypes = this.childrenPropertyTypes;
+    const newChildrenPropertyTypes: any = {};
+
+    for (const key in pickSchema) {
+      const childrenType = childrenPropertyTypes[key];
+      const currentPickedSchema = pickSchema[key];
+
+      if (!childrenType) continue;
+      if (childrenType instanceof MixedType && isObject(currentPickedSchema)) {
+        newChildrenPropertyTypes[key] = childrenType.pickBy(
+          currentPickedSchema as any
+        );
+      } else if (currentPickedSchema === true) {
+        newChildrenPropertyTypes[key] = childrenType;
+      }
+    }
+
+    return MixedType.create(newChildrenPropertyTypes, {
+      strict: this._strict,
+      ...options,
+    });
+  }
+
   omit<K extends keyof TypeMap>(
     keys: K[] = [],
     options?: {
@@ -161,6 +248,44 @@ export class MixedType<
   ) {
     const childrenPropertyTypes = this.childrenPropertyTypes;
     const newChildrenPropertyTypes = omit(childrenPropertyTypes, keys);
+
+    return MixedType.create(newChildrenPropertyTypes, {
+      strict: this._strict,
+      ...options,
+    });
+  }
+
+  omitBy<Schema extends PickBySchemaMap<TypeMap>>(
+    omitSchema: Schema,
+    options?: {
+      error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
+      strict?: boolean;
+    }
+  ): MixedType<
+    OmitByMixedType<this, Schema>,
+    keyof OmitByMixedType<this, Schema>
+  > {
+    const childrenPropertyTypes = this.childrenPropertyTypes;
+    const newChildrenPropertyTypes: any = {};
+
+    for (const key in childrenPropertyTypes) {
+      const childrenType = childrenPropertyTypes[key];
+      if (key in omitSchema) {
+        const currentOmittedSchema = omitSchema[key];
+        if (
+          childrenType instanceof MixedType &&
+          isObject(currentOmittedSchema)
+        ) {
+          newChildrenPropertyTypes[key] = childrenType.omitBy(
+            currentOmittedSchema as any
+          );
+        } else if (currentOmittedSchema !== true) {
+          newChildrenPropertyTypes[key] = childrenType;
+        }
+      } else {
+        newChildrenPropertyTypes[key] = childrenType;
+      }
+    }
 
     return MixedType.create(newChildrenPropertyTypes, {
       strict: this._strict,
@@ -200,13 +325,20 @@ export class MixedType<
   }
 
   pickAndModifers<
+    PickKeys extends Keys,
     PickModifiers extends {
-      [key in Keys]?: ICallback<CoreType<unknown>, [base: TypeMap[key]]>;
+      [key in PickKeys]?:
+        | ICallback<CoreType<unknown>, [base: TypeMap[key]]>
+        | boolean;
     },
     PickModifiersTypeValue extends {
-      [key in keyof PickModifiers]: ReturnType<
-        NotUndefined<PickModifiers[key]>
-      >;
+      [key in keyof PickModifiers]: PickModifiers[key] extends boolean
+        ? PickModifiers[key] extends Exclude<boolean, false>
+          ? key extends Keys
+            ? TypeMap[key]
+            : never
+          : never
+        : ReturnType<NotUndefined<PickModifiers[key]>>;
     }
   >(childrens: PickModifiers) {
     const { childrenPropertyTypes: currentChildrenTypes } = this;
@@ -216,9 +348,17 @@ export class MixedType<
       const childTransform = childrens[key];
       const currentChildType = currentChildrenTypes[key];
       if (childTransform) {
-        modifiedChildren[key] = childTransform(
-          currentChildType
-        ) as PickModifiersTypeValue[Extract<keyof PickModifiers, string>];
+        if (typeof childTransform === "boolean" && childTransform === true) {
+          modifiedChildren[key] =
+            currentChildType as unknown as PickModifiersTypeValue[Extract<
+              keyof PickModifiers,
+              string
+            >];
+        } else {
+          modifiedChildren[key] = childTransform(
+            currentChildType
+          ) as PickModifiersTypeValue[Extract<keyof PickModifiers, string>];
+        }
       }
     }
 

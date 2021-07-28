@@ -12,6 +12,8 @@
   - [.omit](#omit)
   - [.modifiers](#modifiers)
   - [.pickAndModifers](#pickandmodifers)
+  - [.pickBy](#pickby)
+  - [.omitBy](#omitby)
 - [Array](#array)
   - [.noempty](#noempty)
 - [OneOf](#OneOf)
@@ -223,16 +225,88 @@ import { mixed, string, number, ValueType } from "vcc-schema";
 const UserSchema = mixed({
   name: string(),
   age: number(),
+  email: string(),
 });
 
 const UpdateUserSchema = UserSchema.pickAndModifers({
   name: (name) => name.optional(),
+  age: true,
 });
 
 type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
 /*
 	type UpdateUserPayload = {
 		name: string | undefined;
+    age: string;
+	}
+*/
+```
+
+### `.pickBy`
+
+```ts
+import { mixed, string, number, ValueType } from "vcc-schema";
+
+const UserSchema = mixed({
+  name: string(),
+  age: number(),
+  email: string(),
+  address: {
+    name: string(),
+    detail: string(),
+  },
+});
+
+const UpdateUserSchema = UserSchema.pickBy({
+  name: true,
+  age: true,
+  address: {
+    name: true,
+  },
+});
+
+type UpdateUserPayload = ValueType<typeof UpdateUserSchema>;
+/*
+	type UpdateUserPayload = {
+		name: string;
+    age: string;
+    address: {
+      name: string;
+    }
+	}
+*/
+```
+
+### `.omitBy`
+
+```ts
+import { mixed, string, number, ValueType } from "vcc-schema";
+
+const UserSchema = mixed({
+  name: string(),
+  age: number(),
+  email: string(),
+  address: {
+    name: string(),
+    detail: string(),
+  },
+});
+
+const omitSchema = UserSchema.omitBy({
+  name: true,
+  address: {
+    name: true,
+  },
+});
+
+type OmitPayload = ValueType<typeof omitSchema>;
+/*
+	type OmitPayload = {
+	  name: string;
+    email: string;
+    address: {
+      detail: string;
+    }
 	}
 */
 ```
