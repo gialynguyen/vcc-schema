@@ -1,13 +1,15 @@
-import dts from 'rollup-plugin-dts'
-import esbuild from 'rollup-plugin-esbuild'
+import dts from "rollup-plugin-dts";
+import esbuild from "rollup-plugin-esbuild";
 
-const name = require('./package.json').main.replace(/\.js$/, '')
+const isWin = process.platform === "win32";
 
-const bundle = config => ({
+const name = require("./package.json").main.replace(/\.js$/, "");
+
+const bundle = (config) => ({
   ...config,
-  input: 'src/index.ts',
-  external: id => !/^[./]/.test(id),
-})
+  input: "src/index.ts",
+  external: (id) => (isWin ? fasle : !/^[./]/.test(id)),
+});
 
 export default [
   bundle({
@@ -15,12 +17,12 @@ export default [
     output: [
       {
         file: `${name}.js`,
-        format: 'cjs',
+        format: "cjs",
         sourcemap: true,
       },
       {
         file: `${name}.mjs`,
-        format: 'es',
+        format: "es",
         sourcemap: true,
       },
     ],
@@ -29,7 +31,7 @@ export default [
     plugins: [dts()],
     output: {
       file: `${name}.d.ts`,
-      format: 'es',
+      format: "es",
     },
   }),
-]
+];
