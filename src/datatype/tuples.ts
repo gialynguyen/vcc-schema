@@ -4,21 +4,22 @@ import { typeOf } from "../utils/type";
 import {
   ErrorConstructorMessage,
   ErrorSubject,
+  IncorrectSizeError,
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
 
-export class TuplesType<TypeMap extends Array<CoreType<any>>> extends CoreType<
-  ValueType<TypeMap[number]>
+export class TuplesType<TypeSet extends Array<CoreType<any>>> extends CoreType<
+  ValueType<TypeSet[number]>
 > {
-  static create = <TypeMap extends Array<CoreType<any>>>(
-    types: TypeMap,
+  static create = <TypeSet extends Array<CoreType<any>>>(
+    types: TypeSet,
     options?: {
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
       strict?: boolean;
     }
   ) => {
-    return new TuplesType<TypeMap>({
+    return new TuplesType<TypeSet>({
       type: Types.tuples,
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
@@ -35,9 +36,19 @@ export class TuplesType<TypeMap extends Array<CoreType<any>>> extends CoreType<
           });
         },
         (value: any, { ctx }) => {
+          const valueLength = value.length;
+          const typesLength = types.length;
           const returnValue = value;
-          let errors: ErrorSubject[] = [];
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
+          let errors: ErrorSubject[] = [];
+
+          if (valueLength > typesLength) {
+            return new IncorrectSizeError({
+              expectedSize: typesLength,
+              receivedSize: valueLength,
+              inputData: value,
+            });
+          }
 
           for (let index = 0; index < types.length; index++) {
             const type = types[index];
