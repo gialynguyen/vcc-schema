@@ -34,6 +34,7 @@ const dummyData = Array(51861).fill({
   addressDetails: [{ name: "Gialynguyen123" }],
   address: {
     name: "GL123123123",
+    detail: "Detail's address"
   },
   stringOrNumber: 4,
   birthDate: new Date("2021-04-30T07:47:24.168Z"),
