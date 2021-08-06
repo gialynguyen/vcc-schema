@@ -24,6 +24,7 @@
 - [Unknown](#unknown)
 - [Any](#any)
 - [Record](#record)
+- [Tuples](#tuples)
 - [Enum](#enum)
 - [Custom](#custom)
 - [BaseType](#basetype)
@@ -408,6 +409,31 @@ const isAny = any();
 ```
 
 # Record (Cập nhật sau)
+
+# Tuples
+
+```ts
+import { tuples, number, string, array, ValueType } from "vcc-schema";
+
+const tuplesSchema = tuples([
+  number("Vui lòng nhập một số"),
+  string(),
+  array(string()),
+  tuples([string()]),
+]);
+
+const result = tuplesSchema.parser([
+  1,
+  "gialynguyen",
+  ["address", "age"],
+  ["name"],
+]);
+
+type T = ValueType<typeof tuplesSchema>;
+/*
+ T = [number, string, string[], [string]]
+*/
+```
 
 # Enum (Cập nhật sau)
 

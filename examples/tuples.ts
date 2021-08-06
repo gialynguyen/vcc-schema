@@ -7,5 +7,11 @@ const tuplesSchema = tuples([
   tuples([string()]),
 ]);
 
-const result = tuplesSchema.parser([1, "gialynguyen"]);
+const result = tuplesSchema.parser([
+  1,
+  "gialynguyen",
+  ["address", "age"],
+  ["name"],
+]);
+
 type T = ValueType<typeof tuplesSchema>;
