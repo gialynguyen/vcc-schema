@@ -7,11 +7,24 @@ import {
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
+import { ArrayType } from "./array";
+import { TuplesType } from "./tuples";
 
-export class RecordType<TypeSet extends CoreType<any>> extends CoreType<
-  Record<string, ValueType<TypeSet>>
+export type RecordInputType = CoreType<any> | ArrayType<any> | TuplesType<any>;
+
+export type RecordOutputValue<Input extends RecordInputType> =
+  Input extends TuplesType<any>
+    ? ValueType<Input>
+    : Input extends ArrayType<infer Item>
+    ? ValueType<Item>[]
+    : Input extends CoreType<any>
+    ? ValueType<Input>
+    : never;
+
+export class RecordType<TypeSet extends RecordInputType> extends CoreType<
+  Record<string, RecordOutputValue<TypeSet>>
 > {
-  static create = <TypeSet extends CoreType<any>>(
+  static create = <TypeSet extends RecordInputType>(
     types: TypeSet,
     options?: {
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
