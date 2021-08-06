@@ -1,4 +1,4 @@
-import { CoreType, Types } from "./base";
+import { CoreType, Types, ValueType } from "./base";
 
 import {
   ErrorConstructorMessage,
@@ -12,9 +12,11 @@ import {
 } from "../error";
 import { typeOf } from "../utils/type";
 
-export class ArrayType<Item> extends CoreType<Item[]> {
-  static create = <Item>(
-    elementType: CoreType<Item>,
+export class ArrayType<Item extends CoreType<unknown>> extends CoreType<
+  ValueType<Item>[]
+> {
+  static create = <Item extends CoreType<unknown>>(
+    elementType: Item,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
     return new ArrayType<Item>({

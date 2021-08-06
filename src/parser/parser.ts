@@ -63,7 +63,7 @@ export const runnerParser = ({
           } else {
             returnValue = defaultValue;
           }
-          
+
           continue;
         }
 
@@ -92,7 +92,7 @@ export const runnerParser = ({
           break;
         }
 
-        if (throwOnFirstError) shouldThrowError = true;
+        if (throwOnFirstError && errors.length) shouldThrowError = true;
 
         if (shouldThrowError) {
           if (nestedParser) return errors;
