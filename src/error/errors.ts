@@ -10,6 +10,7 @@ export type ErrorConstructorMessage<ParamByErrorType> =
 export interface InvalidTypeErrorPayload {
   expectedType: Primitive;
   receivedType: Primitive;
+  instance?: typeof InvalidTypeError;
 }
 
 export type ErrorConstructorParams<Params> = Params & {
@@ -36,6 +37,7 @@ export class InvalidTypeError extends ErrorSubject {
     let message = payload.message || InvalidTypeError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: InvalidTypeError,
         expectedType: payload.expectedType,
         receivedType: payload.receivedType,
       });
@@ -57,7 +59,7 @@ export class InvalidTypeError extends ErrorSubject {
     InvalidTypeError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is InvalidTypeError {
     return error instanceof InvalidTypeError;
   }
 }
@@ -65,6 +67,7 @@ export class InvalidTypeError extends ErrorSubject {
 export interface InvalidUnionTypeErrorPayload {
   expectedType: string[];
   receivedType: string;
+  instance?: typeof InvalidUnionTypeError;
 }
 
 export class InvalidUnionTypeError extends ErrorSubject {
@@ -93,6 +96,7 @@ export class InvalidUnionTypeError extends ErrorSubject {
     let message = payload.message || InvalidUnionTypeError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: InvalidUnionTypeError,
         expectedType: payload.expectedType,
         receivedType: payload.receivedType,
       });
@@ -116,7 +120,7 @@ export class InvalidUnionTypeError extends ErrorSubject {
     InvalidUnionTypeError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is InvalidUnionTypeError {
     return error instanceof InvalidUnionTypeError;
   }
 }
@@ -124,6 +128,10 @@ export class InvalidUnionTypeError extends ErrorSubject {
 export interface SizeErrorPayload {
   expectedSize: number;
   receivedSize: number;
+  instance?:
+    | typeof TooSmallError
+    | typeof TooBigError
+    | typeof IncorrectSizeError;
 }
 
 export class TooSmallError extends ErrorSubject {
@@ -144,6 +152,7 @@ export class TooSmallError extends ErrorSubject {
 
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: TooSmallError,
         expectedSize: payload.expectedSize,
         receivedSize: payload.receivedSize,
       });
@@ -165,7 +174,7 @@ export class TooSmallError extends ErrorSubject {
     TooSmallError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is TooSmallError {
     return error instanceof TooSmallError;
   }
 }
@@ -186,6 +195,7 @@ export class TooBigError extends ErrorSubject {
     let message = payload.message || TooBigError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: TooBigError,
         expectedSize: payload.expectedSize,
         receivedSize: payload.receivedSize,
       });
@@ -207,7 +217,7 @@ export class TooBigError extends ErrorSubject {
     TooBigError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is TooBigError {
     return error instanceof TooBigError;
   }
 }
@@ -228,6 +238,7 @@ export class IncorrectSizeError extends ErrorSubject {
     let message = payload.message || IncorrectSizeError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: IncorrectSizeError,
         expectedSize: payload.expectedSize,
         receivedSize: payload.receivedSize,
       });
@@ -251,7 +262,7 @@ export class IncorrectSizeError extends ErrorSubject {
     IncorrectSizeError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is IncorrectSizeError {
     return error instanceof IncorrectSizeError;
   }
 }
@@ -259,6 +270,7 @@ export class IncorrectSizeError extends ErrorSubject {
 export interface NoEqualErrorPayload<Type> {
   expectedValue: Type;
   receivedValue: Type;
+  instance?: typeof NoEqualError;
 }
 
 export class NoEqualError<Type> extends ErrorSubject {
@@ -277,6 +289,7 @@ export class NoEqualError<Type> extends ErrorSubject {
     let message = payload.message || NoEqualError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: NoEqualError,
         expectedValue: payload.expectedValue,
         receivedValue: payload.receivedValue,
       });
@@ -298,13 +311,14 @@ export class NoEqualError<Type> extends ErrorSubject {
     NoEqualError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is NoEqualError<unknown> {
     return error instanceof NoEqualError;
   }
 }
 
 export interface InvalidFieldErrorPayload {
   invalidFieldPaths: string;
+  instance?: typeof InvalidFieldError;
 }
 
 export class InvalidFieldError extends ErrorSubject {
@@ -319,6 +333,7 @@ export class InvalidFieldError extends ErrorSubject {
     let message = payload.message || InvalidFieldError.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: InvalidFieldError,
         invalidFieldPaths: payload.invalidFieldPaths,
       });
     }
@@ -340,12 +355,13 @@ export class InvalidFieldError extends ErrorSubject {
     InvalidFieldError.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is InvalidFieldError {
     return error instanceof InvalidFieldError;
   }
 }
 
 export interface InvalidStringFormatPayload {
+  instance?: typeof InvalidStringFormat;
   receivedString: unknown;
   formatName?: string;
 }
@@ -363,6 +379,7 @@ export class InvalidStringFormat extends ErrorSubject {
     let message = payload.message || InvalidStringFormat.defaultMessage;
     if (isFunction(message)) {
       message = (message as Function)({
+        instance: InvalidStringFormat,
         receivedString: payload.receivedString,
         formatName: payload.formatName,
       });
@@ -383,7 +400,7 @@ export class InvalidStringFormat extends ErrorSubject {
     InvalidStringFormat.defaultMessage = config;
   }
 
-  static is(error: any) {
+  static is(error: any): error is InvalidStringFormat {
     return error instanceof InvalidStringFormat;
   }
 }
