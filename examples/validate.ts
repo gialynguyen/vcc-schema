@@ -27,6 +27,21 @@ const UserModel = mixed({
   birthDate: date(),
 });
 
+// const session = UserModel.createSession();
+
+// const unWatch  = session.onError({
+//   at: (errors) => errors?.name,
+//   action: () => { 
+
+//   }
+// });
+
+// unWatch();
+
+// session.validate({});
+
+// session.end();
+
 const { data, error } = UserModel.validate({
   name: "gialynguyen",
   age: 23,

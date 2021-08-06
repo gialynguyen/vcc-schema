@@ -95,7 +95,9 @@ export abstract class CoreType<Type> {
 
   validate: (
     raw: any
-  ) => { success: true; data: Type } | { success: false; error: ErrorSet };
+  ) =>
+    | { success: true; data: Type; error: null }
+    | { success: false; data: null; error: ErrorSet };
 
   constructor(params: CoreTypeConstructorParams<Type>) {
     this._checkers = params.defaultCheckers || [];
@@ -141,11 +143,13 @@ export abstract class CoreType<Type> {
         return {
           success: true,
           data: successData,
+          error: null,
         };
       } catch (error) {
         return {
           success: false,
           error: error as ErrorSet,
+          data: null,
         };
       }
     };
