@@ -37,7 +37,7 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "vcc-utils": "0.0.6"
+    "vcc-utils": "0.0.7"
   },
   "keywords": [
     "type",

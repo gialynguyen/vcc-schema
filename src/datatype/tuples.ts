@@ -7,15 +7,42 @@ import {
   IncorrectSizeError,
   InvalidTypeError,
   InvalidTypeErrorPayload,
+  SizeErrorPayload,
 } from "../error";
+import { ArrayType } from "./array";
 
-export class TuplesType<TypeSet extends Array<CoreType<any>>> extends CoreType<
-  ValueType<TypeSet[number]>
-> {
-  static create = <TypeSet extends Array<CoreType<any>>>(
+export type ValueTypeTuples<
+  T extends [
+    CoreType<any>,
+    ...(CoreType<any> | ArrayType<any> | ValueTypeTuples<any>)[]
+  ]
+> = {
+  [k in keyof T]: T[k] extends TuplesType<any>
+    ? ValueType<T[k]>
+    : T[k] extends ArrayType<infer Item>
+    ? ValueType<Item>[]
+    : T[k] extends CoreType<any>
+    ? ValueType<T[k]>
+    : never;
+};
+
+export class TuplesType<
+  TypeSet extends [
+    CoreType<any>,
+    ...(CoreType<any> | ArrayType<any> | ValueTypeTuples<any>)[]
+  ]
+> extends CoreType<ValueTypeTuples<TypeSet>> {
+  static create = <
+    TypeSet extends [
+      CoreType<any>,
+      ...(CoreType<any> | ArrayType<any> | ValueTypeTuples<any>)[]
+    ]
+  >(
     types: TypeSet,
     options?: {
-      error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
+      error?: ErrorConstructorMessage<
+        InvalidTypeErrorPayload | SizeErrorPayload
+      >;
       strict?: boolean;
     }
   ) => {
@@ -38,17 +65,19 @@ export class TuplesType<TypeSet extends Array<CoreType<any>>> extends CoreType<
         (value: any, { ctx }) => {
           const valueLength = value.length;
           const typesLength = types.length;
-          const returnValue = value;
-          const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
-          let errors: ErrorSubject[] = [];
 
           if (valueLength > typesLength) {
             return new IncorrectSizeError({
               expectedSize: typesLength,
               receivedSize: valueLength,
               inputData: value,
+              message: options?.error,
             });
           }
+
+          const returnValue = value;
+          const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
+          let errors: ErrorSubject[] = [];
 
           for (let index = 0; index < types.length; index++) {
             const type = types[index];

@@ -19,6 +19,7 @@ import {
 import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
 import { isArray } from "vcc-utils";
 import { ErrorSet, ErrorSubject } from "../error";
+import { TuplesType } from "./tuples";
 
 export enum Types {
   string = "string",
@@ -36,10 +37,12 @@ export enum Types {
   oneOf = "oneOf",
   custom = "custom",
   const = "const",
-  tuples = "tuples"
+  tuples = "tuples",
 }
 
-export type ValueType<Type> = Type extends CoreType<infer T>
+export type ValueType<Type> = Type extends TuplesType<any>
+  ? ReturnType<Type["parser"]>
+  : Type extends CoreType<infer T>
   ? ReturnType<Type["parser"]>
   : never;
 
@@ -92,7 +95,7 @@ export abstract class CoreType<Type> {
 
   nullish: () => OneOfType<[this, NullType, UndefinedType]>;
 
-  array: () => ArrayType<Type>;
+  array: () => ArrayType<this>;
 
   validate: (
     raw: any

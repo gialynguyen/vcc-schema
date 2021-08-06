@@ -6,11 +6,15 @@ import {
   ValueType,
   date,
   ErrorType,
+  array,
 } from "../dist";
 
 const NormalName = string()
   .min(4, "Tên phải dài hơn 4 ký tự")
   .max(15, "Tên phải ngắn hơn 15 ký tự");
+
+const t = array(string());
+type T = ValueType<typeof t>
 
 const UserModel = mixed({
   name: NormalName,
