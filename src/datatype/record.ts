@@ -53,24 +53,22 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
 
           for (const key in value) {
-            if (Object.prototype.hasOwnProperty.call(value, key)) {
-              const propertyValue = value[key];
+            const propertyValue = value[key];
 
-              const propertyValueOrError: any = types.parser(propertyValue, {
-                deepTryParser: ctx.deepTryParser,
-                tryParser: ctx.deepTryParser ? ctx.tryParser : false,
-                paths: [...ctx.paths, key],
-                nestedParser: true,
-                throwOnFirstError: ctx.throwOnFirstError,
-              });
+            const propertyValueOrError: any = types.parser(propertyValue, {
+              deepTryParser: ctx.deepTryParser,
+              tryParser: ctx.deepTryParser ? ctx.tryParser : false,
+              paths: [...ctx.paths, key],
+              nestedParser: true,
+              throwOnFirstError: ctx.throwOnFirstError,
+            });
 
-              if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
-                errors = errors.concat(propertyValueOrError);
-                if (ctx.tryParser) returnValue[key] = undefined;
-                if (options?.strict || throwOnFirstError) break;
-              } else {
-                returnValue[key] = propertyValueOrError;
-              }
+            if (ErrorSubject.isArrayErrorSubject(propertyValueOrError)) {
+              errors = errors.concat(propertyValueOrError);
+              if (ctx.tryParser) returnValue[key] = undefined;
+              if (options?.strict || throwOnFirstError) break;
+            } else {
+              returnValue[key] = propertyValueOrError;
             }
           }
 

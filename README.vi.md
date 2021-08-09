@@ -408,7 +408,25 @@ import { any } from "vcc-schema";
 const isAny = any();
 ```
 
-# Record (Cập nhật sau)
+# Record
+
+```ts
+const recordSchema = record(record(tuples([number(), array(string())])));
+
+type T = ValueType<typeof recordSchema>;
+/*
+type T = {
+    [x: string]: Record<string, [number, string[]]>;
+}
+*/
+
+recordSchema.parser({
+  demo: {
+    nested: [3, ["Tom"]],
+  },
+});
+
+```
 
 # Tuples
 
