@@ -10,8 +10,8 @@
   - [.children](#children)
   - [.pick](#pick)
   - [.omit](#omit)
-  - [.modifiers](#modifiers)
-  - [.pickAndModifers](#pickandmodifers)
+  - [.modify](#modify)
+  - [.pickAndModify](#pickandmodifers)
   - [.pickBy](#pickby)
   - [.omitBy](#omitby)
 - [Array](#array)
@@ -195,7 +195,7 @@ const UserAddress = User.pick(["name"]);
 */
 ```
 
-### `.modifiers`
+### `.modify`
 
 ```ts
 import { mixed, string, number, ValueType } from "vcc-schema";
@@ -205,7 +205,7 @@ const UserSchema = mixed({
   age: number(),
 });
 
-const CreateUserSchema = UserSchema.modifiers({
+const CreateUserSchema = UserSchema.modify({
   name: (name) => name.optional(),
 });
 
@@ -218,7 +218,7 @@ type CreateUserType = ValueType<typeof CreateUserSchema>;
 */
 ```
 
-### `.pickAndModifers`
+### `.pickAndModify`
 
 ```ts
 import { mixed, string, number, ValueType } from "vcc-schema";
@@ -229,7 +229,7 @@ const UserSchema = mixed({
   email: string(),
 });
 
-const UpdateUserSchema = UserSchema.pickAndModifers({
+const UpdateUserSchema = UserSchema.pickAndModify({
   name: (name) => name.optional(),
   age: true,
 });

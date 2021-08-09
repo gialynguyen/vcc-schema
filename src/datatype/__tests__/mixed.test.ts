@@ -171,21 +171,21 @@ describe("DataType Mixed", () => {
     });
   });
 
-  describe("modifiers", () => {
+  describe("modify", () => {
     it("should have instance of MixedType", () => {
-      const modifiersSubject = subject.modifiers({ age: (age) => age.max(7) });
-      expect(modifiersSubject).toBeInstanceOf(MixedType);
+      const modifySubject = subject.modify({ age: (age) => age.max(7) });
+      expect(modifySubject).toBeInstanceOf(MixedType);
       expect(
-        modifiersSubject.parser({
-          name: "modifiers",
+        modifySubject.parser({
+          name: "modify",
           age: 7,
           company: { name: "3dacam" },
         })["age"]
       ).toBe(7);
 
       try {
-        modifiersSubject.parser({
-          name: "modifiers",
+        modifySubject.parser({
+          name: "modify",
           age: 24,
           company: { name: "3dacam" },
         });
@@ -195,25 +195,25 @@ describe("DataType Mixed", () => {
     });
   });
 
-  describe("pickAndModifers", () => {
+  describe("pickAndModify", () => {
     it("should have instance of MixedType", () => {
-      const pickAndModifersSubject = subject.pickAndModifers({
+      const pickAndModifySubject = subject.pickAndModify({
         name: true,
         age: (age) => age.max(7),
       });
 
-      const parsedResult = pickAndModifersSubject.parser({
+      const parsedResult = pickAndModifySubject.parser({
         age: 7,
         name: "VCCorp",
       });
 
-      expect(pickAndModifersSubject).toBeInstanceOf(MixedType);
+      expect(pickAndModifySubject).toBeInstanceOf(MixedType);
       expect(parsedResult.age).toBe(7);
       expect(parsedResult.name).toBe("VCCorp");
-      expect(pickAndModifersSubject).not.toContain("company");
+      expect(pickAndModifySubject).not.toContain("company");
 
       try {
-        pickAndModifersSubject.parser({ age: 24, name: "VCCorp" });
+        pickAndModifySubject.parser({ age: 24, name: "VCCorp" });
       } catch (err) {
         expect(err.errors[0]).toBeInstanceOf(TooBigError);
       }

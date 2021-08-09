@@ -10,13 +10,13 @@ const UserSchema = mixed({
   }),
 });
 
-const CreateUserSchema = UserSchema.modifiers({
+const CreateUserSchema = UserSchema.modify({
   name: (name) => name.optional(),
 });
 
 type CreateUserType = ValueType<typeof CreateUserSchema>;
 
-const UpdateUserSchema = UserSchema.pickAndModifers({
+const UpdateUserSchema = UserSchema.pickAndModify({
   name: (name) => name.min(3),
   age: true,
 });

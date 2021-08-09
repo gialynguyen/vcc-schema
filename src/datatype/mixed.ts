@@ -293,7 +293,7 @@ export class MixedType<
     });
   }
 
-  modifiers<
+  modify<
     Modifiers extends {
       [key in Keys]?: ICallback<CoreType<unknown>, [base: TypeMap[key]]>;
     },
@@ -324,7 +324,7 @@ export class MixedType<
     });
   }
 
-  pickAndModifers<
+  pickAndModify<
     PickKeys extends Keys,
     PickModifiers extends {
       [key in PickKeys]?:
