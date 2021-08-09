@@ -38,6 +38,7 @@ export enum Types {
   custom = "custom",
   const = "const",
   tuples = "tuples",
+  record = "record",
 }
 
 export type ValueType<Type> = Type extends TuplesType<any>

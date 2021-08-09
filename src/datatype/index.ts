@@ -11,6 +11,7 @@ import { unknown } from "./unknown";
 import { date } from "./date";
 import { array } from "./array";
 import { tuples } from "./tuples";
+import { record } from "./record";
 
 export const VCS = {
   string,
@@ -26,6 +27,7 @@ export const VCS = {
   date,
   array,
   tuples,
+  record,
 };
 
 export * from "./string";
@@ -43,3 +45,4 @@ export * from "./array";
 export * from "./base";
 export * from "./constant";
 export * from "./tuples";
+export * from "./record";
