@@ -1,12 +1,12 @@
 {
   "name": "vcc-schema",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "exports": {
-    "import": "./lib/index.es.js",
-    "require": "./lib/index.cjs"
+    "import": "./dist/index.es.js",
+    "require": "./dist/index.cjs"
   },
   "author": "VCTeam",
   "license": "MIT",
