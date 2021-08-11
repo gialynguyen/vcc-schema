@@ -2,7 +2,7 @@ import { string } from "./string";
 import { number } from "./number";
 import { mixed } from "./mixed";
 import { oneOf } from "./oneOf";
-import { undefined } from "./undefined";
+import { undefinedType } from "./undefined";
 import { nullable } from "./null";
 import { func } from "./func";
 import { boolean } from "./boolean";
@@ -12,13 +12,14 @@ import { date } from "./date";
 import { array } from "./array";
 import { tuples } from "./tuples";
 import { record } from "./record";
+import { enumType } from "./enum";
 
 export const VCS = {
   string,
   number,
   mixed,
   oneOf,
-  undefined,
+  undefinedType,
   nullable,
   func,
   boolean,
@@ -28,6 +29,7 @@ export const VCS = {
   array,
   tuples,
   record,
+  enumType,
 };
 
 export * from "./string";
@@ -46,3 +48,4 @@ export * from "./base";
 export * from "./constant";
 export * from "./tuples";
 export * from "./record";
+export * from "./enum";

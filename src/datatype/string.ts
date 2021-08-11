@@ -167,7 +167,7 @@ export class StringType extends CoreType<string> {
     });
   };
 
-  noempty = (error?: ErrorConstructorMessage<SizeErrorPayload>) => {
+  nonempty = (error?: ErrorConstructorMessage<SizeErrorPayload>) => {
     return this.min(1, error || "Expected no empty");
   };
 }

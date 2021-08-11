@@ -1,6 +1,5 @@
 import {
   ErrorConstructorMessage,
-  ErrorSet,
   ErrorSubject,
   InvalidTypeError,
   InvalidUnionTypeError,
@@ -10,9 +9,9 @@ import { typeOf } from "../utils/type";
 import { CoreType, Types, ValueType } from "./base";
 
 export class OneOfType<
-  TypeSet extends Array<CoreType<unknown>>
+  TypeSet extends Array<CoreType<any>>
 > extends CoreType<ValueType<TypeSet[number]>> {
-  static create = <TypeSet extends Array<CoreType<unknown>>>(
+  static create = <TypeSet extends Array<CoreType<any>>>(
     types: TypeSet,
     error?: ErrorConstructorMessage<InvalidUnionTypeErrorPayload>
   ) => {
@@ -45,7 +44,7 @@ export class OneOfType<
 
           if (hasSomeonePassed) return true;
 
-          const notInvaidTypeError: ErrorSubject[] = [];
+          const notInvalidTypeError: ErrorSubject[] = [];
 
           for (let index = 0; index < errors.length; index++) {
             const _error = errors[index];
@@ -60,11 +59,11 @@ export class OneOfType<
                 });
               }
 
-              notInvaidTypeError.push(errors[index]);
+              notInvalidTypeError.push(errors[index]);
             }
           }
 
-          if (notInvaidTypeError.length > 0) return notInvaidTypeError;
+          if (notInvalidTypeError.length > 0) return notInvalidTypeError;
 
           return new InvalidUnionTypeError({
             expectedType,

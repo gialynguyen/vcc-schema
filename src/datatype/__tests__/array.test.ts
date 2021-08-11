@@ -38,7 +38,7 @@ describe("DataType Array", () => {
   });
 
   describe("NoEmpty", () => {
-    const subject = array(string()).noempty();
+    const subject = array(string()).nonempty();
     expect(subject).toBeInstanceOf(ArrayType);
     expect(subject.parser(["1"]).length).toBeGreaterThan(0);
 

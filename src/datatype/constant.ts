@@ -6,7 +6,7 @@ import {
 } from "../error";
 import { CoreType, Types } from "./base";
 
-export class ConstantType<Value extends any> extends CoreType<Value> {
+export class ConstantType<Value extends Primitive> extends CoreType<Value> {
   static create = <Value extends Primitive>(
     constantValue: Value,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
