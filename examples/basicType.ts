@@ -6,15 +6,12 @@ import {
   ValueType,
   date,
   ErrorType,
-  array,
+  enumType,
 } from "../dist";
 
 const NormalName = string()
   .min(4, "Tên phải dài hơn 4 ký tự")
   .max(15, "Tên phải ngắn hơn 15 ký tự");
-
-const t = array(string());
-type T = ValueType<typeof t>
 
 const UserModel = mixed({
   name: NormalName,
@@ -33,8 +30,10 @@ const UserModel = mixed({
 
   address: mixed({
     name: NormalName,
-    detail: string().noempty(),
+    detail: string().nonempty(),
   }),
+
+  gender: enumType(["Male", "Female"]),
 
   birthDate: date("ISO").default(() => new Date()),
 });

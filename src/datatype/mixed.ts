@@ -19,7 +19,7 @@ import { typeOf } from "../utils/type";
 
 type PickBySchemaMap<TypeMap> = {
   [Key in keyof TypeMap]?: TypeMap[Key] extends MixedType<any, any>
-    ? PickBySchemaMap<TypeMap[Key]["children"]>
+    ? PickBySchemaMap<TypeMap[Key]["children"]> | boolean
     : boolean;
 };
 
@@ -295,17 +295,17 @@ export class MixedType<
 
   modify<
     Modifiers extends {
-      [key in Keys]?: ICallback<CoreType<unknown>, [base: TypeMap[key]]>;
+      [key in Keys]?: ICallback<CoreType<any>, [base: TypeMap[key]]>;
     },
     ModifiersTypeValue extends {
       [key in keyof Modifiers]: ReturnType<NotUndefined<Modifiers[key]>>;
     }
-  >(childrens: Modifiers) {
+  >(children: Modifiers) {
     const { childrenPropertyTypes: currentChildrenTypes } = this;
     const modifiedChildren = {} as ModifiersTypeValue;
 
-    for (const key in childrens) {
-      const childTransform = childrens[key];
+    for (const key in children) {
+      const childTransform = children[key];
       const currentChildType = currentChildrenTypes[key];
       if (childTransform) {
         modifiedChildren[key] = childTransform(
@@ -314,14 +314,15 @@ export class MixedType<
       }
     }
 
-    const children = {
-      ...currentChildrenTypes,
-      ...modifiedChildren,
-    };
-
-    return MixedType.create(children, {
-      strict: this._strict,
-    });
+    return MixedType.create(
+      {
+        ...currentChildrenTypes,
+        ...modifiedChildren,
+      },
+      {
+        strict: this._strict,
+      }
+    );
   }
 
   pickAndModify<
@@ -340,12 +341,12 @@ export class MixedType<
           : never
         : ReturnType<NotUndefined<PickModifiers[key]>>;
     }
-  >(childrens: PickModifiers) {
+  >(children: PickModifiers) {
     const { childrenPropertyTypes: currentChildrenTypes } = this;
     const modifiedChildren = {} as PickModifiersTypeValue;
 
-    for (const key in childrens) {
-      const childTransform = childrens[key];
+    for (const key in children) {
+      const childTransform = children[key];
       const currentChildType = currentChildrenTypes[key];
       if (childTransform) {
         if (typeof childTransform === "boolean" && childTransform === true) {
@@ -367,17 +368,7 @@ export class MixedType<
     });
   }
 
-  strict(
-    strict: boolean,
-    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) {
-    return MixedType.create(this.childrenPropertyTypes, {
-      strict,
-      error,
-    });
-  }
-
-  extends<ExtendsFields extends IObject<ValueType<CoreType<unknown>>>>(
+  extends<ExtendsFields extends IObject<ValueType<CoreType<any>>>>(
     fields: ExtendsFields
   ) {
     return MixedType.create(
@@ -386,6 +377,27 @@ export class MixedType<
         strict: this._strict,
       }
     );
+  }
+
+  merge<MergeFields extends IObject<ValueType<CoreType<any>>>>(
+    fields: MergeFields
+  ) {
+    return MixedType.create(
+      { ...this.childrenPropertyTypes, ...fields },
+      {
+        strict: this._strict,
+      }
+    );
+  }
+
+  strict(
+    strict: boolean,
+    error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
+  ) {
+    return MixedType.create(this.childrenPropertyTypes, {
+      strict,
+      error,
+    });
   }
 }
 

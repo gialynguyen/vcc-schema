@@ -1,4 +1,4 @@
-import { string, number, mixed, oneOf, date, ErrorType } from "../dist";
+import { string, number, mixed, oneOf, date } from "../dist";
 
 const NormalName = string()
   .min(4, "Tên phải dài hơn 4 ký tự")

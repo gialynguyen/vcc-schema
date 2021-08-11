@@ -15,7 +15,7 @@
   - [.pickBy](#pickby)
   - [.omitBy](#omitby)
 - [Array](#array)
-  - [.noempty](#noempty)
+  - [.nonempty](#nonempty)
 - [OneOf](#OneOf)
 - [Boolean](#boolean)
 - [Date](#date)
@@ -99,7 +99,7 @@ string().length(7);
 string().email();
 string().url();
 string().regex(/gialy/g);
-string().noempty();
+string().nonempty();
 ```
 
 ##### Tuỳ chỉnh ErrorMessage:
@@ -324,14 +324,14 @@ const stringArray = array(string());
 const stringArray = string().array();
 ```
 
-### `.noempty`
+### `.nonempty`
 
 Sử dụng hàm này nếu muốn đảm bảo mảng có ít nhất 1 phần tử
 
 ```ts
 import { array } from "vcc-schema";
 
-const stringArray = string().array().noempty();
+const stringArray = string().array().nonempty();
 ```
 
 ### `.min` / `.max` / `.length`
@@ -383,9 +383,9 @@ const isNull = nullable();
 # Undefined
 
 ```ts
-import { undefined } from "vcc-schema";
+import { undefinedType } from "vcc-schema";
 
-const isUndefined = undefined();
+const isUndefined = undefinedType();
 ```
 
 # Unknown
@@ -453,7 +453,19 @@ type T = ValueType<typeof tuplesSchema>;
 */
 ```
 
-# Enum (Cập nhật sau)
+# Enum
+
+```ts
+
+const gender = enumType(["Male", "Female"]);
+
+type GenderType = ValueType<typeof gender>;
+
+/*
+  type GenderType = "Male" | "Female";
+*/
+
+```
 
 # Custom (Cập nhật sau)
 

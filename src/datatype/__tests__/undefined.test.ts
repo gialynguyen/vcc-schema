@@ -1,4 +1,4 @@
-import { undefined as undefinedType, UndefinedType } from '../';
+import { undefinedType, UndefinedType } from '../';
 import { ErrorSet, InvalidTypeError } from '../../error';
 
 describe("DataType Undefined", () => {

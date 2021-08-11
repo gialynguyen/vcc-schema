@@ -12,10 +12,10 @@ import {
 } from "../error";
 import { typeOf } from "../utils/type";
 
-export class ArrayType<Item extends CoreType<unknown>> extends CoreType<
+export class ArrayType<Item extends CoreType<any>> extends CoreType<
   ValueType<Item>[]
 > {
-  static create = <Item extends CoreType<unknown>>(
+  static create = <Item extends CoreType<any>>(
     elementType: Item,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
   ) => {
@@ -117,7 +117,7 @@ export class ArrayType<Item extends CoreType<unknown>> extends CoreType<
     });
   }
 
-  noempty(error?: ErrorConstructorMessage<SizeErrorPayload>) {
+  nonempty(error?: ErrorConstructorMessage<SizeErrorPayload>) {
     return this._extends({
       checkers: [
         (value: Array<any>) => {

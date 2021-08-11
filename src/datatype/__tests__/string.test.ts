@@ -116,9 +116,9 @@ describe("DataType String", () => {
   });
 
   describe("NoEmpty", () => {
-    const subject = string().noempty();
+    const subject = string().nonempty();
     expect(subject).toBeInstanceOf(StringType);
-    expect(subject.parser("noempty")).toEqual("noempty");
+    expect(subject.parser("nonempty")).toEqual("nonempty");
 
     it("should throw an TooSmallError error", () => {
       try {

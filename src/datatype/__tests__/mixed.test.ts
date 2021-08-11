@@ -263,4 +263,32 @@ describe("DataType Mixed", () => {
       }
     });
   });
+
+  describe("merge", () => {
+    it("should have instance of MixedType", () => {
+      const mergedSubject = subject.merge({
+        name: number(),
+        routines: array(string()),
+      });
+      expect(mergedSubject).toBeInstanceOf(MixedType);
+      expect(mergedSubject.children.routines).not.toBeUndefined();
+    });
+
+    it("should throw an InvalidTypeError error", () => {
+      const mergedSubject = subject.extends({
+        name: number(),
+        routines: array(string()),
+      });
+      try {
+        mergedSubject.parser({
+          name: "Tom",
+          age: 24,
+          company: { name: "3dacam" },
+          routines: ["drink coffee"],
+        });
+      } catch (err) {
+        expect(err.errors[0]).toBeInstanceOf(InvalidTypeError);
+      }
+    });
+  });
 });

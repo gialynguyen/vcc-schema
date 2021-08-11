@@ -31,4 +31,4 @@ export class UndefinedType extends CoreType<undefined> {
   };
 }
 
-export const undefined = UndefinedType.create;
+export const undefinedType = UndefinedType.create;

@@ -11,7 +11,7 @@ import {
   ArrayType,
   nullable,
   NullType,
-  undefined,
+  undefinedType,
   UndefinedType,
   oneOf,
   OneOfType,
@@ -160,7 +160,7 @@ export abstract class CoreType<Type> {
     };
 
     this.optional = () => {
-      return oneOf([this, undefined()]);
+      return oneOf([this, undefinedType()]);
     };
 
     this.nullable = (): OneOfType<[this, NullType]> => {
@@ -170,7 +170,7 @@ export abstract class CoreType<Type> {
     this.array = () => array(this);
 
     this.nullish = (): OneOfType<[this, NullType, UndefinedType]> => {
-      return oneOf([this, nullable(), undefined()]);
+      return oneOf([this, nullable(), undefinedType()]);
     };
   }
 
