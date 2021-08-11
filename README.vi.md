@@ -1,3 +1,5 @@
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/vcc-schema)
+
 # Mục lục
 
 - [Giới thiệu](#giới-thiệu)
