@@ -21,7 +21,7 @@ export default [
         sourcemap: true,
       },
       {
-        file: `${name}.mjs`,
+        file: `${name}.module.js`,
         format: "es",
         sourcemap: true,
       },

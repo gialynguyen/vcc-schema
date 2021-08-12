@@ -9,10 +9,10 @@ specifiers:
   rollup-plugin-esbuild: ^3.0.2
   ts-jest: ^27.0.0
   typescript: ^4.2.3
-  vcc-utils: 0.0.7
+  vcc-utils: 0.0.8
 
 dependencies:
-  vcc-utils: 0.0.7
+  vcc-utils: 0.0.8
 
 devDependencies:
   '@types/jest': 26.0.23
@@ -2641,8 +2641,8 @@ packages:
       source-map: 0.7.3
     dev: true
 
-  /vcc-utils/0.0.7:
-    resolution: {integrity: sha512-sl4KdxUJTJHFypqEb1Q+jhnW/+oPbbGSHDsihXp+1VgC6Y2H8lcflelQC6j0po+BtXqkWjMprLoCtU21eVWlsg==}
+  /vcc-utils/0.0.8:
+    resolution: {integrity: sha512-1KtDMcQ/p1GrsoDGgRD4py4YMo9Iq9Sw587IRGeMEaCvCaOhDp1yDxg6D3n8CHPA+CFpeTIBbjeCO/0Q4uVyxA==}
     dev: false
 
   /w3c-hr-time/1.0.2:
