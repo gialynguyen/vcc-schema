@@ -57,15 +57,6 @@ export const runnerParser = ({
       });
 
       if (passed !== true) {
-        if (defaultValue) {
-          if (typeof defaultValue === "function" && type !== Types.func) {
-            returnValue = defaultValue();
-          } else {
-            returnValue = defaultValue;
-          }
-
-          continue;
-        }
 
         if (passed instanceof ErrorSubject) {
           if (passed.error.prerequisite) shouldThrowError = true;
@@ -84,7 +75,21 @@ export const runnerParser = ({
           }
 
           if (hasPrerequisiteError) shouldThrowError = true;
+
           errors = errors.concat(passed);
+        }
+
+        if (defaultValue) {
+          if (typeof defaultValue === "function" && type !== Types.func) {
+            returnValue = defaultValue();
+          } else {
+            returnValue = defaultValue;
+          }
+
+          if (shouldThrowError) {
+            break;
+          }
+          continue;
         }
 
         if (errors.length && tryParser) {

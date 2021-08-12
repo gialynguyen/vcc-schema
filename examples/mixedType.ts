@@ -1,14 +1,23 @@
-import { mixed, string, number, ValueType } from "../dist";
+import { mixed, string, number, ValueType, array } from "../dist";
 
 const UserSchema = mixed({
   name: string(),
   age: number(),
-  roleIds: string().array(),
+  roleIds: array(string()).default([]),
   detail: mixed({
     email: string(),
     phone: string(),
   }),
 });
+
+UserSchema.parser({
+  name: "tom",
+  age: 24,
+  detail: {
+    email: "tom@gmail.com",
+    phone: "+8433691545"
+  }
+})
 
 const CreateUserSchema = UserSchema.modify({
   name: (name) => name.optional(),
