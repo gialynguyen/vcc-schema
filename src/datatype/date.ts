@@ -41,9 +41,9 @@ export class DateType extends CoreType<Date> {
         (value: any, { ctx: { paths } }) => {
           let valid = false;
           if (format === "ISO") {
-            valid = iso8601.test(value);
+            valid = isDate(value) || iso8601.test(value);
           } else if (format === "strictISO") {
-            valid = iso8601Strict.test(value);
+            valid = isDate(value) || iso8601Strict.test(value);
           } else {
             valid = isDate(value);
           }
