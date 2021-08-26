@@ -16,7 +16,7 @@ export class BooleanType extends CoreType<boolean> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isBoolean(value);
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.boolean,

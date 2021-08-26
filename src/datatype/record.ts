@@ -36,7 +36,7 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const isValidObject = isObject(value);
-          if (isValidObject) return true;
+          if (isValidObject) return value;
 
           return new InvalidTypeError({
             expectedType: Types.record,
@@ -76,7 +76,7 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
             return errors;
           }
 
-          return true;
+          return value;
         },
       ],
     });

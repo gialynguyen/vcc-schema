@@ -51,7 +51,7 @@ export class TuplesType<
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const isValidArray = isArray(value);
-          if (isValidArray) return true;
+          if (isValidArray) return value;
 
           return new InvalidTypeError({
             expectedType: Types.mixed,

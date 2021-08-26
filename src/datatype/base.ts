@@ -43,7 +43,7 @@ export enum Types {
 
 export type ValueType<Type> = Type extends TuplesType<any>
   ? ReturnType<Type["parser"]>
-  : Type extends CoreType<infer T>
+  : Type extends CoreType<any>
   ? ReturnType<Type["parser"]>
   : never;
 
@@ -56,7 +56,7 @@ export type ErrorType<Type> = Type extends IObject
 export type TypeDefaultValue<Type> = Type | ICallback<Type>;
 
 export interface CoreTypeConstructorParams<Type> {
-  defaultCheckers: Checker[];
+  defaultCheckers: Checker<Type>[];
   type: Types;
   defaultValue?: TypeDefaultValue<Type>;
   defaultLazyCheckers?: Type extends IObject
@@ -67,7 +67,7 @@ export interface CoreTypeConstructorParams<Type> {
 export abstract class CoreType<Type> {
   protected _type: Types;
 
-  protected _checkers: Checker[];
+  protected _checkers: Checker<Type>[];
 
   protected _lazyCheckers: LazyType<any>[];
 
@@ -174,7 +174,7 @@ export abstract class CoreType<Type> {
     };
   }
 
-  _extends(payload: { checkers?: Checker[]; lazy?: LazyType<Type>[] }): this {
+  _extends(payload: { checkers?: Checker<Type>[]; lazy?: LazyType<Type>[] }): this {
     return new (this as any).constructor({
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
       defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
@@ -183,7 +183,7 @@ export abstract class CoreType<Type> {
     });
   }
 
-  check(checker: Checker) {
+  check(checker: Checker<Type>) {
     return this._extends({
       checkers: [...this._checkers, checker],
     });

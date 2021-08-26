@@ -28,7 +28,7 @@ export class StringType extends CoreType<string> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isString(value);
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.string,
@@ -50,7 +50,7 @@ export class StringType extends CoreType<string> {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
-          if (value.length <= maxLength) return true;
+          if (value.length <= maxLength) return value;
 
           return new TooBigError({
             expectedSize: maxLength,
@@ -71,7 +71,7 @@ export class StringType extends CoreType<string> {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
-          if (value.length >= minLength) return true;
+          if (value.length >= minLength) return value;
 
           return new TooSmallError({
             expectedSize: minLength,
@@ -92,7 +92,7 @@ export class StringType extends CoreType<string> {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
-          if (value.length === length) return true;
+          if (value.length === length) return value;
 
           return new IncorrectSizeError({
             expectedSize: length,
@@ -110,7 +110,7 @@ export class StringType extends CoreType<string> {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
-          if (emailRegex.test(value)) return true;
+          if (emailRegex.test(value)) return value;
 
           return new InvalidStringFormat({
             receivedString: value,
@@ -130,7 +130,7 @@ export class StringType extends CoreType<string> {
         (value: string, { ctx: { paths } }) => {
           try {
             new URL(value);
-            return true;
+            return value;
           } catch (e) {
             return new InvalidStringFormat({
               receivedString: value,
@@ -153,7 +153,7 @@ export class StringType extends CoreType<string> {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
-          if (format.test(value)) return true;
+          if (format.test(value)) return value;
 
           return new InvalidStringFormat({
             receivedString: value,

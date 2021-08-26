@@ -1,4 +1,4 @@
-import { mixed, MixedType, string, StringType, number, array } from "../";
+import { mixed, MixedType, string, StringType, number, array, ValueType } from "../";
 import {
   ErrorSet,
   InvalidTypeError,
@@ -16,12 +16,17 @@ describe("DataType Mixed", () => {
     }),
   });
 
+  type t = ValueType<typeof subject>;
+
   it("should have instance of MixedType", () => {
     const mixedValue = {
       name: "Người Da Màu",
       age: 24,
       company: { name: "3dacam" },
     };
+
+    const t = subject.parser(mixedValue);
+
     expect(subject).toBeInstanceOf(MixedType);
     expect(subject.children["name"]).toBeInstanceOf(StringType);
     expect(subject.parser(mixedValue)).toEqual(mixedValue);
@@ -198,8 +203,8 @@ describe("DataType Mixed", () => {
   describe("pickAndModify", () => {
     it("should have instance of MixedType", () => {
       const pickAndModifySubject = subject.pickAndModify({
-        name: true,
-        age: (age) => age.max(7),
+        age: true,
+        name: (age) => age.optional(),
       });
 
       const parsedResult = pickAndModifySubject.parser({

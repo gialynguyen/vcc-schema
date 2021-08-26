@@ -22,7 +22,7 @@ export class NumberType extends CoreType<number> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isNumber(value);
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.number,
@@ -44,7 +44,7 @@ export class NumberType extends CoreType<number> {
     return this._extends({
       checkers: [
         (value: number, { ctx: { paths } }) => {
-          if (value <= maxValue) return true;
+          if (value <= maxValue) return value;
 
           return new TooBigError({
             expectedSize: maxValue,
@@ -65,7 +65,7 @@ export class NumberType extends CoreType<number> {
     return this._extends({
       checkers: [
         (value: number, { ctx: { paths } }) => {
-          if (value >= minValue) return true;
+          if (value >= minValue) return value;
 
           return new TooSmallError({
             expectedSize: minValue,
@@ -86,7 +86,7 @@ export class NumberType extends CoreType<number> {
     return this._extends({
       checkers: [
         (data: number, { ctx: { paths } }) => {
-          if (data === value) return true;
+          if (data === value) return value;
 
           return new NoEqualError<number>({
             expectedValue: value,

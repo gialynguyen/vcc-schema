@@ -4,7 +4,7 @@ export class UnknownType extends CoreType<unknown> {
   static create = () => {
     return new UnknownType({
       type: Types.unknown,
-      defaultCheckers: [() => true],
+      defaultCheckers: [(value) => value],
     });
   };
 }

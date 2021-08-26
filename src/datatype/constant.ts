@@ -16,7 +16,7 @@ export class ConstantType<Value extends Primitive> extends CoreType<Value> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = value === constantValue;
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: constantValue,

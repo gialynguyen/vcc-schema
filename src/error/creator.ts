@@ -22,7 +22,7 @@ export class ErrorSubject extends Subject<IError> {
     this.error = this.proxyState;
   }
 
-  static isArrayErrorSubject(subject: unknown) {
+  static isArrayErrorSubject(subject: unknown): subject is ErrorSubject[] {
     return Array.isArray(subject) && subject[0] instanceof ErrorSubject;
   }
 }

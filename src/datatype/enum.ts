@@ -37,7 +37,7 @@ export class EnumType<
             }
           }
 
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: `one of ${enumValue.join(", ")}`,

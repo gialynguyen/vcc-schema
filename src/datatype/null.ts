@@ -17,7 +17,7 @@ export class NullType extends CoreType<null> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isNull(value);
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.null,

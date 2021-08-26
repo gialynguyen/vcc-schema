@@ -15,7 +15,7 @@ export class UndefinedType extends CoreType<undefined> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = typeof value === "undefined";
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.undefined,

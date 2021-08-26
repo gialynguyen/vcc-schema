@@ -42,7 +42,7 @@ export class OneOfType<
             }
           }
 
-          if (hasSomeonePassed) return true;
+          if (hasSomeonePassed) return value;
 
           const notInvalidTypeError: ErrorSubject[] = [];
 

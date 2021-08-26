@@ -24,7 +24,7 @@ export class DateType extends CoreType<Date> {
   constructor(
     props: CoreTypeConstructorParams<Date> & { format: DateFormatType }
   ) {
-    const { format, ...superProps } = props;
+    const { format } = props;
 
     super(props);
     this.format = format;
@@ -40,15 +40,18 @@ export class DateType extends CoreType<Date> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           let valid = false;
+          let returnValue = value;
           if (format === "ISO") {
             valid = isDate(value) || iso8601.test(value);
+            returnValue = new Date(value);
           } else if (format === "strictISO") {
             valid = isDate(value) || iso8601Strict.test(value);
+            returnValue = new Date(value);
           } else {
             valid = isDate(value);
           }
 
-          if (valid) return true;
+          if (valid) return returnValue;
 
           return new InvalidTypeError({
             expectedType: Types.date,

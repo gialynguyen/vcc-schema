@@ -24,7 +24,7 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
       defaultCheckers: [
         (value: any, { ctx }) => {
           const isValidArray = Array.isArray(value);
-          if (isValidArray) return true;
+          if (isValidArray) return value;
 
           return new InvalidTypeError({
             expectedType: Types.array,
@@ -73,7 +73,7 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     return this._extends({
       checkers: [
         (value: Array<any>) => {
-          if (value.length === length) return true;
+          if (value.length === length) return value;
           return new IncorrectSizeError({
             expectedSize: length,
             receivedSize: value.length,
@@ -89,7 +89,8 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     return this._extends({
       checkers: [
         (value: Array<any>) => {
-          if (value.length >= length) return true;
+          if (value.length >= length) return value;
+
           return new TooSmallError({
             expectedSize: length,
             receivedSize: value.length,
@@ -105,7 +106,7 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     return this._extends({
       checkers: [
         (value: Array<any>) => {
-          if (value.length <= length) return true;
+          if (value.length <= length) return value;
           return new TooBigError({
             expectedSize: length,
             receivedSize: value.length,
@@ -121,7 +122,7 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     return this._extends({
       checkers: [
         (value: Array<any>) => {
-          if (value.length > 0) return true;
+          if (value.length > 0) return value;
           return new TooSmallError({
             expectedSize: 1,
             receivedSize: value.length,

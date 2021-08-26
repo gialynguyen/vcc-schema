@@ -105,7 +105,7 @@ export class MixedType<
         (value: any, { ctx: { paths } }) => {
           const isValidObject = isObject(value);
 
-          if (isValidObject) return true;
+          if (isValidObject) return value;
 
           return new InvalidTypeError({
             expectedType: Types.mixed,
@@ -334,7 +334,7 @@ export class MixedType<
     PickKeys extends Keys,
     PickModifiers extends {
       [key in PickKeys]?:
-        | ICallback<CoreType<unknown>, [base: TypeMap[key]]>
+        | ICallback<CoreType<any>, [base: TypeMap[key]]>
         | boolean;
     },
     PickModifiersTypeValue extends {

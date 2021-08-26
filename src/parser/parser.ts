@@ -4,7 +4,7 @@ import { ErrorCode } from "../error/type";
 import { Checker, LazyType } from "./checker";
 
 export interface ParserPayload {
-  checkers: Checker[];
+  checkers: Checker<unknown>[];
   lazyCheckers: LazyType<any>[];
   schemaType: CoreType<any>;
 }
@@ -56,56 +56,57 @@ export const runnerParser = ({
         },
       });
 
-      if (passed !== true) {
-        if (passed instanceof ErrorSubject) {
-          if (passed.error.prerequisite) shouldThrowError = true;
-          slotErrors.push(passed);
-        } else if (passed instanceof ErrorSet) {
-          if (passed.hasPrerequisiteError) shouldThrowError = true;
-          slotErrors = slotErrors.concat(passed.errors);
-        } else if (ErrorSubject.isArrayErrorSubject(passed)) {
-          let hasPrerequisiteError = false;
-          for (let index = 0; index < passed.length; index++) {
-            const error = passed[index];
-            if (error.error.prerequisite) {
-              hasPrerequisiteError = true;
-              break;
-            }
-          }
-
-          if (hasPrerequisiteError) shouldThrowError = true;
-          slotErrors = slotErrors.concat(passed);
-        }
-
-        if (defaultValue && slotErrors.length > 0) {
-          if (typeof defaultValue === "function" && type !== Types.func) {
-            returnValue = defaultValue();
-          } else {
-            returnValue = defaultValue;
-          }
-
-          if (shouldThrowError) {
+      if (passed instanceof ErrorSubject) {
+        if (passed.error.prerequisite) shouldThrowError = true;
+        slotErrors.push(passed);
+      } else if (passed instanceof ErrorSet) {
+        if (passed.hasPrerequisiteError) shouldThrowError = true;
+        slotErrors = slotErrors.concat(passed.errors);
+      } else if (ErrorSubject.isArrayErrorSubject(passed)) {
+        let hasPrerequisiteError = false;
+        for (let index = 0; index < passed.length; index++) {
+          const error = passed[index];
+          if (error.error.prerequisite) {
+            hasPrerequisiteError = true;
             break;
           }
-
-          continue;
         }
 
-        errors = errors.concat(slotErrors);
+        if (hasPrerequisiteError) shouldThrowError = true;
+        slotErrors = slotErrors.concat(passed);
+      }
 
-        if (errors.length && tryParser) {
-          returnValue = undefined;
-          break;
+      const slotHasError = slotErrors.length > 0;
+
+      if (defaultValue && slotHasError) {
+        if (typeof defaultValue === "function" && type !== Types.func) {
+          returnValue = defaultValue();
+        } else {
+          returnValue = defaultValue;
         }
-
-        if (throwOnFirstError && errors.length) shouldThrowError = true;
 
         if (shouldThrowError) {
-          if (nestedParser) return errors;
-          const errorSubject = new ErrorSet(errors);
-          throw errorSubject;
+          break;
         }
-      } else {
+        continue;
+      }
+
+      errors = errors.concat(slotErrors);
+
+      if (errors.length && tryParser) {
+        returnValue = undefined;
+        break;
+      }
+
+      if (throwOnFirstError && errors.length) shouldThrowError = true;
+
+      if (shouldThrowError) {
+        if (nestedParser) return errors;
+        const errorSubject = new ErrorSet(errors);
+        throw errorSubject;
+      }
+
+      if (!slotHasError) {
         if (schemaType instanceof DateType) {
           const { format } = schemaType;
           if (format === "ISO" || format === "strictISO")

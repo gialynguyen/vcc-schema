@@ -105,4 +105,11 @@ describe("DataType Array", () => {
       }
     });
   });
+
+  describe("DefaultValue", () => {
+    const subject = array(string()).default([]);
+    expect(subject).toBeInstanceOf(ArrayType);
+    expect(subject.parser(["1", "2", "3"]).length).toEqual(3);
+    expect(subject.parser(undefined).length).toEqual(0);
+  });
 });

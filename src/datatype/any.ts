@@ -17,7 +17,7 @@ export class AnyType extends CoreType<any> {
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = !isNull(value) && typeof value !== "undefined";
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.any,

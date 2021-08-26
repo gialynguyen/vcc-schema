@@ -22,7 +22,7 @@ export class VoidType<
       defaultCheckers: [
         (value: any, { ctx: { paths } }) => {
           const valid = isFunction(value);
-          if (valid) return true;
+          if (valid) return value;
 
           return new InvalidTypeError({
             expectedType: Types.func,
