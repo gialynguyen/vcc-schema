@@ -57,5 +57,5 @@ try {
   console.log("user: ", user);
 } catch (error) {
   const errorObjectLike: ErrorType<UserEntity> = error.format();
-  console.log("error: ", JSON.stringify(errorObjectLike, null, 2));
+  console.log("error: ", errorObjectLike);
 }
