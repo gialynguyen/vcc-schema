@@ -15,10 +15,12 @@ const data = UserSchema.tryDeepParser({
   age: 24,
   detail: {
     email: "tom@gmail.com",
-    phone: "+8433691545"
+    phone: "+8433691545",
   },
-  a: 10
-})
+  roleIds: ["123"]
+});
+
+console.log("data: ", data);
 
 const CreateUserSchema = UserSchema.modify({
   name: (name) => name.optional(),

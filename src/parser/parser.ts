@@ -59,7 +59,7 @@ export const runnerParser = ({
       if (passed !== true) {
         if (passed instanceof ErrorSubject) {
           if (passed.error.prerequisite) shouldThrowError = true;
-          slotErrors.push(passed)
+          slotErrors.push(passed);
         } else if (passed instanceof ErrorSet) {
           if (passed.hasPrerequisiteError) shouldThrowError = true;
           slotErrors = slotErrors.concat(passed.errors);
@@ -77,7 +77,7 @@ export const runnerParser = ({
           slotErrors = slotErrors.concat(passed);
         }
 
-        if (defaultValue) {
+        if (defaultValue && slotErrors.length > 0) {
           if (typeof defaultValue === "function" && type !== Types.func) {
             returnValue = defaultValue();
           } else {
