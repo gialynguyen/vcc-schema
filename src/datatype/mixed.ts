@@ -117,7 +117,6 @@ export class MixedType<
           });
         },
         (value: any, { ctx }) => {
-          let returnValue = value;
           let errors: ErrorSubject[] = [];
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
 
@@ -149,6 +148,8 @@ export class MixedType<
           if (errors.length && throwOnFirstError) {
             return errors;
           }
+
+          let returnValue = strict ? {} : value;
 
           for (const key in types) {
             const propertySubjectChecker = types[key];

@@ -1,5 +1,5 @@
 import { string, record, RecordType, tuples, number, array } from "../";
-import { ErrorSet, IncorrectSizeError, InvalidTypeError } from "../../error";
+import { ErrorSet, InvalidTypeError } from "../../error";
 
 describe("Datatype Record", () => {
   const subject = record(string());
