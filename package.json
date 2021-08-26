@@ -1,6 +1,6 @@
 {
   "name": "vcc-schema",
-  "version": "0.1.12",
+  "version": "0.2",
   "main": "dist/index.js",
   "module": "dist/index.module.js",
   "typings": "dist/index.d.ts",
