@@ -45,6 +45,8 @@ export type ValueType<Type> = Type extends TuplesType<any>
   ? ReturnType<Type["parser"]>
   : Type extends CoreType<any>
   ? ReturnType<Type["parser"]>
+  : Type extends CoreType<any[]>
+  ? ReturnType<Type["parser"]>
   : never;
 
 export type ErrorType<Type> = Type extends IObject

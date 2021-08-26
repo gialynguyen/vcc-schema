@@ -4,7 +4,7 @@ import { ErrorCode } from "../error/type";
 import { Checker, LazyType } from "./checker";
 
 export interface ParserPayload {
-  checkers: Checker<unknown>[];
+  checkers: Checker<any>[];
   lazyCheckers: LazyType<any>[];
   schemaType: CoreType<any>;
 }

@@ -16,8 +16,6 @@ describe("DataType Mixed", () => {
     }),
   });
 
-  type t = ValueType<typeof subject>;
-
   it("should have instance of MixedType", () => {
     const mixedValue = {
       name: "Người Da Màu",
