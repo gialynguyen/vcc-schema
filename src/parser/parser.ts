@@ -46,7 +46,7 @@ export const runnerParser = ({
 
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
-
+      let slotErrors: ErrorSubject[] = [];
       const passed = checker(raw, {
         ctx: {
           paths: paths || [],
@@ -57,13 +57,12 @@ export const runnerParser = ({
       });
 
       if (passed !== true) {
-
         if (passed instanceof ErrorSubject) {
           if (passed.error.prerequisite) shouldThrowError = true;
-          errors.push(passed);
+          slotErrors.push(passed)
         } else if (passed instanceof ErrorSet) {
           if (passed.hasPrerequisiteError) shouldThrowError = true;
-          errors = errors.concat(passed.errors);
+          slotErrors = slotErrors.concat(passed.errors);
         } else if (ErrorSubject.isArrayErrorSubject(passed)) {
           let hasPrerequisiteError = false;
           for (let index = 0; index < passed.length; index++) {
@@ -75,8 +74,7 @@ export const runnerParser = ({
           }
 
           if (hasPrerequisiteError) shouldThrowError = true;
-
-          errors = errors.concat(passed);
+          slotErrors = slotErrors.concat(passed);
         }
 
         if (defaultValue) {
@@ -89,8 +87,11 @@ export const runnerParser = ({
           if (shouldThrowError) {
             break;
           }
+
           continue;
         }
+
+        errors = errors.concat(slotErrors);
 
         if (errors.length && tryParser) {
           returnValue = undefined;

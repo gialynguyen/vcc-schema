@@ -118,21 +118,27 @@ export class MixedType<
         },
         (value: any, { ctx }) => {
           let errors: ErrorSubject[] = [];
+          let returnValue = value;
+
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
 
-          if (strict && !ctx.tryParser) {
+          if (strict) {
             const rawObjectKeys = Object.keys(value);
             const propertyCheckerKeys = Object.keys(types);
             const diffKeys: string[] = [];
             for (let index = 0; index < rawObjectKeys.length; index++) {
               const key = rawObjectKeys[index];
               if (!propertyCheckerKeys.includes(key)) {
-                diffKeys.push(key);
-                if (throwOnFirstError) break;
+                if (!ctx.tryParser) {
+                  diffKeys.push(key);
+                  if (throwOnFirstError) break;
+                } else {
+                  delete returnValue[key];
+                }
               }
             }
 
-            if (diffKeys.length > 0) {
+            if (diffKeys.length > 0 && !ctx.tryParser) {
               errors = errors.concat(
                 diffKeys.map(
                   (key) =>
@@ -148,8 +154,6 @@ export class MixedType<
           if (errors.length && throwOnFirstError) {
             return errors;
           }
-
-          let returnValue = strict ? {} : value;
 
           for (const key in types) {
             const propertySubjectChecker = types[key];

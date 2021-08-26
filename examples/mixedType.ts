@@ -10,13 +10,14 @@ const UserSchema = mixed({
   }),
 });
 
-UserSchema.parser({
+const data = UserSchema.tryDeepParser({
   name: "tom",
   age: 24,
   detail: {
     email: "tom@gmail.com",
     phone: "+8433691545"
-  }
+  },
+  a: 10
 })
 
 const CreateUserSchema = UserSchema.modify({
