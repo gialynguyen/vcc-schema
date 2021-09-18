@@ -4,7 +4,7 @@ import {
   mixed,
   oneOf,
   date,
-  Session,
+  Observer,
   record,
   tuples,
 } from "../dist";
@@ -34,15 +34,31 @@ const UserModel = mixed({
   }),
 
   birthDate: date(),
+
   history: record(string()),
+
   template: tuples([number(), string()]),
 });
 
-const session = new Session<typeof UserModel>();
+const observer = new Observer<typeof UserModel>();
 
-session.onError(
-  (error) => error.addressDetails[0].name,
+observer.on(
+  (representor) => representor.addressDetails,
+  ({ data, error }) => {
+    
+  }
+);
+
+observer.onError(
+  (representor) => representor.addressDetails,
   (error) => {
     console.log("error: ", error);
+  },
+);
+
+observer.onSuccess(
+  (representor) => representor.addressDetails,
+  (data) => {
+    console.log("data: ", data);
   }
 );

@@ -3,6 +3,9 @@ import { string, mixed } from "../dist";
 const UserModel = mixed({
   password: string().min(7),
   cPassword: string(),
+  user: mixed({
+    name: string(),
+  })
 }).lazy({
   cPassword: {
     checker: (cPassword, { password }) => cPassword === password,
