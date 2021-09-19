@@ -1,18 +1,18 @@
-import { string } from "./string";
-import { number } from "./number";
-import { mixed } from "./mixed";
-import { oneOf } from "./oneOf";
-import { undefinedType } from "./undefined";
-import { nullable } from "./null";
-import { func } from "./func";
-import { boolean } from "./boolean";
 import { any } from "./any";
-import { unknown } from "./unknown";
-import { date } from "./date";
 import { array } from "./array";
-import { tuples } from "./tuples";
-import { record } from "./record";
+import { boolean } from "./boolean";
+import { date } from "./date";
 import { enumType } from "./enum";
+import { func } from "./func";
+import { mixed } from "./mixed";
+import { nullable } from "./null";
+import { number } from "./number";
+import { oneOf } from "./oneOf";
+import { record } from "./record";
+import { string } from "./string";
+import { tuples } from "./tuples";
+import { undefinedType } from "./undefined";
+import { unknown } from "./unknown";
 
 export const VCS = {
   string,
@@ -32,20 +32,21 @@ export const VCS = {
   enumType,
 };
 
-export * from "./string";
-export * from "./number";
-export * from "./mixed";
-export * from "./oneOf";
-export * from "./undefined";
-export * from "./null";
-export * from "./func";
-export * from "./boolean";
 export * from "./any";
-export * from "./unknown";
-export * from "./date";
 export * from "./array";
 export * from "./base";
+export * from "./boolean";
 export * from "./constant";
-export * from "./tuples";
-export * from "./record";
+export * from "./date";
 export * from "./enum";
+export * from "./func";
+export * from "./mixed";
+export * from "./null";
+export * from "./number";
+export * from "./oneOf";
+export * from "./record";
+export * from "./string";
+export * from "./tuples";
+export * from "./undefined";
+export * from "./unknown";
+

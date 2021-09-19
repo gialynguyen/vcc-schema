@@ -54,14 +54,15 @@ export type ErrorType<Type> = Type extends IObject
   ? { [key in keyof Type]: ErrorType<Type[key]> }
   : Type extends any[]
   ? ErrorType<Type[number]>
-  : ErrorSubject;
+  : ErrorSubjectBase;
 
 export type TypeDefaultValue<Type> = Type | ICallback<Type>;
 
-export type TypeErrorMap = Map<
-  ErrorExtendSubjectClass,
-  (payload: ConstructorParameters<ErrorExtendSubjectClass>) => string | void
->;
+export type TypeErrorHandler = (
+  ...payload: ConstructorParameters<ErrorExtendSubjectClass>
+) => string | void;
+
+export type TypeErrorMap = Map<ErrorExtendSubjectClass, TypeErrorHandler>;
 
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker<Type>[];
@@ -242,7 +243,15 @@ export abstract class CoreType<Type> {
     }
   }
 
-  default(defaultValue: DefaultValueType<Type>): this {
+  errorMessage<ErrorSubject extends ErrorExtendSubjectClass>(
+    errorSubject: ErrorSubject,
+    handler: TypeErrorHandler
+  ) {
+    this._errorMessageMap.set(errorSubject, handler);
+    return this;
+  }
+
+  default(defaultValue: TypeDefaultValue<Type>) {
     this._defaultValue = defaultValue;
     return this;
   }

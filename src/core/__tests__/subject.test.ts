@@ -1,7 +1,7 @@
 // @ts-ignore TS6133
 import { expect, test } from "@jest/globals";
-
 import { Subject } from "../subject";
+
 
 test("subject is object", () => {
   class DemoSubject<State> extends Subject<State> {}

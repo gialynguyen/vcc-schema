@@ -1,4 +1,4 @@
-import { mixed, string, number, array } from "../dist";
+import { mixed, string, number, array, ErrorSubjects } from "../dist";
 
 const UserSchema = mixed({
   name: string(),
@@ -10,8 +10,4 @@ const UserSchema = mixed({
   }),
 });
 
-// UserSchema.errorMessageMap({
-
-// }, { overwrite: true })
-
-// UserSchema.errorMessage()
+UserSchema.errorMessage(ErrorSubjects.TooSmallError, ({}) => {});

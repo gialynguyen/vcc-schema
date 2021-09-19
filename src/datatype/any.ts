@@ -1,11 +1,15 @@
 import { isNull } from "vcc-utils";
 import {
-  ErrorConstructorMessage,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
+    ErrorConstructorMessage,
+    InvalidTypeError,
+    InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
+<<<<<<< HEAD
+=======
+
+>>>>>>> b0fe875 (feat(error-mapping): refactoring)
 
 export class AnyType extends CoreType<any> {
   static create = (

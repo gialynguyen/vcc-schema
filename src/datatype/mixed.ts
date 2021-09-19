@@ -1,16 +1,16 @@
 import { isObject, omit, pick } from "vcc-utils";
 import {
-  ICallback,
-  IObject,
-  NotUndefined,
-  ObjectWithoutNullishProperty,
+    ICallback,
+    IObject,
+    NotUndefined,
+    ObjectWithoutNullishProperty
 } from "../@types";
 import {
-  ErrorConstructorMessage,
-  ErrorSubject,
-  InvalidFieldError,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
+    ErrorConstructorMessage,
+    ErrorSubject,
+    InvalidFieldError,
+    InvalidTypeError,
+    InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";

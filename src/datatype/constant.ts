@@ -1,8 +1,8 @@
 import { Primitive } from "../@types";
 import {
-  ErrorConstructorMessage,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
+    ErrorConstructorMessage,
+    InvalidTypeError,
+    InvalidTypeErrorPayload
 } from "../error";
 import { CoreType, Types } from "./base";
 

@@ -1,11 +1,11 @@
 import { isArray } from "vcc-utils";
 import {
-  ErrorConstructorMessage,
-  ErrorSubject,
-  IncorrectSizeError,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
-  SizeErrorPayload,
+    ErrorConstructorMessage,
+    ErrorSubject,
+    IncorrectSizeError,
+    InvalidTypeError,
+    InvalidTypeErrorPayload,
+    SizeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { ArrayType } from "./array";

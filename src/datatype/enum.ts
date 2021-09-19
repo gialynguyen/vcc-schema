@@ -1,11 +1,12 @@
 import { isNumber, isString } from "vcc-utils";
 import { Writable } from "../@types";
 import {
-  ErrorConstructorMessage,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
+    ErrorConstructorMessage,
+    InvalidTypeError,
+    InvalidTypeErrorPayload
 } from "../error";
 import { CoreType, Types } from "./base";
+
 
 export type EnumElement = string | number;
 

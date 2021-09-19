@@ -404,3 +404,14 @@ export class InvalidStringFormat extends ErrorSubject {
     return error instanceof InvalidStringFormat;
   }
 }
+
+export const ErrorSubjects = {
+  InvalidTypeError,
+  InvalidUnionTypeError,
+  TooSmallError,
+  TooBigError,
+  IncorrectSizeError,
+  NoEqualError,
+  InvalidFieldError,
+  InvalidStringFormat,
+};

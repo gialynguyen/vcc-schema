@@ -1,8 +1,8 @@
 import { isDate } from "vcc-utils";
 import {
-  ErrorConstructorMessage,
-  InvalidTypeError,
-  InvalidTypeErrorPayload,
+    ErrorConstructorMessage,
+    InvalidTypeError,
+    InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, CoreTypeConstructorParams, Types } from "./base";
