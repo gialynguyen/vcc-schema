@@ -10,8 +10,8 @@ const UserSchema = mixed({
   }),
 });
 
-// UserSchema.errorMap({
+// UserSchema.errorMessageMap({
 
 // }, { overwrite: true })
 
-// UserSchema.onError()
+// UserSchema.errorMessage()
