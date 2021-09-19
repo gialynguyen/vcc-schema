@@ -1,6 +1,6 @@
 import { isArray } from "vcc-utils";
 import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
-import { ErrorSet } from "../error";
+import { ErrorExtendSubjectClass, ErrorSet, ErrorSubject } from "../error";
 import {
   Checker,
   LazyObjectType,
@@ -50,6 +50,19 @@ export type ValueType<Type> = Type extends TuplesType<any>
   : never;
 
 export type DefaultValueType<Type> = Type | ICallback<Type>;
+export type ErrorType<Type> = Type extends IObject
+  ? { [key in keyof Type]: ErrorType<Type[key]> }
+  : Type extends any[]
+  ? ErrorType<Type[number]>
+  : ErrorSubject;
+
+export type TypeDefaultValue<Type> = Type | ICallback<Type>;
+
+export type TypeErrorMap = Map<
+  ErrorExtendSubjectClass,
+  (payload: ConstructorParameters<ErrorExtendSubjectClass>) => string | void
+>;
+
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker<Type>[];
   type: Types;
@@ -67,6 +80,8 @@ export abstract class CoreType<Type> {
   protected _lazyCheckers: LazyType<any>[];
 
   protected _defaultValue?: DefaultValueType<Type>;
+
+  protected _errorMessageMap: TypeErrorMap;
 
   parser: (raw: any, ctx?: ParserContext) => Type;
 
@@ -103,6 +118,7 @@ export abstract class CoreType<Type> {
     this._checkers = params.defaultCheckers || [];
     this._type = params.type;
     this._lazyCheckers = params.defaultLazyCheckers || ([] as any);
+    this._errorMessageMap = new Map();
 
     this.parser = runnerParser({
       checkers: this._checkers,

@@ -28,6 +28,10 @@ export class ErrorSubject extends Subject<IError> {
   }
 }
 
+export type ErrorExtendSubjectClass = {
+  new (...args: any[]): ErrorSubject;
+};
+
 export class ErrorSet extends Error {
   errors: ErrorSubject[];
 

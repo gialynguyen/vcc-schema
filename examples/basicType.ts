@@ -7,6 +7,7 @@ import {
   date,
   ErrorType,
   enumType,
+  ErrorSet,
 } from "../dist";
 
 const NormalName = string()
@@ -56,6 +57,8 @@ try {
 
   console.log("user: ", user);
 } catch (error) {
-  const errorObjectLike: ErrorType<UserEntity> = error.format();
-  console.log("error: ", JSON.stringify(errorObjectLike, null, 2));
+  if (error instanceof ErrorSet) {
+    const errorObjectLike: ErrorType<UserEntity> = error.format();
+    console.log("error: ", JSON.stringify(errorObjectLike, null, 2));
+  }
 }
