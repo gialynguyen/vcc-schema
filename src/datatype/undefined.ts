@@ -13,11 +13,11 @@ export class UndefinedType extends CoreType<undefined> {
     return new UndefinedType({
       type: Types.undefined,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): undefined | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = typeof value === "undefined";
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.undefined,
             receivedType: typeOf(value),
             message: error,

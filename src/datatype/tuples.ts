@@ -1,11 +1,11 @@
 import { isArray } from "vcc-utils";
 import {
-    ErrorConstructorMessage,
-    ErrorSubject,
-    IncorrectSizeError,
-    InvalidTypeError,
-    InvalidTypeErrorPayload,
-    SizeErrorPayload
+  ErrorConstructorMessage,
+  ErrorSubject,
+  IncorrectSizeError,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
+  SizeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { ArrayType } from "./array";
@@ -49,14 +49,11 @@ export class TuplesType<
     return new TuplesType<TypeSet>({
       type: Types.tuples,
       defaultCheckers: [
-        (
-          value: any,
-          { ctx: { paths } }
-        ): ValueTypeTuples<TypeSet> | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const isValidArray = isArray(value);
           if (isValidArray) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.mixed,
             receivedType: typeOf(value),
             message: options?.error,
@@ -65,15 +62,12 @@ export class TuplesType<
             inputData: value,
           });
         },
-        (
-          value: any,
-          { ctx }
-        ): ErrorSubject[] | IncorrectSizeError | ValueTypeTuples<TypeSet> => {
+        (value: any, { ctx }) => {
           const valueLength = value.length;
           const typesLength = types.length;
 
           if (valueLength > typesLength) {
-            return new IncorrectSizeError({
+            return ctx.throwError(IncorrectSizeError, {
               expectedSize: typesLength,
               receivedSize: valueLength,
               inputData: value,

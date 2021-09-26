@@ -1,6 +1,10 @@
 import { isArray } from "vcc-utils";
 import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
-import { ErrorExtendSubjectClass, ErrorSet, ErrorSubject } from "../error";
+import {
+  ErrorExtendSubjectClass,
+  ErrorSet,
+  ErrorSubject as ErrorSubjectBase,
+} from "../error";
 import {
   Checker,
   LazyObjectType,
@@ -50,6 +54,7 @@ export type ValueType<Type> = Type extends TuplesType<any>
   : never;
 
 export type DefaultValueType<Type> = Type | ICallback<Type>;
+
 export type ErrorType<Type> = Type extends IObject
   ? { [key in keyof Type]: ErrorType<Type[key]> }
   : Type extends any[]
@@ -58,12 +63,11 @@ export type ErrorType<Type> = Type extends IObject
 
 export type TypeDefaultValue<Type> = Type | ICallback<Type>;
 
-export type TypeErrorHandler = (
-  ...payload: ConstructorParameters<ErrorExtendSubjectClass>
+export type TypeErrorHandler<ErrorSubject extends ErrorExtendSubjectClass> = (
+  ...payload: ConstructorParameters<ErrorSubject>
 ) => string | void;
 
-export type TypeErrorMap = Map<ErrorExtendSubjectClass, TypeErrorHandler>;
-
+export type TypeErrorMap = Map<ErrorExtendSubjectClass, TypeErrorHandler<any>>;
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker<Type>[];
   type: Types;
@@ -71,6 +75,7 @@ export interface CoreTypeConstructorParams<Type> {
   defaultLazyCheckers?: Type extends IObject
     ? LazyObjectType<any>[]
     : LazyType<any>[];
+  errorMessageMap?: TypeErrorMap;
 }
 
 export abstract class CoreType<Type> {
@@ -115,11 +120,20 @@ export abstract class CoreType<Type> {
     | { success: true; data: Type; error: null }
     | { success: false; data: null; error: ErrorSet };
 
+  getErrorMessageHandler: <ErrorSubject extends ErrorExtendSubjectClass>(
+    errorSubject: ErrorSubject
+  ) => TypeErrorHandler<any> | undefined;
+
+  throwError: <ErrorSubject extends ErrorExtendSubjectClass>(
+    errorSubject: ErrorSubject,
+    payload: ConstructorParameters<ErrorSubject>[0]
+  ) => ErrorSubjectBase;
+
   constructor(params: CoreTypeConstructorParams<Type>) {
     this._checkers = params.defaultCheckers || [];
     this._type = params.type;
     this._lazyCheckers = params.defaultLazyCheckers || ([] as any);
-    this._errorMessageMap = new Map();
+    this._errorMessageMap = new Map(params.errorMessageMap || []);
 
     this.parser = runnerParser({
       checkers: this._checkers,
@@ -184,17 +198,44 @@ export abstract class CoreType<Type> {
     this.nullish = (): OneOfType<[this, NullType, UndefinedType]> => {
       return oneOf([this, nullable(), undefinedType()]);
     };
+
+    this.getErrorMessageHandler = (errorSubject) => {
+      const errorMessageHandler = this._errorMessageMap.get(errorSubject);
+      if (errorMessageHandler) return errorMessageHandler;
+
+      return this._errorMessageMap.get(ErrorSubjectBase);
+    };
+
+    this.throwError = (errorSubject, payload) => {
+      const errorMessageHandler = this.getErrorMessageHandler(errorSubject);
+      if (errorMessageHandler) {
+        const errorMessage = errorMessageHandler(payload);
+        if (errorMessage) {
+          return new errorSubject({
+            ...payload,
+            message: errorMessage,
+          });
+        }
+      }
+
+      return new errorSubject({
+        ...payload,
+      });
+    };
   }
 
-  _extends(payload: {
-    checkers?: Checker<Type>[];
-    lazy?: LazyType<Type>[];
-  }): this {
+  protected _extends(
+    payload: Pick<CoreTypeConstructorParams<Type>, "errorMessageMap"> & {
+      checkers?: Checker<Type>[];
+      lazy?: LazyType<Type>[];
+    }
+  ): this {
     return new (this as any).constructor({
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
       defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
       type: this._type,
       defaultValue: this._defaultValue,
+      errorMessageMap: payload.errorMessageMap,
     });
   }
 
@@ -204,9 +245,9 @@ export abstract class CoreType<Type> {
     });
   }
 
-  _lazy(lazyOption: LazyType<any>[]): this {
+  _lazy(lazyOptions: LazyType<any>[]): this {
     return this._extends({
-      lazy: [...lazyOption],
+      lazy: [...this._lazyCheckers, ...lazyOptions],
     });
   }
 
@@ -245,10 +286,14 @@ export abstract class CoreType<Type> {
 
   errorMessage<ErrorSubject extends ErrorExtendSubjectClass>(
     errorSubject: ErrorSubject,
-    handler: TypeErrorHandler
+    handler: TypeErrorHandler<ErrorSubject>
   ) {
-    this._errorMessageMap.set(errorSubject, handler);
-    return this;
+    const errorMessageMap = new Map(this._errorMessageMap);
+    errorMessageMap.set(errorSubject, handler);
+
+    return this._extends({
+      errorMessageMap,
+    });
   }
 
   default(defaultValue: TypeDefaultValue<Type>) {

@@ -7,7 +7,7 @@ import {
   NoEqualErrorPayload,
   SizeErrorPayload,
   TooBigError,
-  TooSmallError
+  TooSmallError,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
@@ -19,11 +19,11 @@ export class NumberType extends CoreType<number> {
     return new NumberType({
       type: Types.number,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): number | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = isNumber(value);
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.number,
             receivedType: typeOf(value),
             message: error,
@@ -42,10 +42,10 @@ export class NumberType extends CoreType<number> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: number, { ctx: { paths } }) => {
+        (value: number, { ctx: { paths, throwError } }) => {
           if (value <= maxValue) return value;
 
-          return new TooBigError({
+          return throwError(TooBigError, {
             expectedSize: maxValue,
             receivedSize: value,
             message: error,
@@ -63,10 +63,10 @@ export class NumberType extends CoreType<number> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: number, { ctx: { paths } }) => {
+        (value: number, { ctx: { paths, throwError } }) => {
           if (value >= minValue) return value;
 
-          return new TooSmallError({
+          return throwError(TooSmallError, {
             expectedSize: minValue,
             receivedSize: value,
             message: error,
@@ -84,13 +84,15 @@ export class NumberType extends CoreType<number> {
   ): this => {
     return this._extends({
       checkers: [
-        (data: number, { ctx: { paths } }) => {
+        (data: number, { ctx: { paths, throwError } }) => {
           if (data === value) return value;
 
-          return new NoEqualError<number>({
+          return throwError(NoEqualError, {
             expectedValue: value,
             receivedValue: data,
-            message: error,
+            message: error as ErrorConstructorMessage<
+              NoEqualErrorPayload<unknown>
+            >,
             paths,
             inputData: value,
           });

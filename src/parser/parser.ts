@@ -42,7 +42,7 @@ export const runnerParser = ({
     let errors: ErrorSubject[] = [];
     let shouldThrowError = false;
 
-    const { defaultValue, type } = schemaType;
+    const { defaultValue, type, throwError } = schemaType;
 
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
@@ -53,6 +53,7 @@ export const runnerParser = ({
           tryParser,
           deepTryParser,
           throwOnFirstError,
+          throwError,
         },
       });
 

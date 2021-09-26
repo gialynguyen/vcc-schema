@@ -2,11 +2,10 @@ import { isNull } from "vcc-utils";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
-  InvalidTypeErrorPayload
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
-
 
 export class NullType extends CoreType<null> {
   static create = (
@@ -15,11 +14,11 @@ export class NullType extends CoreType<null> {
     return new NullType({
       type: Types.null,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): null | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = isNull(value);
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.null,
             receivedType: typeOf(value),
             message: error,

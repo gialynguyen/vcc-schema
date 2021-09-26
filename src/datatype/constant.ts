@@ -1,8 +1,8 @@
 import { Primitive } from "../@types";
 import {
-    ErrorConstructorMessage,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
 } from "../error";
 import { CoreType, Types } from "./base";
 
@@ -14,11 +14,11 @@ export class ConstantType<Value extends Primitive> extends CoreType<Value> {
     return new ConstantType<Value>({
       type: Types.const,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): Value | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = value === constantValue;
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: constantValue,
             receivedType: value,
             message: error,

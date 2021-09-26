@@ -8,7 +8,7 @@ import {
   InvalidTypeErrorPayload,
   SizeErrorPayload,
   TooBigError,
-  TooSmallError
+  TooSmallError,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
@@ -24,11 +24,11 @@ export class StringType extends CoreType<string> {
     return new StringType({
       type: Types.string,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): string | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = isString(value);
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.string,
             receivedType: typeOf(value),
             message: error,
@@ -47,10 +47,10 @@ export class StringType extends CoreType<string> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           if (value.length <= maxLength) return value;
 
-          return new TooBigError({
+          return throwError(TooBigError, {
             expectedSize: maxLength,
             receivedSize: value.length,
             message: error,
@@ -68,10 +68,10 @@ export class StringType extends CoreType<string> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           if (value.length >= minLength) return value;
 
-          return new TooSmallError({
+          return throwError(TooSmallError, {
             expectedSize: minLength,
             receivedSize: value.length,
             message: error,
@@ -89,10 +89,10 @@ export class StringType extends CoreType<string> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           if (value.length === length) return value;
 
-          return new IncorrectSizeError({
+          return throwError(IncorrectSizeError, {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
@@ -109,10 +109,10 @@ export class StringType extends CoreType<string> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           if (emailRegex.test(value)) return value;
 
-          return new InvalidStringFormat({
+          return throwError(InvalidStringFormat, {
             receivedString: value,
             formatName: "email",
             message: error,
@@ -127,12 +127,12 @@ export class StringType extends CoreType<string> {
   url = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           try {
             new URL(value);
             return value;
           } catch (e) {
-            return new InvalidStringFormat({
+            return throwError(InvalidStringFormat, {
               receivedString: value,
               formatName: "url",
               message: error,
@@ -152,10 +152,10 @@ export class StringType extends CoreType<string> {
   ): this => {
     return this._extends({
       checkers: [
-        (value: string, { ctx: { paths } }) => {
+        (value: string, { ctx: { paths, throwError } }) => {
           if (format.test(value)) return value;
 
-          return new InvalidStringFormat({
+          return throwError(InvalidStringFormat, {
             receivedString: value,
             formatName: formatName || `string (should like ${format})`,
             message: error,

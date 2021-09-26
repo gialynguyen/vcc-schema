@@ -1,5 +1,8 @@
 import { IObject } from "../@types";
-import { ErrorSubject } from "../error/creator";
+import {
+  ErrorExtendSubjectClass,
+  ErrorSubject as ErrorSubjectBase,
+} from "../error/creator";
 import { ErrorCodeType } from "../error/type";
 
 export interface CheckerContext {
@@ -7,6 +10,10 @@ export interface CheckerContext {
   tryParser?: boolean;
   deepTryParser?: boolean;
   throwOnFirstError?: boolean;
+  throwError: <ErrorSubject extends ErrorExtendSubjectClass>(
+    errorSubject: ErrorSubject,
+    payload: ConstructorParameters<ErrorSubject>[0]
+  ) => ErrorSubjectBase;
 }
 
 export interface CheckerOptions {
@@ -16,7 +23,7 @@ export interface CheckerOptions {
 export type Checker<ExpectedType, Input = any> = (
   value: Input,
   options: CheckerOptions
-) => ExpectedType | ErrorSubject | ErrorSubject[];
+) => ExpectedType | ErrorSubjectBase | ErrorSubjectBase[];
 
 export type LazyObjectTypeChecker<
   Type extends IObject,
@@ -25,11 +32,9 @@ export type LazyObjectTypeChecker<
   checker: (value: Type[Key], parsedValue: Type) => boolean;
 };
 
-export type LazyObjectType<Type extends IObject> = Partial<
-  {
-    [key in keyof Type]: LazyObjectTypeChecker<Type, key>;
-  }
->;
+export type LazyObjectType<Type extends IObject> = Partial<{
+  [key in keyof Type]: LazyObjectTypeChecker<Type, key>;
+}>;
 
 export type LazyType<Type> = {
   checker: (value: Type) => boolean;

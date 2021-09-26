@@ -3,7 +3,7 @@ import {
   ErrorConstructorMessage,
   ErrorSubject,
   InvalidTypeError,
-  InvalidTypeErrorPayload
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { ArrayType } from "./array";
@@ -34,14 +34,11 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
     return new RecordType<TypeSet>({
       type: Types.record,
       defaultCheckers: [
-        (
-          value: any,
-          { ctx: { paths } }
-        ): Record<string, RecordOutputValue<TypeSet>> | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const isValidObject = isObject(value);
           if (isValidObject) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.record,
             receivedType: typeOf(value),
             message: options?.error,

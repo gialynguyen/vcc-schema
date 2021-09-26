@@ -1,8 +1,8 @@
 import { isDate } from "vcc-utils";
 import {
-    ErrorConstructorMessage,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, CoreTypeConstructorParams, Types } from "./base";
@@ -37,7 +37,7 @@ export class DateType extends CoreType<Date> {
       type: Types.date,
       format,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): Date | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           let valid = false;
           let returnValue = value;
           if (format === "ISO") {
@@ -52,7 +52,7 @@ export class DateType extends CoreType<Date> {
 
           if (valid) return returnValue;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.date,
             receivedType: typeOf(value),
             message: error,

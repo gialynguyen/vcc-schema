@@ -414,4 +414,5 @@ export const ErrorSubjects = {
   NoEqualError,
   InvalidFieldError,
   InvalidStringFormat,
+  Error: ErrorSubject,
 };

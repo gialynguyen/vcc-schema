@@ -1,16 +1,16 @@
 import { isObject, omit, pick } from "vcc-utils";
 import {
-    ICallback,
-    IObject,
-    NotUndefined,
-    ObjectWithoutNullishProperty
+  ICallback,
+  IObject,
+  NotUndefined,
+  ObjectWithoutNullishProperty,
 } from "../@types";
 import {
-    ErrorConstructorMessage,
-    ErrorSubject,
-    InvalidFieldError,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  ErrorSubject,
+  InvalidFieldError,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
@@ -98,17 +98,12 @@ export class MixedType<
     return new MixedType<TypeMap, Keys>({
       type: Types.mixed,
       defaultCheckers: [
-        (
-          value: any,
-          { ctx: { paths } }
-        ):
-          | { [key in keyof TypeMap]: ValueType<TypeMap[key]> }
-          | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const isValidObject = isObject(value);
 
           if (isValidObject) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.mixed,
             receivedType: typeOf(value),
             message: options?.error,
@@ -146,12 +141,11 @@ export class MixedType<
 
             if (diffKeys.length > 0 && !ctx.tryParser) {
               errors = errors.concat(
-                diffKeys.map(
-                  (key) =>
-                    new InvalidFieldError({
-                      invalidFieldPaths: key,
-                      paths: [...ctx.paths, key],
-                    })
+                diffKeys.map((key) =>
+                  ctx.throwError(InvalidFieldError, {
+                    invalidFieldPaths: key,
+                    paths: [...ctx.paths, key],
+                  })
                 )
               );
             }

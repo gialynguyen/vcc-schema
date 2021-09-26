@@ -1,16 +1,11 @@
 import { isNull } from "vcc-utils";
 import {
-    ErrorConstructorMessage,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
-<<<<<<< HEAD
-=======
-
->>>>>>> b0fe875 (feat(error-mapping): refactoring)
-
 export class AnyType extends CoreType<any> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
@@ -18,11 +13,11 @@ export class AnyType extends CoreType<any> {
     return new AnyType({
       type: Types.any,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = !isNull(value) && typeof value !== "undefined";
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.any,
             receivedType: typeOf(value),
             message: error,

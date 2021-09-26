@@ -1,12 +1,11 @@
 import { isNumber, isString } from "vcc-utils";
 import { Writable } from "../@types";
 import {
-    ErrorConstructorMessage,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
 } from "../error";
 import { CoreType, Types } from "./base";
-
 
 export type EnumElement = string | number;
 
@@ -24,7 +23,7 @@ export class EnumType<
     return new EnumType<EnumItemType, Writable<Items>>({
       type: Types.enum,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }): Items[number] | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           let valid = false;
 
           if (isString(value) || isNumber(value)) {
@@ -39,7 +38,7 @@ export class EnumType<
 
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: `one of ${enumValue.join(", ")}`,
             receivedType: value,
             message: error,

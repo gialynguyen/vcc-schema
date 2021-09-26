@@ -3,7 +3,7 @@ import {
   ErrorSubject,
   InvalidTypeError,
   InvalidUnionTypeError,
-  InvalidUnionTypeErrorPayload
+  InvalidUnionTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types, ValueType } from "./base";
@@ -50,7 +50,7 @@ export class OneOfType<TypeSet extends Array<CoreType<any>>> extends CoreType<
             const _error = errors[index];
             if (!InvalidTypeError.is(_error)) {
               if (error) {
-                errors[index] = new InvalidUnionTypeError({
+                errors[index] = ctx.throwError(InvalidUnionTypeError, {
                   expectedType,
                   receivedType,
                   message: error,
@@ -65,7 +65,7 @@ export class OneOfType<TypeSet extends Array<CoreType<any>>> extends CoreType<
 
           if (notInvalidTypeError.length > 0) return notInvalidTypeError;
 
-          return new InvalidUnionTypeError({
+          return ctx.throwError(InvalidUnionTypeError, {
             expectedType,
             receivedType,
             message: error,

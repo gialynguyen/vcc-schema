@@ -21,11 +21,11 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     return new ArrayType<Item>({
       type: Types.array,
       defaultCheckers: [
-        (value: any, { ctx }): InvalidTypeError | ValueType<Item>[] => {
+        (value: any, { ctx }) => {
           const isValidArray = Array.isArray(value);
           if (isValidArray) return value;
 
-          return new InvalidTypeError({
+          return ctx.throwError(InvalidTypeError, {
             expectedType: Types.array,
             receivedType: typeOf(value),
             message: error,
@@ -74,10 +74,9 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
   ): this {
     return this._extends({
       checkers: [
-        (value: ValueType<Item>[]): ValueType<Item>[] | IncorrectSizeError => {
+        (value: Array<any>, { ctx }) => {
           if (value.length === length) return value;
-
-          return new IncorrectSizeError({
+          return ctx.throwError(IncorrectSizeError, {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
@@ -91,10 +90,10 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
   min(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: ValueType<Item>[]): ValueType<Item>[] | TooSmallError => {
+        (value: Array<any>, { ctx }) => {
           if (value.length >= length) return value;
 
-          return new TooSmallError({
+          return ctx.throwError(TooSmallError, {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
@@ -108,10 +107,9 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
   max(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: ValueType<Item>[]): ValueType<Item>[] | TooBigError => {
+        (value: Array<any>, { ctx }) => {
           if (value.length <= length) return value;
-
-          return new TooBigError({
+          return ctx.throwError(TooBigError, {
             expectedSize: length,
             receivedSize: value.length,
             message: error,
@@ -125,10 +123,9 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
   nonempty(error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: ValueType<Item>[]): ValueType<Item>[] | TooSmallError => {
+        (value: Array<any>, { ctx }) => {
           if (value.length > 0) return value;
-
-          return new TooSmallError({
+          return ctx.throwError(TooSmallError, {
             expectedSize: 1,
             receivedSize: value.length,
             message: error || "Expected no empty",

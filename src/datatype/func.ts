@@ -1,9 +1,9 @@
 import { isFunction } from "vcc-utils";
 import { ICallback } from "../@types";
 import {
-    ErrorConstructorMessage,
-    InvalidTypeError,
-    InvalidTypeErrorPayload
+  ErrorConstructorMessage,
+  InvalidTypeError,
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
@@ -18,14 +18,11 @@ export class FuncType<
     return new FuncType<RType, AType>({
       type: Types.func,
       defaultCheckers: [
-        (
-          value: any,
-          { ctx: { paths } }
-        ): ICallback<RType, AType> | InvalidTypeError => {
+        (value: any, { ctx: { paths, throwError } }) => {
           const valid = isFunction(value);
           if (valid) return value;
 
-          return new InvalidTypeError({
+          return throwError(InvalidTypeError, {
             expectedType: Types.func,
             receivedType: typeOf(value),
             message: error,
