@@ -19,11 +19,13 @@ export default [
         file: `${name}.js`,
         format: "cjs",
         sourcemap: true,
+        exports: "named",
       },
       {
         file: `${name}.module.js`,
         format: "es",
         sourcemap: true,
+        exports: "named",
       },
     ],
   }),
@@ -32,6 +34,7 @@ export default [
     output: {
       file: `${name}.d.ts`,
       format: "es",
+      exports: "named",
     },
   }),
 ];
