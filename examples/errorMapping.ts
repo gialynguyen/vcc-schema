@@ -7,19 +7,16 @@ const UserSchema = mixed({
     email: string(),
     phone: string(),
   }),
-})
-  .errorMessage(
-    ErrorSubjects.InvalidTypeError,
-    ({ expectedType, receivedType }) => {
-      console.log("executed");
+});
 
-      return `Nhập ${expectedType} đi, tự nhiên nhập ${receivedType} vậy bro`;
-    }
-  )
-  /**
-   * ErrorSubjects.Error: all message type
-   */
-  .errorMessage(ErrorSubjects.Error, ({}) => {});
+// .errorMessage(
+//   ErrorSubjects.InvalidTypeError,
+//   ({ expectedType, receivedType }) => {
+//     console.log("executed");
+
+//     return `Nhập ${expectedType} đi, tự nhiên nhập ${receivedType} vậy bro`;
+//   }
+// )
 
 UserSchema.parser({
   name: "demo",

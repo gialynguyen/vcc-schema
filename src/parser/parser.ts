@@ -89,6 +89,7 @@ export const runnerParser = ({
         if (shouldThrowError) {
           break;
         }
+
         continue;
       }
 
