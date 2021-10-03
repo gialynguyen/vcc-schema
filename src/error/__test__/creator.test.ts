@@ -1,4 +1,4 @@
-import { ErrorSubject, ErrorSet } from '../creator';
+import { ErrorSet, ErrorSubject } from '../creator';
 
 describe("Error Creator", () => {
     describe("ErrorSubject", () => {

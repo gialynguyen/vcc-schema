@@ -10,11 +10,11 @@ export class ConstantType<Value extends Primitive> extends CoreType<Value> {
   static create = <Value extends Primitive>(
     constantValue: Value,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): ConstantType<Value> => {
     return new ConstantType<Value>({
       type: Types.const,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): Value | InvalidTypeError => {
           const valid = value === constantValue;
           if (valid) return value;
 

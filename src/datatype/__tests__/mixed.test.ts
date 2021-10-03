@@ -1,8 +1,8 @@
-import { mixed, MixedType, string, StringType, number, array, ValueType } from "../";
+import { array, mixed, MixedType, number, string, StringType } from "../";
 import {
   ErrorSet,
-  InvalidTypeError,
   InvalidFieldError,
+  InvalidTypeError,
   TooBigError,
 } from "../../error";
 

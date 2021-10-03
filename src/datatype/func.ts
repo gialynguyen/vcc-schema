@@ -1,26 +1,27 @@
 import { isFunction } from "vcc-utils";
 import { ICallback } from "../@types";
-import { CoreType, Types } from "./base";
-
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
 export class VoidType<
   RType = void,
-  AType extends any[] = [],
-  BType extends ICallback<RType, AType> = ICallback<RType, AType>
-> extends CoreType<BType> {
-  static create = <RType = void, AType extends any[] = []>(
+  AType extends unknown[] = []
+> extends CoreType<ICallback<RType, AType>> {
+  static create = <RType = void, AType extends unknown[] = []>(
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
-    return new VoidType<RType, AType, ICallback<RType, AType>>({
+  ): VoidType<RType, AType> => {
+    return new VoidType<RType, AType>({
       type: Types.func,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (
+          value: any,
+          { ctx: { paths } }
+        ): ICallback<RType, AType> | InvalidTypeError => {
           const valid = isFunction(value);
           if (valid) return value;
 

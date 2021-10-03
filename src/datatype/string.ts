@@ -1,6 +1,4 @@
 import { isString } from "vcc-utils";
-import { Types, CoreType } from "./base";
-
 import {
   ErrorConstructorMessage,
   IncorrectSizeError,
@@ -10,10 +8,10 @@ import {
   InvalidTypeErrorPayload,
   SizeErrorPayload,
   TooBigError,
-  TooSmallError,
+  TooSmallError
 } from "../error";
-
 import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
 // from https://stackoverflow.com/a/46181/1550155
 const emailRegex =
@@ -22,11 +20,11 @@ const emailRegex =
 export class StringType extends CoreType<string> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): StringType => {
     return new StringType({
       type: Types.string,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): string | InvalidTypeError => {
           const valid = isString(value);
           if (valid) return value;
 
@@ -46,7 +44,7 @@ export class StringType extends CoreType<string> {
   max = (
     maxLength: number,
     error?: ErrorConstructorMessage<SizeErrorPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -67,7 +65,7 @@ export class StringType extends CoreType<string> {
   min = (
     minLength: number,
     error?: ErrorConstructorMessage<SizeErrorPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -88,7 +86,7 @@ export class StringType extends CoreType<string> {
   length = (
     length: number,
     error?: ErrorConstructorMessage<SizeErrorPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -106,7 +104,9 @@ export class StringType extends CoreType<string> {
     });
   };
 
-  email = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
+  email = (
+    error?: ErrorConstructorMessage<InvalidStringFormatPayload>
+  ): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -124,7 +124,7 @@ export class StringType extends CoreType<string> {
     });
   };
 
-  url = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>) => {
+  url = (error?: ErrorConstructorMessage<InvalidStringFormatPayload>): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -149,7 +149,7 @@ export class StringType extends CoreType<string> {
     format: RegExp,
     formatName?: string,
     error?: ErrorConstructorMessage<InvalidStringFormatPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: string, { ctx: { paths } }) => {
@@ -167,7 +167,7 @@ export class StringType extends CoreType<string> {
     });
   };
 
-  nonempty = (error?: ErrorConstructorMessage<SizeErrorPayload>) => {
+  nonempty = (error?: ErrorConstructorMessage<SizeErrorPayload>): this => {
     return this.min(1, error || "Expected no empty");
   };
 }

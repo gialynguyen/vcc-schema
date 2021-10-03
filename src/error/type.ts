@@ -1,3 +1,5 @@
+import { ErrorSubject } from ".";
+import { IObject } from "../@types";
 import { enumFromArray } from "../utils";
 
 export const ErrorCode = enumFromArray([
@@ -11,5 +13,11 @@ export const ErrorCode = enumFromArray([
   "invalid_string_format",
   "custom_error",
 ]);
+
+export type ErrorType<Type> = Type extends IObject
+  ? { [key in keyof Type]: ErrorType<Type[key]> }
+  : Type extends any[]
+  ? ErrorType<Type[number]>
+  : ErrorSubject;
 
 export type ErrorCodeType = keyof typeof ErrorCode | string;

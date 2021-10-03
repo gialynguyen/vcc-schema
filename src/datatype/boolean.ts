@@ -2,7 +2,7 @@ import { isBoolean } from "vcc-utils";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
-  InvalidTypeErrorPayload,
+  InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";
@@ -10,11 +10,11 @@ import { CoreType, Types } from "./base";
 export class BooleanType extends CoreType<boolean> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): BooleanType => {
     return new BooleanType({
       type: Types.boolean,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): boolean | InvalidTypeError => {
           const valid = isBoolean(value);
           if (valid) return value;
 

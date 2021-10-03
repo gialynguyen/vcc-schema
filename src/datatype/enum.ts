@@ -1,5 +1,5 @@
-import { isString, isNumber } from "vcc-utils";
-
+import { isNumber, isString } from "vcc-utils";
+import { Writable } from "../@types";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
@@ -9,24 +9,23 @@ import { CoreType, Types } from "./base";
 
 export type EnumElement = string | number;
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
-
 export class EnumType<
   EnumItemType extends EnumElement,
-  Input extends [EnumItemType, ...EnumItemType[]]
-> extends CoreType<Input[number]> {
+  Items extends [EnumItemType, ...EnumItemType[]]
+> extends CoreType<Items[number]> {
   static create = <
     EnumItemType extends EnumElement,
-    Input extends Readonly<[EnumItemType, ...EnumItemType[]]>
+    Items extends Readonly<[EnumItemType, ...EnumItemType[]]>
   >(
-    enumValue: Input,
+    enumValue: Items,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
-    return new EnumType<EnumItemType, Writeable<Input>>({
+  ): EnumType<EnumItemType, Writable<Items>> => {
+    return new EnumType<EnumItemType, Writable<Items>>({
       type: Types.enum,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): Items[number] | InvalidTypeError => {
           let valid = false;
+
           if (isString(value) || isNumber(value)) {
             for (let index = 0; index < enumValue.length; index++) {
               const element = enumValue[index];
@@ -52,7 +51,7 @@ export class EnumType<
     });
   };
 
-  get(v: Input[number]) {
+  get(v: Items[number]) {
     return v;
   }
 }

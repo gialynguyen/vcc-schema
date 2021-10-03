@@ -1,3 +1,4 @@
+import { IObject } from "../@types";
 import { Subject } from "../core/subject";
 import { joinFieldPath } from "../utils";
 import { ErrorCodeType } from "./type";
@@ -48,7 +49,7 @@ export class ErrorSet extends Error {
     );
   }
 
-  get message() {
+  get message(): string {
     const errorMessage: string[] = [
       `${this.errors.length} issue(s) has found`,
       "",
@@ -71,18 +72,24 @@ export class ErrorSet extends Error {
     return this.errors.length === 0;
   }
 
-  addError = (sub: ErrorSubject) => {
-    this.errors = [...this.errors, sub];
+  addError = (sub: ErrorSubject): ErrorSubject[] => {
+    const errors = [...this.errors, sub];
+    this.errors = [...errors];
+
     if (sub.error.prerequisite) {
       this.hasPrerequisiteError = true;
     }
+
+    return errors;
   };
 
-  addErrors = (sub: ErrorSubject[] = []) => {
+  addErrors = (sub: ErrorSubject[] = []): ErrorSubject[] => {
     sub.forEach((error) => this.addError(error));
+
+    return [...this.errors];
   };
 
-  format = () => {
+  format = (): IObject<IError> => {
     const { errors } = this;
     const objectError = {} as any;
     for (let index = 0; index < errors.length; index++) {

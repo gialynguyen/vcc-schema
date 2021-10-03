@@ -1,6 +1,4 @@
 import { isNumber } from "vcc-utils";
-import { CoreType, Types } from "./base";
-
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
@@ -9,18 +7,19 @@ import {
   NoEqualErrorPayload,
   SizeErrorPayload,
   TooBigError,
-  TooSmallError,
+  TooSmallError
 } from "../error";
 import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
 export class NumberType extends CoreType<number> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): NumberType => {
     return new NumberType({
       type: Types.number,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): number | InvalidTypeError => {
           const valid = isNumber(value);
           if (valid) return value;
 
@@ -40,7 +39,7 @@ export class NumberType extends CoreType<number> {
   max = (
     maxValue: number,
     error?: ErrorConstructorMessage<SizeErrorPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: number, { ctx: { paths } }) => {
@@ -61,7 +60,7 @@ export class NumberType extends CoreType<number> {
   min = (
     minValue: number,
     error?: ErrorConstructorMessage<SizeErrorPayload>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (value: number, { ctx: { paths } }) => {
@@ -82,7 +81,7 @@ export class NumberType extends CoreType<number> {
   equal = (
     value: number,
     error?: ErrorConstructorMessage<NoEqualErrorPayload<number>>
-  ) => {
+  ): this => {
     return this._extends({
       checkers: [
         (data: number, { ctx: { paths } }) => {

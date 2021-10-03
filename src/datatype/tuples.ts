@@ -1,6 +1,4 @@
 import { isArray } from "vcc-utils";
-import { CoreType, Types, ValueType } from "./base";
-import { typeOf } from "../utils/type";
 import {
   ErrorConstructorMessage,
   ErrorSubject,
@@ -9,7 +7,9 @@ import {
   InvalidTypeErrorPayload,
   SizeErrorPayload,
 } from "../error";
+import { typeOf } from "../utils/type";
 import { ArrayType } from "./array";
+import { CoreType, Types, ValueType } from "./base";
 
 export type ValueTypeTuples<
   T extends [
@@ -45,11 +45,14 @@ export class TuplesType<
       >;
       strict?: boolean;
     }
-  ) => {
+  ): TuplesType<TypeSet> => {
     return new TuplesType<TypeSet>({
       type: Types.tuples,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (
+          value: any,
+          { ctx: { paths } }
+        ): ValueTypeTuples<TypeSet> | InvalidTypeError => {
           const isValidArray = isArray(value);
           if (isValidArray) return value;
 
@@ -62,7 +65,10 @@ export class TuplesType<
             inputData: value,
           });
         },
-        (value: any, { ctx }) => {
+        (
+          value: any,
+          { ctx }
+        ): ErrorSubject[] | IncorrectSizeError | ValueTypeTuples<TypeSet> => {
           const valueLength = value.length;
           const typesLength = types.length;
 

@@ -1,4 +1,4 @@
-import { string, record, RecordType, tuples, number, array } from "../";
+import { array, number, record, RecordType, string, tuples } from "../";
 import { ErrorSet, InvalidTypeError } from "../../error";
 
 describe("Datatype Record", () => {

@@ -1,13 +1,13 @@
 import { isObject } from "vcc-utils";
-import { CoreType, Types, ValueType } from "./base";
-import { typeOf } from "../utils/type";
 import {
   ErrorConstructorMessage,
   ErrorSubject,
   InvalidTypeError,
-  InvalidTypeErrorPayload,
+  InvalidTypeErrorPayload
 } from "../error";
+import { typeOf } from "../utils/type";
 import { ArrayType } from "./array";
+import { CoreType, Types, ValueType } from "./base";
 import { TuplesType } from "./tuples";
 
 export type RecordInputType = CoreType<any> | ArrayType<any> | TuplesType<any>;
@@ -30,11 +30,14 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
       strict?: boolean;
     }
-  ) => {
+  ): RecordType<TypeSet> => {
     return new RecordType<TypeSet>({
       type: Types.record,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (
+          value: any,
+          { ctx: { paths } }
+        ): Record<string, RecordOutputValue<TypeSet>> | InvalidTypeError => {
           const isValidObject = isObject(value);
           if (isValidObject) return value;
 
@@ -47,7 +50,10 @@ export class RecordType<TypeSet extends RecordInputType> extends CoreType<
             inputData: value,
           });
         },
-        (value: any, { ctx }) => {
+        (
+          value: any,
+          { ctx }
+        ): Record<string, RecordOutputValue<TypeSet>> | ErrorSubject[] => {
           let returnValue = value;
           let errors: ErrorSubject[] = [];
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;

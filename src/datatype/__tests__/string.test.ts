@@ -1,11 +1,11 @@
 import { string, StringType } from "../";
 import {
   ErrorSet,
+  IncorrectSizeError,
+  InvalidStringFormat,
   InvalidTypeError,
   TooBigError,
   TooSmallError,
-  IncorrectSizeError,
-  InvalidStringFormat,
 } from "../../error";
 
 describe("DataType String", () => {

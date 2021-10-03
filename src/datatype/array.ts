@@ -1,16 +1,15 @@
-import { CoreType, Types, ValueType } from "./base";
-
 import {
   ErrorConstructorMessage,
   ErrorSubject,
+  IncorrectSizeError,
   InvalidTypeError,
   InvalidTypeErrorPayload,
   SizeErrorPayload,
-  TooSmallError,
-  IncorrectSizeError,
   TooBigError,
+  TooSmallError,
 } from "../error";
 import { typeOf } from "../utils/type";
+import { CoreType, Types, ValueType } from "./base";
 
 export class ArrayType<Item extends CoreType<any>> extends CoreType<
   ValueType<Item>[]
@@ -18,11 +17,11 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
   static create = <Item extends CoreType<any>>(
     elementType: Item,
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): ArrayType<Item> => {
     return new ArrayType<Item>({
       type: Types.array,
       defaultCheckers: [
-        (value: any, { ctx }) => {
+        (value: any, { ctx }): InvalidTypeError | ValueType<Item>[] => {
           const isValidArray = Array.isArray(value);
           if (isValidArray) return value;
 
@@ -35,7 +34,7 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
             inputData: value,
           });
         },
-        (value: any, { ctx }) => {
+        (value: any, { ctx }): ErrorSubject[] | ValueType<Item>[] => {
           const returnValue = value;
           let errors: ErrorSubject[] = [];
           const throwOnFirstError = ctx.throwOnFirstError && !ctx.tryParser;
@@ -69,11 +68,15 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     });
   };
 
-  length(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+  length(
+    length: number,
+    error?: ErrorConstructorMessage<SizeErrorPayload>
+  ): this {
     return this._extends({
       checkers: [
-        (value: Array<any>) => {
+        (value: ValueType<Item>[]): ValueType<Item>[] | IncorrectSizeError => {
           if (value.length === length) return value;
+
           return new IncorrectSizeError({
             expectedSize: length,
             receivedSize: value.length,
@@ -85,10 +88,10 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     });
   }
 
-  min(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+  min(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: Array<any>) => {
+        (value: ValueType<Item>[]): ValueType<Item>[] | TooSmallError => {
           if (value.length >= length) return value;
 
           return new TooSmallError({
@@ -102,11 +105,12 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     });
   }
 
-  max(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>) {
+  max(length: number, error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: Array<any>) => {
+        (value: ValueType<Item>[]): ValueType<Item>[] | TooBigError => {
           if (value.length <= length) return value;
+
           return new TooBigError({
             expectedSize: length,
             receivedSize: value.length,
@@ -118,11 +122,12 @@ export class ArrayType<Item extends CoreType<any>> extends CoreType<
     });
   }
 
-  nonempty(error?: ErrorConstructorMessage<SizeErrorPayload>) {
+  nonempty(error?: ErrorConstructorMessage<SizeErrorPayload>): this {
     return this._extends({
       checkers: [
-        (value: Array<any>) => {
+        (value: ValueType<Item>[]): ValueType<Item>[] | TooSmallError => {
           if (value.length > 0) return value;
+
           return new TooSmallError({
             expectedSize: 1,
             receivedSize: value.length,

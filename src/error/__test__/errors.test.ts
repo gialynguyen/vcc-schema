@@ -1,13 +1,13 @@
 import { Types } from "../../datatype";
 import {
-  InvalidTypeError,
-  InvalidUnionTypeError,
-  TooSmallError,
-  TooBigError,
   IncorrectSizeError,
-  NoEqualError,
   InvalidFieldError,
   InvalidStringFormat,
+  InvalidTypeError,
+  InvalidUnionTypeError,
+  NoEqualError,
+  TooBigError,
+  TooSmallError,
 } from "../errors";
 
 describe("Error Errors", () => {

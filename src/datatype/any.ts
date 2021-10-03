@@ -1,17 +1,16 @@
-import { CoreType, Types } from "./base";
-
+import { isNull } from "vcc-utils";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
-import { isNull } from "vcc-utils";
 import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
 export class AnyType extends CoreType<any> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): AnyType => {
     return new AnyType({
       type: Types.any,
       defaultCheckers: [

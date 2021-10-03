@@ -1,10 +1,10 @@
-import { array, string, ArrayType } from "../";
+import { array, ArrayType, string } from "../";
 import {
   ErrorSet,
-  InvalidTypeError,
-  TooSmallError,
   IncorrectSizeError,
+  InvalidTypeError,
   TooBigError,
+  TooSmallError,
 } from "../../error";
 
 describe("DataType Array", () => {

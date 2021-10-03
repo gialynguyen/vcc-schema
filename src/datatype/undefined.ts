@@ -1,19 +1,19 @@
-import { CoreType, Types } from "./base";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
-  InvalidTypeErrorPayload,
+  InvalidTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
 
 export class UndefinedType extends CoreType<undefined> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): UndefinedType => {
     return new UndefinedType({
       type: Types.undefined,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): undefined | InvalidTypeError => {
           const valid = typeof value === "undefined";
           if (valid) return value;
 

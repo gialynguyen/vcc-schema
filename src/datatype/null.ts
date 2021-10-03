@@ -1,21 +1,21 @@
 import { isNull } from "vcc-utils";
-import { CoreType, Types } from "./base";
-
-import { typeOf } from "../utils/type";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
-  InvalidTypeErrorPayload,
+  InvalidTypeErrorPayload
 } from "../error";
+import { typeOf } from "../utils/type";
+import { CoreType, Types } from "./base";
+
 
 export class NullType extends CoreType<null> {
   static create = (
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ) => {
+  ): NullType => {
     return new NullType({
       type: Types.null,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (value: any, { ctx: { paths } }): null | InvalidTypeError => {
           const valid = isNull(value);
           if (valid) return value;
 

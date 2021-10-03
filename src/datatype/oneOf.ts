@@ -3,14 +3,14 @@ import {
   ErrorSubject,
   InvalidTypeError,
   InvalidUnionTypeError,
-  InvalidUnionTypeErrorPayload,
+  InvalidUnionTypeErrorPayload
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types, ValueType } from "./base";
 
-export class OneOfType<
-  TypeSet extends Array<CoreType<any>>
-> extends CoreType<ValueType<TypeSet[number]>> {
+export class OneOfType<TypeSet extends Array<CoreType<any>>> extends CoreType<
+  ValueType<TypeSet[number]>
+> {
   static create = <TypeSet extends Array<CoreType<any>>>(
     types: TypeSet,
     error?: ErrorConstructorMessage<InvalidUnionTypeErrorPayload>

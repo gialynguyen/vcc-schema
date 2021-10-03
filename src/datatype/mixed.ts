@@ -1,12 +1,10 @@
-import { omit, pick, isObject } from "vcc-utils";
+import { isObject, omit, pick } from "vcc-utils";
 import {
   ICallback,
   IObject,
   NotUndefined,
   ObjectWithoutNullishProperty,
 } from "../@types";
-import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
-
 import {
   ErrorConstructorMessage,
   ErrorSubject,
@@ -14,8 +12,8 @@ import {
   InvalidTypeError,
   InvalidTypeErrorPayload,
 } from "../error";
-
 import { typeOf } from "../utils/type";
+import { CoreType, CoreTypeConstructorParams, Types, ValueType } from "./base";
 
 type PickBySchemaMap<TypeMap> = {
   [Key in keyof TypeMap]?: TypeMap[Key] extends MixedType<any, any>
@@ -34,15 +32,13 @@ type PickByMixedType<Origin, Schema> = Origin extends MixedType<any, any>
           : never;
       }[keyof Schema]
     > &
-      ObjectWithoutNullishProperty<
-        {
-          [Key in keyof Origin["children"]]: Key extends keyof Schema
-            ? Origin["children"][Key] extends MixedType<any, any>
-              ? MixedType<PickByMixedType<Origin["children"][Key], Schema[Key]>>
-              : PickByMixedType<Origin["children"][Key], Schema[Key]>
-            : undefined;
-        }
-      >
+      ObjectWithoutNullishProperty<{
+        [Key in keyof Origin["children"]]: Key extends keyof Schema
+          ? Origin["children"][Key] extends MixedType<any, any>
+            ? MixedType<PickByMixedType<Origin["children"][Key], Schema[Key]>>
+            : PickByMixedType<Origin["children"][Key], Schema[Key]>
+          : undefined;
+      }>
   : Origin;
 
 type OmitByMixedType<Origin, Schema> = Origin extends MixedType<any, any>
@@ -75,9 +71,9 @@ export class MixedType<
   _strict?: boolean;
 
   constructor(
-    props: CoreTypeConstructorParams<
-      { [key in keyof TypeMap]: ValueType<TypeMap[key]> }
-    > & {
+    props: CoreTypeConstructorParams<{
+      [key in keyof TypeMap]: ValueType<TypeMap[key]>;
+    }> & {
       strict?: boolean;
       childrenPropertyTypes: TypeMap;
     }
@@ -96,13 +92,18 @@ export class MixedType<
       error?: ErrorConstructorMessage<InvalidTypeErrorPayload>;
       strict?: boolean;
     }
-  ) => {
+  ): MixedType<TypeMap, Keys> => {
     const strict = options?.strict ?? true;
 
     return new MixedType<TypeMap, Keys>({
       type: Types.mixed,
       defaultCheckers: [
-        (value: any, { ctx: { paths } }) => {
+        (
+          value: any,
+          { ctx: { paths } }
+        ):
+          | { [key in keyof TypeMap]: ValueType<TypeMap[key]> }
+          | InvalidTypeError => {
           const isValidObject = isObject(value);
 
           if (isValidObject) return value;
@@ -116,7 +117,12 @@ export class MixedType<
             inputData: value,
           });
         },
-        (value: any, { ctx }) => {
+        (
+          value: any,
+          { ctx }
+        ):
+          | { [key in keyof TypeMap]: ValueType<TypeMap[key]> }
+          | ErrorSubject[] => {
           let errors: ErrorSubject[] = [];
           let returnValue = value;
 
@@ -191,7 +197,7 @@ export class MixedType<
     });
   };
 
-  get children() {
+  get children(): TypeMap {
     return this.childrenPropertyTypes;
   }
 

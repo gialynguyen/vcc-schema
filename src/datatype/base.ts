@@ -1,25 +1,25 @@
-import { ParserContext, runnerParser } from "../parser/parser";
+import { isArray } from "vcc-utils";
+import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
+import { ErrorSet } from "../error";
 import {
   Checker,
   LazyObjectType,
   LazyObjectTypeChecker,
   LazyType,
-} from "../parser/checker";
-
+  ParserContext,
+  runnerParser,
+} from "../parser";
 import {
   array,
   ArrayType,
   nullable,
   NullType,
-  undefinedType,
-  UndefinedType,
   oneOf,
   OneOfType,
+  TuplesType,
+  undefinedType,
+  UndefinedType,
 } from "./";
-import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
-import { isArray } from "vcc-utils";
-import { ErrorSet, ErrorSubject } from "../error";
-import { TuplesType } from "./tuples";
 
 export enum Types {
   string = "string",
@@ -49,18 +49,11 @@ export type ValueType<Type> = Type extends TuplesType<any>
   ? ReturnType<Type["parser"]>
   : never;
 
-export type ErrorType<Type> = Type extends IObject
-  ? { [key in keyof Type]: ErrorType<Type[key]> }
-  : Type extends any[]
-  ? ErrorType<Type[number]>
-  : ErrorSubject;
-
-export type TypeDefaultValue<Type> = Type | ICallback<Type>;
-
+export type DefaultValueType<Type> = Type | ICallback<Type>;
 export interface CoreTypeConstructorParams<Type> {
   defaultCheckers: Checker<Type>[];
   type: Types;
-  defaultValue?: TypeDefaultValue<Type>;
+  defaultValue?: DefaultValueType<Type>;
   defaultLazyCheckers?: Type extends IObject
     ? LazyObjectType<any>[]
     : LazyType<any>[];
@@ -73,7 +66,7 @@ export abstract class CoreType<Type> {
 
   protected _lazyCheckers: LazyType<any>[];
 
-  protected _defaultValue?: TypeDefaultValue<Type>;
+  protected _defaultValue?: DefaultValueType<Type>;
 
   parser: (raw: any, ctx?: ParserContext) => Type;
 
@@ -176,7 +169,10 @@ export abstract class CoreType<Type> {
     };
   }
 
-  _extends(payload: { checkers?: Checker<Type>[]; lazy?: LazyType<Type>[] }): this {
+  _extends(payload: {
+    checkers?: Checker<Type>[];
+    lazy?: LazyType<Type>[];
+  }): this {
     return new (this as any).constructor({
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
       defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
@@ -185,13 +181,13 @@ export abstract class CoreType<Type> {
     });
   }
 
-  check(checker: Checker<Type>) {
+  check(checker: Checker<Type>): this {
     return this._extends({
       checkers: [...this._checkers, checker],
     });
   }
 
-  _lazy(lazyOption: LazyType<any>[]) {
+  _lazy(lazyOption: LazyType<any>[]): this {
     return this._extends({
       lazy: [...lazyOption],
     });
@@ -211,6 +207,7 @@ export abstract class CoreType<Type> {
           message,
           errorType,
         } = lazyOption[key] as LazyObjectTypeChecker<Type, keyof Type>;
+
         lazyCheckers.push({
           checker: (parsedValue: Type) => {
             const fieldValue = (parsedValue as any)[key];
@@ -229,16 +226,16 @@ export abstract class CoreType<Type> {
     }
   }
 
-  default(defaultValue: TypeDefaultValue<Type>) {
+  default(defaultValue: DefaultValueType<Type>): this {
     this._defaultValue = defaultValue;
     return this;
   }
 
-  get defaultValue() {
+  get defaultValue(): DefaultValueType<Type> | undefined {
     return this._defaultValue;
   }
 
-  get type() {
+  get type(): Types {
     return this._type;
   }
 }

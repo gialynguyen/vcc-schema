@@ -1,9 +1,9 @@
-import { tuples, TuplesType, boolean, string, number, array } from "../";
+import { array, boolean, number, string, tuples, TuplesType } from "../";
 import { ErrorSet, IncorrectSizeError, InvalidTypeError } from "../../error";
 
 describe("Datatype Tuples", () => {
   const subject = tuples([boolean(), number(), string(), array(number())]);
-  
+
   it("should have instance of TuplesType", () => {
     expect(subject).toBeInstanceOf(TuplesType);
     expect(subject.parser([true, 1, "one", [1, 2]])).toEqual([
