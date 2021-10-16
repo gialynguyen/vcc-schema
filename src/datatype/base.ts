@@ -55,12 +55,6 @@ export type ValueType<Type> = Type extends TuplesType<any>
 
 export type DefaultValueType<Type> = Type | ICallback<Type>;
 
-export type ErrorType<Type> = Type extends IObject
-  ? { [key in keyof Type]: ErrorType<Type[key]> }
-  : Type extends any[]
-  ? ErrorType<Type[number]>
-  : ErrorSubjectBase;
-
 export type TypeDefaultValue<Type> = Type | ICallback<Type>;
 
 export type TypeErrorHandler<ErrorSubject extends ErrorExtendSubjectClass> = (

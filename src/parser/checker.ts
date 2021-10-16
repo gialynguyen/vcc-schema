@@ -2,9 +2,8 @@ import { IObject } from "../@types";
 import {
   ErrorExtendSubjectClass,
   ErrorSubject as ErrorSubjectBase,
-} from "../error/creator";
-import { ErrorCodeType } from "../error/type";
-
+  ErrorCodeType,
+} from "../error";
 export interface CheckerContext {
   paths: (string | number)[];
   tryParser?: boolean;

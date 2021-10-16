@@ -1,7 +1,6 @@
-import { CoreType, DateType, Types } from "../datatype";
-import { ErrorSet, ErrorSubject } from "../error";
-import { ErrorCode } from "../error/type";
-import { Checker, LazyType } from "./checker";
+import { CoreType, DateType, Types } from '../datatype';
+import { ErrorSet, ErrorSubject, ErrorCode } from '../error';
+import { Checker, LazyType } from './checker';
 
 export interface ParserPayload {
   checkers: Checker<any>[];
@@ -80,7 +79,7 @@ export const runnerParser = ({
       const slotHasError = slotErrors.length > 0;
 
       if (defaultValue && slotHasError) {
-        if (typeof defaultValue === "function" && type !== Types.func) {
+        if (typeof defaultValue === 'function' && type !== Types.func) {
           returnValue = defaultValue();
         } else {
           returnValue = defaultValue;
@@ -111,7 +110,7 @@ export const runnerParser = ({
       if (!slotHasError) {
         if (schemaType instanceof DateType) {
           const { format } = schemaType;
-          if (format === "ISO" || format === "strictISO")
+          if (format === 'ISO' || format === 'strictISO')
             returnValue = new Date(returnValue);
         }
       }

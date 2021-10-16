@@ -1,6 +1,6 @@
 import { isFunction } from "vcc-utils";
 import { Primitive } from "../@types";
-import { ErrorSubject } from "./creator";
+import { ErrorSubject } from "./errorSubject";
 import { ErrorCode } from "./type";
 
 export type ErrorConstructorMessage<ParamByErrorType> =

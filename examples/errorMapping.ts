@@ -1,4 +1,4 @@
-import { mixed, string, number, ErrorSubjects } from "../dist";
+import { mixed, string, number, ErrorSubjects } from '../dist';
 
 const UserSchema = mixed({
   name: string(),
@@ -9,20 +9,20 @@ const UserSchema = mixed({
   }),
 });
 
-// .errorMessage(
-//   ErrorSubjects.InvalidTypeError,
-//   ({ expectedType, receivedType }) => {
-//     console.log("executed");
+const CreateUserSchema = UserSchema.modify({
+  age: (ageSchema) =>
+    ageSchema.errorMessage(
+      ErrorSubjects.InvalidTypeError,
+      ({ expectedType, receivedType }) =>
+        `Please enter a value that is ${expectedType} type, not ${receivedType} type`
+    ),
+});
 
-//     return `Nhập ${expectedType} đi, tự nhiên nhập ${receivedType} vậy bro`;
-//   }
-// )
-
-UserSchema.parser({
-  name: "demo",
-  age: "12",
+CreateUserSchema.parser({
+  name: 'demo',
+  age: '12',
   detail: {
-    email: "demo@gmail.com",
-    phone: "0336915454",
+    email: 'demo@gmail.com',
+    phone: '0336915454',
   },
 });

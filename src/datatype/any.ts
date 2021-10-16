@@ -2,7 +2,7 @@ import { isNull } from "vcc-utils";
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
-  InvalidTypeErrorPayload
+  InvalidTypeErrorPayload,
 } from "../error";
 import { typeOf } from "../utils/type";
 import { CoreType, Types } from "./base";

@@ -1,36 +1,8 @@
 import { IObject } from "../@types";
-import { Subject } from "../core/subject";
 import { joinFieldPath } from "../utils";
-import { ErrorCodeType } from "./type";
+import { ErrorSubject } from './errorSubject';
+import { IError } from './type';
 
-export interface IError {
-  code: ErrorCodeType;
-  inputData?: any;
-  message: string;
-  paths: (string | number)[];
-  prerequisite?: boolean;
-}
-
-export class ErrorSubject extends Subject<IError> {
-  public error: IError;
-
-  constructor(error: IError) {
-    if (!("prerequisite" in error)) {
-      error.prerequisite = false;
-    }
-
-    super({ initialState: error });
-    this.error = this.proxyState;
-  }
-
-  static isArrayErrorSubject(subject: unknown): subject is ErrorSubject[] {
-    return Array.isArray(subject) && subject[0] instanceof ErrorSubject;
-  }
-}
-
-export type ErrorExtendSubjectClass = {
-  new (...args: any[]): ErrorSubject;
-};
 
 export class ErrorSet extends Error {
   errors: ErrorSubject[];
