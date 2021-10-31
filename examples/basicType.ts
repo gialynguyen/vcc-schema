@@ -8,11 +8,11 @@ import {
   ErrorType,
   enumType,
   ErrorSet,
-} from "../dist";
+} from '../dist';
 
 const NormalName = string()
-  .min(4, "Tên phải dài hơn 4 ký tự")
-  .max(15, "Tên phải ngắn hơn 15 ký tự");
+  .min(4, 'Tên phải dài hơn 4 ký tự')
+  .max(15, 'Tên phải ngắn hơn 15 ký tự');
 
 const UserModel = mixed({
   name: NormalName,
@@ -34,31 +34,31 @@ const UserModel = mixed({
     detail: string().nonempty(),
   }),
 
-  gender: enumType(["Male", "Female"]),
+  gender: enumType(['Male', 'Female']),
 
-  birthDate: date("ISO").default(() => new Date()),
+  birthDate: date('ISO').default(() => new Date()),
 });
 
 type UserEntity = ValueType<typeof UserModel>;
 
 try {
   const user = UserModel.parser({
-    name: "gialynguyen",
+    name: 'gialynguyen',
     age: 23,
-    email: "emthanchet@gmail.com",
-    addressIds: [],
-    addressDetails: [{ name: "Gialynguyen123" }],
+    email: 'emthanchet@gmail.com',
+    addressIds: [1],
+    addressDetails: [{ name: 'Gialynguyen123' }],
     address: {
-      name: "GL123123123",
-      detail: "HCM",
+      name: 'GL123123123',
+      detail: 'HCM',
     },
     stringOrNumber: 4,
   });
 
-  console.log("user: ", user);
+  console.log('user: ', user);
 } catch (error) {
   if (error instanceof ErrorSet) {
-    const errorObjectLike: ErrorType<UserEntity> = error.format();
-    console.log("error: ", JSON.stringify(errorObjectLike, null, 2));
+    const errorObject: ErrorType<UserEntity> = error.format();
+    console.log('error: ', JSON.stringify(errorObject, null, 2));
   }
 }

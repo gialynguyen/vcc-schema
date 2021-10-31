@@ -1,4 +1,4 @@
-import { IObject } from '../@types';
+import { DeepPartial, IObject } from '../@types';
 import { Subject } from '../core/subject';
 import { IError } from './type';
 
@@ -6,7 +6,7 @@ export class ErrorSubject extends Subject<IError> {
   public error: IError;
 
   constructor(error: IError) {
-    if (!("prerequisite" in error)) {
+    if (!('prerequisite' in error)) {
       error.prerequisite = false;
     }
 
@@ -23,8 +23,10 @@ export type ErrorExtendSubjectClass = {
   new (...args: any[]): ErrorSubject;
 };
 
-export type ErrorType<Type> = Type extends IObject
-  ? { [key in keyof Type]: ErrorType<Type[key]> }
-  : Type extends any[]
-  ? ErrorType<Type[number]>
-  : ErrorSubject;
+export type ErrorType<Type> = DeepPartial<
+  Type extends IObject
+    ? { [key in keyof Type]: ErrorType<Type[key]> }
+    : Type extends any[]
+    ? ErrorType<Type[number]>
+    : IError
+>;

@@ -1,4 +1,3 @@
-import { IObject } from "../@types";
 import { enumFromArray } from "../utils";
 
 export interface IError {

@@ -1,8 +1,6 @@
-import { IObject } from "../@types";
-import { joinFieldPath } from "../utils";
+import { isNumber } from 'vcc-utils';
+import { joinFieldPath } from '../utils';
 import { ErrorSubject } from './errorSubject';
-import { IError } from './type';
-
 
 export class ErrorSet extends Error {
   errors: ErrorSubject[];
@@ -28,7 +26,7 @@ export class ErrorSet extends Error {
   get message(): string {
     const errorMessage: string[] = [
       `${this.errors.length} issue(s) has found`,
-      "",
+      '',
     ];
     for (const err of this.errors) {
       const pathString = joinFieldPath(err.error.paths);
@@ -38,10 +36,10 @@ export class ErrorSet extends Error {
         }`
       );
       errorMessage.push(`   ${err.error.message}`);
-      errorMessage.push("");
+      errorMessage.push('');
     }
 
-    return errorMessage.join("\n");
+    return errorMessage.join('\n');
   }
 
   get isEmpty(): boolean {
@@ -65,7 +63,7 @@ export class ErrorSet extends Error {
     return [...this.errors];
   };
 
-  format = (): IObject<IError> => {
+  format = (): any => {
     const { errors } = this;
     const objectError = {} as any;
     for (let index = 0; index < errors.length; index++) {
@@ -76,7 +74,7 @@ export class ErrorSet extends Error {
       const pathsSize = paths.length - 1;
 
       if (paths.length === 0) {
-        Reflect.set(pointer, "", error);
+        Reflect.set(pointer, '', error);
       } else {
         paths.forEach((path, index) => {
           const isLastPath = index === pathsSize;
