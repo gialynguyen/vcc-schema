@@ -1,28 +1,30 @@
-import { isFunction } from "vcc-utils";
-import { ICallback } from "../@types";
+import { isFunction } from 'vcc-utils';
+import { ICallback } from '../@types';
+import { CoreType, Types } from './base';
+
 import {
   ErrorConstructorMessage,
   InvalidTypeError,
   InvalidTypeErrorPayload,
-} from "../error";
-import { typeOf } from "../utils/type";
-import { CoreType, Types } from "./base";
+} from '../error';
+import { typeOf } from '../utils/type';
 
 export class FuncType<
   RType = void,
-  AType extends unknown[] = []
-> extends CoreType<ICallback<RType, AType>> {
-  static create = <RType = void, AType extends unknown[] = []>(
+  AType extends any[] = [],
+  BType extends ICallback<RType, AType> = ICallback<RType, AType>
+> extends CoreType<BType> {
+  static create = <RType = void, AType extends any[] = []>(
     error?: ErrorConstructorMessage<InvalidTypeErrorPayload>
-  ): FuncType<RType, AType> => {
-    return new FuncType<RType, AType>({
+  ) => {
+    return new FuncType<RType, AType, ICallback<RType, AType>>({
       type: Types.func,
       defaultCheckers: [
-        (value: any, { ctx: { paths, throwError } }) => {
+        (value: any, { ctx: { paths } }) => {
           const valid = isFunction(value);
           if (valid) return value;
 
-          return throwError(InvalidTypeError, {
+          return new InvalidTypeError({
             expectedType: Types.func,
             receivedType: typeOf(value),
             message: error,

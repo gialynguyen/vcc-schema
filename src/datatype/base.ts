@@ -1,18 +1,19 @@
-import { isArray } from "vcc-utils";
-import { DeepPartial, ICallback, IObject, NoneDeepPartial } from "../@types";
+import { isArray } from 'vcc-utils';
+import { DeepPartial, ICallback, IObject, NoneDeepPartial } from '../@types';
 import {
   ErrorExtendSubjectClass,
   ErrorSet,
   ErrorSubject as ErrorSubjectBase,
-} from "../error";
+} from '../error';
 import {
+  BeforeTransform,
   Checker,
   LazyObjectType,
   LazyObjectTypeChecker,
   LazyType,
   ParserContext,
   runnerParser,
-} from "../parser";
+} from '../parser';
 import {
   array,
   ArrayType,
@@ -23,34 +24,34 @@ import {
   TuplesType,
   undefinedType,
   UndefinedType,
-} from "./";
+} from './';
 
 export enum Types {
-  string = "string",
-  number = "number",
-  date = "date",
-  boolean = "boolean",
-  mixed = "mixed",
-  array = "array",
-  undefined = "undefined",
-  null = "null",
-  func = "function",
-  any = "any",
-  unknown = "unknown",
-  enum = "enum",
-  oneOf = "oneOf",
-  custom = "custom",
-  const = "const",
-  tuples = "tuples",
-  record = "record",
+  string = 'string',
+  number = 'number',
+  date = 'date',
+  boolean = 'boolean',
+  mixed = 'mixed',
+  array = 'array',
+  undefined = 'undefined',
+  null = 'null',
+  func = 'function',
+  any = 'any',
+  unknown = 'unknown',
+  enum = 'enum',
+  oneOf = 'oneOf',
+  custom = 'custom',
+  const = 'const',
+  tuples = 'tuples',
+  record = 'record',
 }
 
 export type ValueType<Type> = Type extends TuplesType<any>
-  ? ReturnType<Type["parser"]>
+  ? ReturnType<Type['parser']>
   : Type extends CoreType<any>
-  ? ReturnType<Type["parser"]>
+  ? ReturnType<Type['parser']>
   : Type extends CoreType<any[]>
-  ? ReturnType<Type["parser"]>
+  ? ReturnType<Type['parser']>
   : never;
 
 export type DefaultValueType<Type> = Type | ICallback<Type>;
@@ -62,13 +63,17 @@ export type TypeErrorHandler<ErrorSubject extends ErrorExtendSubjectClass> = (
 ) => string | void;
 
 export type TypeErrorMap = Map<ErrorExtendSubjectClass, TypeErrorHandler<any>>;
+
+type TypeLazyChecker<Type> = Type extends IObject
+  ? LazyObjectType<any>[]
+  : LazyType<any>[];
+
 export interface CoreTypeConstructorParams<Type> {
-  defaultCheckers: Checker<Type>[];
   type: Types;
+  defaultBeforeTransform?: BeforeTransform[];
+  defaultCheckers?: Checker<Type>[];
   defaultValue?: DefaultValueType<Type>;
-  defaultLazyCheckers?: Type extends IObject
-    ? LazyObjectType<any>[]
-    : LazyType<any>[];
+  defaultLazyCheckers?: TypeLazyChecker<Type>;
   errorMessageMap?: TypeErrorMap;
 }
 
@@ -76,6 +81,8 @@ export abstract class CoreType<Type> {
   protected _type: Types;
 
   protected _checkers: Checker<Type>[];
+
+  protected _beforeTransform: BeforeTransform[];
 
   protected _lazyCheckers: LazyType<any>[];
 
@@ -87,17 +94,17 @@ export abstract class CoreType<Type> {
 
   strictParser: (
     raw: any,
-    ctx?: Omit<ParserContext, "throwOnFirstError">
+    ctx?: Omit<ParserContext, 'throwOnFirstError'>
   ) => Type;
 
   tryParser: (
     x: any,
-    ctx?: Omit<ParserContext, "tryParser">
+    ctx?: Omit<ParserContext, 'tryParser'>
   ) => NoneDeepPartial<Type>;
 
   tryDeepParser: (
     x: any,
-    ctx?: Omit<ParserContext, "deepTryParser" | "tryParser">
+    ctx?: Omit<ParserContext, 'deepTryParser' | 'tryParser'>
   ) => DeepPartial<Type>;
 
   optional: () => OneOfType<[this, UndefinedType]>;
@@ -124,12 +131,14 @@ export abstract class CoreType<Type> {
   ) => ErrorSubjectBase;
 
   constructor(params: CoreTypeConstructorParams<Type>) {
+    this._beforeTransform = params.defaultBeforeTransform || [];
     this._checkers = params.defaultCheckers || [];
     this._type = params.type;
     this._lazyCheckers = params.defaultLazyCheckers || ([] as any);
     this._errorMessageMap = new Map(params.errorMessageMap || []);
 
     this.parser = runnerParser({
+      beforeTransform: this._beforeTransform,
       checkers: this._checkers,
       lazyCheckers: this._lazyCheckers,
       schemaType: this,
@@ -219,29 +228,45 @@ export abstract class CoreType<Type> {
   }
 
   protected _extends(
-    payload: Pick<CoreTypeConstructorParams<Type>, "errorMessageMap"> & {
+    payload: Pick<CoreTypeConstructorParams<Type>, 'errorMessageMap'> & {
       checkers?: Checker<Type>[];
+      beforeTransform?: BeforeTransform[];
       lazy?: LazyType<Type>[];
     }
   ): this {
-    return new (this as any).constructor({
+    const params: CoreTypeConstructorParams<Type> = {
+      defaultBeforeTransform: [
+        ...this._beforeTransform,
+        ...(payload.beforeTransform || []),
+      ],
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
-      defaultLazyCheckers: [...this._lazyCheckers, ...(payload.lazy || [])],
+      defaultLazyCheckers: [
+        ...this._lazyCheckers,
+        ...(payload.lazy || []),
+      ] as TypeLazyChecker<Type>,
       type: this._type,
       defaultValue: this._defaultValue,
       errorMessageMap: payload.errorMessageMap,
+    };
+
+    return new (this as any).constructor(params);
+  }
+
+  protected _lazy(lazyOptions: LazyType<any>[]): this {
+    return this._extends({
+      lazy: [...this._lazyCheckers, ...lazyOptions],
+    });
+  }
+
+  before<Output = unknown>(transformer: BeforeTransform<Output>): this {
+    return this._extends({
+      beforeTransform: [transformer],
     });
   }
 
   check(checker: Checker<Type>): this {
     return this._extends({
       checkers: [...this._checkers, checker],
-    });
-  }
-
-  _lazy(lazyOptions: LazyType<any>[]): this {
-    return this._extends({
-      lazy: [...this._lazyCheckers, ...lazyOptions],
     });
   }
 

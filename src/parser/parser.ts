@@ -1,11 +1,14 @@
 import { CoreType, DateType, Types } from '../datatype';
-import { ErrorSet, ErrorSubject, ErrorCode } from '../error';
+import { ErrorCode, ErrorSet, ErrorSubject } from '../error';
+import { clone } from '../utils';
 import { Checker, LazyType } from './checker';
+import { BeforeTransform } from './transform';
 
-export interface ParserPayload {
-  checkers: Checker<any>[];
-  lazyCheckers: LazyType<any>[];
-  schemaType: CoreType<any>;
+export interface ParserPayload<Type> {
+  checkers: Checker<Type>[];
+  beforeTransform: BeforeTransform[];
+  lazyCheckers: LazyType<Type>[];
+  schemaType: CoreType<Type>;
 }
 
 export interface ParserContext {
@@ -16,11 +19,24 @@ export interface ParserContext {
   throwOnFirstError?: boolean;
 }
 
-export const runnerParser = ({
+const beforeTransformRunner = (
+  inputData: unknown,
+  ...transformers: Array<BeforeTransform>
+) => {
+  let transformedData = clone(inputData);
+  for (let index = 0; index < transformers.length; index++) {
+    transformedData = transformers[index](clone(transformedData));
+  }
+
+  return transformedData;
+};
+
+export const runnerParser = <Type = any>({
+  beforeTransform,
   checkers,
   lazyCheckers,
   schemaType,
-}: ParserPayload) => {
+}: ParserPayload<Type>) => {
   return (
     raw: any,
     {
@@ -37,16 +53,18 @@ export const runnerParser = ({
       throwOnFirstError: false,
     }
   ) => {
-    let returnValue = raw;
+    let returnValue = clone(raw);
     let errors: ErrorSubject[] = [];
     let shouldThrowError = false;
 
     const { defaultValue, type, throwError } = schemaType;
 
+    returnValue = beforeTransformRunner(returnValue, ...beforeTransform);
+
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
       let slotErrors: ErrorSubject[] = [];
-      const passed = checker(raw, {
+      const passed = checker(returnValue, {
         ctx: {
           paths: paths || [],
           tryParser,
@@ -80,7 +98,7 @@ export const runnerParser = ({
 
       if (defaultValue && slotHasError) {
         if (typeof defaultValue === 'function' && type !== Types.func) {
-          returnValue = defaultValue();
+          returnValue = (defaultValue as Function)();
         } else {
           returnValue = defaultValue;
         }
@@ -120,7 +138,7 @@ export const runnerParser = ({
       for (let index = 0; index < lazyCheckers.length; index++) {
         const { checker, message, defaultPaths, errorType } =
           lazyCheckers[index];
-        const passed = checker(raw);
+        const passed = checker(returnValue);
         if (!passed) {
           const error = new ErrorSubject({
             code: errorType || ErrorCode.custom_error,

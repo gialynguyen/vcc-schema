@@ -19,7 +19,8 @@ module.exports = {
     '!**/src/**/*.test.ts',
     '!**/src/error/logger.ts',
     '!**/src/**/index.ts',
-    '!**/src/datatype/base.ts'
+    '!**/src/datatype/base.ts',
+    '!**/src/utils/*.ts'
   ],
   coverageDirectory: 'coverage',
   moduleDirectories: ['node_modules', 'src'],
