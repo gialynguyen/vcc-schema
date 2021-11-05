@@ -2,11 +2,12 @@ import { CoreType, DateType, Types } from '../datatype';
 import { ErrorCode, ErrorSet, ErrorSubject } from '../error';
 import { clone } from '../utils';
 import { Checker, LazyType } from './checker';
-import { BeforeTransform } from './transform';
+import { AfterTransform, BeforeTransform } from './transform';
 
 export interface ParserPayload<Type> {
   checkers: Checker<Type>[];
   beforeTransform: BeforeTransform[];
+  afterTransform: AfterTransform<Type>[];
   lazyCheckers: LazyType<Type>[];
   schemaType: CoreType<Type>;
 }
@@ -19,9 +20,9 @@ export interface ParserContext {
   throwOnFirstError?: boolean;
 }
 
-const beforeTransformRunner = (
+const transformRunner = (
   inputData: unknown,
-  ...transformers: Array<BeforeTransform>
+  transformers: Array<BeforeTransform> | Array<AfterTransform<any>>
 ) => {
   let transformedData = clone(inputData);
   for (let index = 0; index < transformers.length; index++) {
@@ -34,6 +35,7 @@ const beforeTransformRunner = (
 export const runnerParser = <Type = any>({
   beforeTransform,
   checkers,
+  afterTransform,
   lazyCheckers,
   schemaType,
 }: ParserPayload<Type>) => {
@@ -59,7 +61,7 @@ export const runnerParser = <Type = any>({
 
     const { defaultValue, type, throwError } = schemaType;
 
-    returnValue = beforeTransformRunner(returnValue, ...beforeTransform);
+    returnValue = transformRunner(returnValue, beforeTransform);
 
     for (let index = 0; index < checkers.length; index++) {
       const checker = checkers[index];
@@ -131,6 +133,8 @@ export const runnerParser = <Type = any>({
           if (format === 'ISO' || format === 'strictISO')
             returnValue = new Date(returnValue);
         }
+
+        returnValue = transformRunner(returnValue, afterTransform);
       }
     }
 

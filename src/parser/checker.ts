@@ -1,9 +1,6 @@
 import { IObject } from "../@types";
-import {
-  ErrorExtendSubjectClass,
-  ErrorSubject as ErrorSubjectBase,
-  ErrorCodeType,
-} from "../error";
+import { ErrorCodeType, ErrorExtendSubjectClass, ErrorSubject as ErrorSubjectBase } from "../error";
+
 export interface CheckerContext {
   paths: (string | number)[];
   tryParser?: boolean;
@@ -22,7 +19,7 @@ export interface CheckerOptions {
 export type Checker<ExpectedType, Input = any> = (
   value: Input,
   options: CheckerOptions
-) => ExpectedType | ErrorSubjectBase | ErrorSubjectBase[];
+) => true | ExpectedType | ErrorSubjectBase | ErrorSubjectBase[];
 
 export type LazyObjectTypeChecker<
   Type extends IObject,

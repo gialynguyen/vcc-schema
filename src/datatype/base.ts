@@ -1,4 +1,5 @@
 import { isArray } from 'vcc-utils';
+
 import { DeepPartial, ICallback, IObject, NoneDeepPartial } from '../@types';
 import {
   ErrorExtendSubjectClass,
@@ -6,6 +7,7 @@ import {
   ErrorSubject as ErrorSubjectBase,
 } from '../error';
 import {
+  AfterTransform,
   BeforeTransform,
   Checker,
   LazyObjectType,
@@ -72,6 +74,7 @@ export interface CoreTypeConstructorParams<Type> {
   type: Types;
   defaultBeforeTransform?: BeforeTransform[];
   defaultCheckers?: Checker<Type>[];
+  defaultAfterTransform?: AfterTransform<Type>[];
   defaultValue?: DefaultValueType<Type>;
   defaultLazyCheckers?: TypeLazyChecker<Type>;
   errorMessageMap?: TypeErrorMap;
@@ -83,6 +86,8 @@ export abstract class CoreType<Type> {
   protected _checkers: Checker<Type>[];
 
   protected _beforeTransform: BeforeTransform[];
+
+  protected _afterTransform: AfterTransform<Type>[];
 
   protected _lazyCheckers: LazyType<any>[];
 
@@ -133,6 +138,7 @@ export abstract class CoreType<Type> {
   constructor(params: CoreTypeConstructorParams<Type>) {
     this._beforeTransform = params.defaultBeforeTransform || [];
     this._checkers = params.defaultCheckers || [];
+    this._afterTransform = params.defaultAfterTransform || [];
     this._type = params.type;
     this._lazyCheckers = params.defaultLazyCheckers || ([] as any);
     this._errorMessageMap = new Map(params.errorMessageMap || []);
@@ -140,6 +146,7 @@ export abstract class CoreType<Type> {
     this.parser = runnerParser({
       beforeTransform: this._beforeTransform,
       checkers: this._checkers,
+      afterTransform: this._afterTransform,
       lazyCheckers: this._lazyCheckers,
       schemaType: this,
     });
@@ -231,6 +238,7 @@ export abstract class CoreType<Type> {
     payload: Pick<CoreTypeConstructorParams<Type>, 'errorMessageMap'> & {
       checkers?: Checker<Type>[];
       beforeTransform?: BeforeTransform[];
+      afterTransform?: AfterTransform<Type>[];
       lazy?: LazyType<Type>[];
     }
   ): this {
@@ -240,6 +248,10 @@ export abstract class CoreType<Type> {
         ...(payload.beforeTransform || []),
       ],
       defaultCheckers: [...this._checkers, ...(payload.checkers || [])],
+      defaultAfterTransform: [
+        ...this._afterTransform,
+        ...(payload.afterTransform || []),
+      ],
       defaultLazyCheckers: [
         ...this._lazyCheckers,
         ...(payload.lazy || []),
@@ -261,6 +273,12 @@ export abstract class CoreType<Type> {
   before<Output = unknown>(transformer: BeforeTransform<Output>): this {
     return this._extends({
       beforeTransform: [transformer],
+    });
+  }
+
+  after(transform: AfterTransform<Type>): this {
+    return this._extends({
+      afterTransform: [transform],
     });
   }
 
